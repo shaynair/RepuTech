@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<link rel="stylesheet" type="text/css" href="assets/css/Sign-Up.css">
+<link rel="stylesheet" href="assets/css/style.css">
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Welcome</title>
+</head>
+
+<body>
+
+<header>
+   <div class="nav-container">
+         <nav>
+             <a href="index.html" class="logo"> <!--Link to index of webpage-->
+                 <img border="0" alt="CareFree" src="assets/images/logo.png" width="200" height="50">
+             </a>
+             <a href="/login" class="button" style="float:right">Log In</a>
+             <a href="sign-up.html" class="button" style="float:right">Sign Up</a>
+             <!--Should display View Profile button after logging in-->
+         </nav>
+    </div>
+</header>
+
+<script src="sign-up.js">
+</script>
+
+<main>
+  
+  <section id="form-sec">
+    <h1 id="title">Sign Up Form</h1>
+    <form type="post" onsubmit="return validate()">
+	
+	  <span id="email_err" class="error"></span>
+	  <input type="text" name="email" id="email" class="reg-inp" placeholder="Enter Your Email Address..."/><br/>
+	  
+	  <span id="email2_err" class="error"></span>
+	  <input type="text" name="email2" id="email2" class="reg-inp" placeholder="Re-Enter Your Email Address..."><br/>
+	  
+	  <span id="pass_err" class="error"></span>
+	  <input type="password" name="pass" id="pass" class="reg-inp" placeholder="Enter Your Password..."/>
+	  
+	  <span id="name_err" class="error"></span>
+	  <input type="text" class="name" id="name"  name="firstname" placeholder="First Name..."/>	  
+	  
+	  <input type="text" class="name" id="lastname"  name="firstname" placeholder="Last Name..."/>	  
+	  
+	  <select class="loc" id="country" name="country">
+            <option disabled selected>Country</option>
+      </select>
+	  
+      <select class="loc" id="state" name="state" >
+          <option selected >State/Province</option>
+      </select>
+	  
+	  <span id="city_err" class="error"></span>
+	  <input type="text" class="reg-inp" id="city" name="city" placeholder="City"/>
+	  
+	  <span id="address_err" class="error"></span>
+	  <input type="text" class="reg-inp" id="address"  name="address" placeholder="Address..." maxlength="50"/><br/>
+      <span class="check_box">
+            <input type="checkbox" name="addr-perm"/> <em>Check The Box to Hide Your Address From Other Users.</em><br>
+      </span>	  
+	  
+	  <span id="post_err" class="error"></span>
+	  <input type="text" class="reg-inp" id="postcode"  name="postcode" placeholder="Postal Code..." maxlength="6"/><br/>
+	  
+	  <span id="phone_err" class="error"></span>
+	  <input type="number" class="reg-inp" id="phone"  name="phone" placeholder="Phone Number..."/><br/>	  
+	  
+	  <input type="submit" id="submit" value="Sign Up"/>	  
+	 </form>
+   </section>
+</main>
+<footer> 
+   <p>Copyright placeholder</p>
+</footer>
+</body>
+</html>
