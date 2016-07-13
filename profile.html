@@ -3,15 +3,29 @@
     <head>
         <title>Profile</title>
         <meta charset="utf-8">
-        
-        <link rel="stylesheet" href="./assets/css/style.css" type="text/css">
+        <link rel="stylesheet" href="assets/css/style.css" type="text/css">
+        <link rel="stylesheet" href="assets/css/profile.css" type="text/css">
         <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 
-        <script type="text/javascript" src="./assets/scripts/jquery-2.2.4.js"></script>
-        <script type="text/javascript" src="./assets/scripts/script.js" defer></script>
+        <script type="text/javascript" src="assets/scripts/jquery-2.2.4.js"></script>
+        <script type="text/javascript" src="assets/scripts/profile.js" defer></script>
 
     </head>
     <body>
+        <header>
+           <div class="nav-container">
+                 <nav>
+                     <a href="index.html" class="logo"> <!--Link to index of webpage-->
+                         <img border="0" alt="RepuTech" src="assets/images/logo.png" width="200" height="40">
+                     </a>
+                     <a href="login.html" class="button" style="float:right">Log In</a>
+                     <a href="sign-up.html" class="button" style="float:right">Sign Up</a>
+                     <!--Should display View Profile button after logging in-->
+                     <a href="profile.html" class="button" style="float:right">Temp Profile</a>
+                 </nav>
+            </div>
+        </header>
+        
         <div class="profile-container">
             <section class="profile-sidebar">
                 
@@ -45,7 +59,7 @@
                     <section class="profile-menu">
                         <ul class="nav">
                             <li>
-                                <a href="index.html" class="self">
+                                <a href="profile.html" class="self">
                                 Profile</a>
                             </li>
                             <li>
@@ -61,11 +75,9 @@
             </section>
 
             <section class="profile-content">
-
-
             </section>
+            
         </div>
-
         
     </body>
     

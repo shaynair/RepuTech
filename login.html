@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-
-<link rel="stylesheet" type="text/css" href="assets/css/login.css">
-<link rel="stylesheet" type="text/css" href="assets/css/style.css">
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Welcome</title>
+    <link rel="stylesheet" type="text/css" href="assets/css/login.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <title>Welcome</title>
 </head>
 
 <body>
@@ -14,11 +13,12 @@
    <div class="nav-container">
          <nav>
              <a href="index.html" class="logo"> <!--Link to index of webpage-->
-                 <img border="0" alt="CareFree" src="assets/images/logo.png" width="200" height="50">
+                 <img border="0" alt="RepuTech" src="assets/images/logo.png" width="200" height="40">
              </a>
-             <a href="/login" class="button" style="float:right">Log In</a>
+             <a href="login.html" class="button" style="float:right">Log In</a>
              <a href="sign-up.html" class="button" style="float:right">Sign Up</a>
              <!--Should display View Profile button after logging in-->
+             <a href="profile.html" class="button" style="float:right">Temp Profile</a>
          </nav>
     </div>
 </header>
@@ -27,14 +27,12 @@
 
 <section id="log-sec">
     <h1 id="title">Login</h1>
-   <form type="post" onsubmit="return login_check()">
-    <input type="text" name="email" id="email" class="reg-inp" placeholder="Email Address..."/>
-	<input type="password" name="pass" id="pass" class="reg-inp" placeholder="Password..."/>
-    <input type="submit" id="submit" value="Login"/>
-   </form> <br/>
-   <section id="fb-icon">
-   </section>		
-
+    <form type="post" onsubmit="return login_check()">
+        <input type="text" name="email" id="email" class="reg-inp" placeholder="Email Address..."/>
+        <input type="password" name="pass" id="pass" class="reg-inp" placeholder="Password..."/>
+        <input type="submit" id="submit" value="Login"/>
+    </form> <br/>
+    <section id="fb-icon"></section>		
 </section>
 
 </main>
