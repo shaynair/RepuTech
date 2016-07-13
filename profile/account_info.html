@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Account Information</title>
+        <meta charset="utf-8">
+        
+        <link rel="stylesheet" href="./assets/css/style.css" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+
+    </head>
+    <body>
+        <div class="profile-container">
+            <section class="profile-sidebar">
+                
+                    <div class="profile-pic">
+                        <img src="http://placehold.it/100x100">
+                    </div>
+                
+                    <section class="profile-rating">
+                        <span class="star1">&#9733</span>
+                        <span class="star2">&#9733</span>
+                        <span class="star3">&#9733</span>
+                        <span class="star4">&#9733</span>
+                        <span class="star5">&#9734</span>
+                    </section>
+                
+                    <section class="profile-title">
+                        <div class="profile-title-name">
+                            John Doe
+                        </div>
+                        <div class="profile-title-job">
+                            Smartphone Technician
+                        </div>
+                    </section>
+                
+                    <section class="profile-buttons">
+                        <button>Follow</button>
+                        <button>Message</button>
+                    </section>
+
+                    <section class="profile-menu">
+                        <ul class="nav">
+                            <li>
+                                <a href="index.html" class="self">
+                                Profile</a>
+                            </li>
+                            <li>
+                                <a href="messages.html" class="self">
+                                Messages</a>
+                            </li>
+                            <li>
+                                <a href="account_info.html" class="self">
+                                Account Settings</a>
+                            </li>
+                        </ul>
+                    </section>
+            </section>
+
+            <section class="profile-content">
+                <form>
+                    <fieldset>
+                        <legend>Personal Information:</legend>
+                        First name:
+                        <input type="text" id="firstname" value="John">
+                        Last name:
+                        <input type="text" id="lastname" value="Doe"><br>
+                        Country:
+                        <input type="text" id="country" value="Canada">
+                        Province/State:
+                        <input type="text" id="province-state" value="Ontario">
+                        City:
+                        <input type="text" id="city" value="Toronto"><br>
+                        House #:
+                        <input type="text" id="housenum" value="123">
+                        Unit #: 
+                        <input type="text" id="unit">
+                        Street:
+                        <input type="text" id="street" value="Street Ave.">
+                        Postal Code:
+                        <input type="text" id="postalcode" value="A1A 2B2"><br>
+                        Phone #:
+                        <input type="text" id="phonenum" value="111-111-1111"><br>
+                    </fieldset>
+                    <br>
+                    <fieldset>
+                        <legend>Account Information:</legend>
+                        Email:<br>
+                        <input type="text" id="email" value="john.doe@email.com"><br>
+                        New Password:<br>
+                        <input type="text" id="newpass"><br>
+                        New Password (must be same as above): <br>
+                        <input type="text" id="newpass-confirmation"><br>
+                        Current Password (must be entered to make any account changes): <br>
+                        <input type="text" id="currentpass"><br>
+                    </fieldset>
+                    <br>
+                    <input type="submit" value="Submit">
+                    
+                </form>
+
+            </section>
+        </div>
+
+        
+    </body>
+    
+</html>
