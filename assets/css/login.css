@@ -47,7 +47,7 @@ main{
  width: 293px;
  height: 62px;
  background: red;
- background-image: url('fb.jpg');
+ background-image: url('../images/fb.jpg');
  background-size:cover;
  background-repeat: no-repeat;
  margin-top: 2em;
