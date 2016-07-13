@@ -1,0 +1,108 @@
+html,body{
+ padding:0;
+ margin:0;
+}
+header{
+ margin: 0;
+ width: 100%;
+ height: auto;
+}
+
+main{
+ width: 100%;
+ /*min-width: 1200;*/
+ height: auto;
+ min-height: 640px;
+ background: #dedede; 
+ padding-bottom: 5em;
+ margin-top: -1px;
+ padding-top: 1px; 
+ margin-bottom: -1px;
+ padding-bottom: 1px;
+}
+
+#log-sec{
+ width: 40%;
+ margin-top: 8em;
+ margin-left: auto;
+ margin-right: auto;
+ margin-bottom: 5em;
+ background: white; 
+ border-radius: 10px;
+ box-shadow: 0 0 10px 2px grey;
+ border: 2px solid grey;
+ height: 450px;
+}
+
+ #log-sec form{
+ width: 70%;
+ padding-bottom: 1em;
+ margin-top: 1em;
+ margin-left: auto;
+ margin-right: auto;
+ 
+}
+
+#fb-icon{
+ width: 293px;
+ height: 62px;
+ background: red;
+ background-image: url('fb.jpg');
+ background-size:cover;
+ background-repeat: no-repeat;
+ margin-top: 2em;
+ margin-left: auto;
+ margin-right: auto;
+}
+
+.reg-inp{
+ width: 96%; 
+ padding-left: .5em;
+ outline: none;
+ 
+ margin-top: .4em;
+ margin-bottom: .4em;
+ height: 2em;
+ border-radius: 10px;
+ color:#595959;
+ border: 2px solid lightgrey;
+ font: 1.3em Arial, Helvetica, sans-serif;
+
+
+}
+
+.reg-inp:focus{
+ border: 2px solid #80b3ff;
+ box-shadow: 0px 0px 8px #b3d1ff;
+}
+
+#submit{
+ width:100%;
+ margin-top: 1em;
+ color: #8600b3;
+ height: 2em;
+ border-radius: 10px;
+ border: 2px solid darkgrey;
+ transition-duration: .4s;
+ font-weight: bold;
+ font:1.4em  Arial, Helvetica, sans-serif;
+}
+
+#submit:hover{
+ cursor:pointer;
+ background: #8600b3;
+ color: white;
+}
+
+#title{
+ width: 70%;
+ margin-left:auto;
+ margin-right:auto;
+ text-align: center;
+ font-weight: bold;
+ font: 1.8em Arial, Helvetica, sans-serif; 
+ color: #8600b3;
+ padding-top: 1em;
+ padding-bottom: 5px;
+ border-bottom: 1px solid lightgrey;
+}
