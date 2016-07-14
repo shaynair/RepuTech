@@ -251,9 +251,16 @@ header h1 {
 
 /* Profile page */
 
-.sidebar, .profile-content {
+.sidebar, .profile-content, .topbar, .post-comments, .post-reviews {
     padding: 1em;
     background-color: white;
+}
+
+.blog {
+	padding: 3em;
+	background-color: white;
+	text-align: center;
+	overflow: scroll-y;
 }
 
 .profile-title {
@@ -261,13 +268,13 @@ header h1 {
 	color: grey;
 }
 
-.profile-status {
+.profile-status, .post-review {
     margin-bottom: 1em;
 	color: green;
 }
 
-.profile-blog, .admin-user, .post {
-	border: 1px solid black;
+.profile-blog, .admin-user, .post, .post-similar, .post-review, .post-comment {
+	border: 1px solid grey;
 	border-radius: 0.5em;
     margin: 1em;
     padding: 1em;
@@ -275,7 +282,28 @@ header h1 {
     overflow: scroll-y;
 }
 
-.post h2, .blog, .portal {
+.post, .post-similar, .post-review, .post-comment {
+	transition: border 0.5s, transform 0.5s;
+}
+
+.post:hover, .post-similar:hover, .post-review:hover, .post-comment:hover {
+	border: 1px solid lightgrey;
+	transform: scale(1.01);
+}
+
+.post-full {
+	padding: 2em;
+}
+
+.post-img {
+	border-radius: 1em;
+}
+
+.post-similar {
+	float: left;
+}
+
+.post h2, .post-full h2, .portal {
 	text-align: center;
 }
 
@@ -345,7 +373,7 @@ footer a:link {
 		top: 9em; /* header */
 	}
 	
-	.admin-report .profile-title {
+	.admin-report-user {
 		width: 50%;
 		float: left;
 	}
