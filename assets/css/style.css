@@ -138,7 +138,7 @@ a, a > * {
 }
 
 a:hover, a > *:hover {
-	opacity: 0.8;
+	opacity: 0.6;
 }
 
 button { 
@@ -148,12 +148,11 @@ button {
     cursor: pointer;
     text-decoration: none;
     margin: 0.5em 1em;
-	transition: background-color 0.4s, opacity 0.4s;
+	transition: background-color 0.4s;
 }
 
 button:hover {
     background-color: #448AFF;
-	opacity: 0.8;
 }
 
 main, footer {
@@ -194,12 +193,6 @@ input[type="password"]:focus, input[type="email"]:focus{
 .logo img {
     padding: 0.25em;
 	max-height: 12em; /* nav bar size */
-	
-	transition: opacity 0.4s;
-}
-
-.logo img:hover {
-	opacity: 0.6;
 }
 
 nav {
@@ -282,7 +275,7 @@ header h1 {
     overflow: scroll-y;
 }
 
-.post h2, .blog {
+.post h2, .blog, .portal {
 	text-align: center;
 }
 

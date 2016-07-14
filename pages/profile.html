@@ -11,18 +11,20 @@
 		<meta name="Copyright" content="Akshay Nair, Seyed Hossein Fazeli, Anson Chen, Kevin Thich" />
 		
 		<!-- Title of the page -->
-        <title>RepuTech - Messages</title>
+        <title>RepuTech - Profile</title>
         <meta name="description" content="Reputable technology aid services">
 		
 		<!-- Assets, CSS, JS -->
-		<script defer src="assets/scripts/jquery-3.0.0.min.js"></script>
-        <link rel="stylesheet" href="assets/css/style.css">
+		<script defer src="../assets/scripts/jquery-3.0.0.min.js"></script>
+        <link rel="stylesheet" href="../assets/css/style.css">
+        <script src="../assets/scripts/profile.js" defer></script>
+
     </head>
     <body>
         <!--Navigation menu at top-->
         <nav>
             <a href="index.html" class="logo"> <!--Link to index of webpage-->
-                <img alt="Logo" src="assets/images/logo.png" />
+                <img alt="Logo" src="../assets/images/logo.png" />
             </a>
 			<section class="right">
 				<form id="search-form" method="post" action="search.html" class="inline-form">
@@ -39,14 +41,13 @@
             <section class="sidebar flexbox flexbox-column">
                 
                 <section class="profile-pic">
-                    <img alt="Avatar" src="assets/images/avatar.png">
+                    <img alt="Avatar" src="../assets/images/avatar.png">
                 </section>
                 
 				<section class="profile-status">
 					<p>&#9733&#9733&#9733&#9733&#9734</p>
 					<p>23 Followers</p>
                 </section>
-                
                 <section class="profile-title">
                     <h3>John Doe</h3>
                     <p>Smartphone Technician</p>
@@ -54,7 +55,12 @@
 					<p>Mood: Tech-tastic</p>
                 </section>
                 
+                <section class="profile-buttons">
+                    <a href="profile.html" class="other"><button>Follow</button></a>
+                    <a href="messages.html" class="other"><button>Message</button></a>
+                </section>
 				<section class="profile-menu">
+                    <a href="messages.html" class="self"><button>Messages</button></a>
                     <a href="account_info.html" class="self"><button>Settings</button></a>
 					<a href="post.html" class="self"><button>Create Listing</button></a>
                 </section>
@@ -62,23 +68,13 @@
 					<a href="blog.html"><p>Lorem Ipsum</p></a>
                     <a href="blog.html" class="self"><button>New Blog</button></a>
                 </section>
+				
             </section>
 
             <section class="profile-content">
-                <section id="messages">
-                    <section class="post">
-                        <p>A A: Hey!</p>
-                        <button>Reply</button>
-                    </section>
-                    <section class="post">
-                        <p>Jane D: Hi John</p>
-                        <p>John Doe: Hey Jane!</p>
-                        <button>Reply</button>
-                    </section>
-                </section>
             </section>
-        </main>
-
+            
+        </main> 
 		
 		<!-- Footer, copyright -->
         <footer>
@@ -93,5 +89,4 @@
 			</p>
         </footer>
     </body>
-    
 </html>
