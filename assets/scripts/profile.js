@@ -41,9 +41,9 @@ function initialize() {
         $(curr_id).append($('<p/>', {class: 'author', text: 'Posted by: ' + posts[i].author}));
         $(curr_id).append($('<p/>', {class: 'post_type', id: 'type-' + i}));
         if (posts[i].type === 'Searching') {
-            $('#type-' + i).text("Searching for pet service");
+            $('#type-' + i).text("Searching for service");
         } else {
-            $('#type-' + i).text("Offering pet service");
+            $('#type-' + i).text("Offering service");
         }
         if (posts[i].contact_info != '') {
             $(curr_id).append($('<p/>', {class: 'contact-info', text: 'Contact Info: ' + posts[i].contact_info}));

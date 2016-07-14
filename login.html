@@ -1,45 +1,61 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <link rel="stylesheet" type="text/css" href="assets/css/login.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
-    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-    <title>Welcome</title>
-</head>
+    <head>
+		<!-- Responsive Design Tags -->
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="ie=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+		
+		<!-- Copyright information. -->
+		<meta name="author" content="Akshay Nair, Seyed Hossein Fazeli, Anson Chen, Kevin Thich" />
+		<meta name="Copyright" content="Akshay Nair, Seyed Hossein Fazeli, Anson Chen, Kevin Thich" />
+		
+		<!-- Title of the page -->
+        <title>RepuTech - Log In</title>
+        <meta name="description" content="Reputable technology aid services">
+		
+		<!-- Assets, CSS, JS -->
+		<script defer src="assets/scripts/jquery-3.0.0.min.js"></script>
+        <link rel="stylesheet" href="assets/css/style.css">
+    </head>
 
-<body>
+	<body>
 
-<header>
-   <div class="nav-container">
-         <nav>
-             <a href="index.html" class="logo"> <!--Link to index of webpage-->
-                 <img border="0" alt="RepuTech" src="assets/images/logo.png" width="200" height="40">
-             </a>
-             <a href="login.html" class="button" style="float:right">Log In</a>
-             <a href="sign-up.html" class="button" style="float:right">Sign Up</a>
-             <!--Should display View Profile button after logging in-->
-             <a href="profile.html" class="button" style="float:right">Temp Profile</a>
-         </nav>
-    </div>
-</header>
+        <!--Navigation menu at top-->
+        <nav>
+            <a href="index.html" class="logo"> <!--Link to index of webpage-->
+                <img alt="Logo" src="assets/images/logo.png" />
+            </a>
+                
+            <a href="signup.html" class="right"><button>Sign Up</button></a>
+        </nav>
 
-<main>
-
-<section id="log-sec">
-    <h1 id="title">Login</h1>
-    <form type="post" onsubmit="return login_check()">
-        <input type="text" name="email" id="email" class="reg-inp" placeholder="Email Address..."/>
-        <input type="password" name="pass" id="pass" class="reg-inp" placeholder="Password..."/>
-        <input type="submit" id="submit" value="Login"/>
-    </form> <br/>
-    <section id="fb-icon"></section>		
-</section>
-
-</main>
-<footer>
-    <p>Copyright placeholder</p>
-</footer>
-</body>
+		<!-- Main login form -->
+		<main>
+			<section class="modal-box">
+				<h2 class="title">Log In</h2>
+				<form method="post" id="login-form" action="profile.html">
+					<input type="text" name="email" id="email" placeholder="Email Address..."/>
+					<input type="password" name="pass" id="pass" placeholder="Password..."/>
+					<button type="submit" form="login-form" value="Log In">Log In</button>
+				</form>
+				<a href=""><img alt="Facebook" src="assets/images/fb.jpg" /></a>
+			</section>
+		</main>
+		
+		<!-- Footer, copyright -->
+        <footer>
+            <p>
+                Banner image from <a href="http://connectnc.com/wp-content/uploads/2015/06/computerrepair.jpg">here</a>
+			</p>
+			<p>
+                Icons from <a href="http://www.flaticon.com">Flaticon</a>
+            </p>
+			<p>
+				&copy; Akshay Nair, Seyed Hossein Fazeli, Anson Chen, Kevin Thich | Made for <a href="http://www.cdf.toronto.edu/~csc309h/summer">CSC309, Summer 2016</a>.
+			</p>
+        </footer>
+	</body>
 </html>
 
 

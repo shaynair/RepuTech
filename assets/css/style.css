@@ -1,192 +1,352 @@
-* {
-    padding: 0;
-    margin: 0;
-    font-family: Helvetica, Arial, sans-serif;
+
+/* 'Hacks' section for responsive design
+------------------------------------------------------------- */
+/* Handle box-sizing cross browsers */
+html {
+	box-sizing: border-box;
 }
 
-/* Logo on top left */ 
+*, *:before, *:after {
+	box-sizing: inherit;
+}
+
+/* Responsive images */
 img {
-    padding: 5px;
+	max-width: 100%;
 }
 
-.nav-container {
-    width: 100%;
-    position: fixed;
-    top: 0px;
-    background-color: white;
-    display: inline-block;
-    z-index: 10;
-    border-bottom: 1px solid lightgrey;
+
+/* Global styles section
+------------------------------------------------------------- */
+html, body {
+	/* Standardize font so we can resize it later */
+	font-size: 100%;
+	height: 100%;
 }
 
-nav {
-    margin: 0px auto;
-    max-width: 1000px;
-    height: 50px;
+body, nav, footer, header {
+	width: 100%;
+	margin: 0 auto;
+	padding: 0 0;
+	font-family: Helvetica, Geneva, Tahoma, sans-serif;
 }
 
-.login-form .form-group {
-    display: inline-block;
-    vertical-align: middle;
+/* Helper classes */
+.flexbox {
+	/* Flexbox container for responsively changing rows/columns */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	align-content: center;
 }
 
-.login-form .form-group .form-control {
-    display: block;
-    height: 15px;
-    padding: 8px 12px;
-    font-size: 14px;
-    color: #555;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+.flexbox-row {
+	flex-flow: row wrap;
 }
 
-.button { 
-    background: #1976D2;
-    color: #FFF;
-    border: none;
-    margin-top: 8px;
-    margin-right: 10px;
-    padding: 8px 16px;
-    font-size: 1em;
-    transition-duration: 0.4s;
-    cursor: pointer;
-    text-decoration: none;
-    border-radius: 5px;
+.flexbox-column {
+	flex-flow: column wrap;
 }
 
-.button:hover {
-    background-color: #448AFF;
-    color: #fff;
+.flexbox > * {
+	flex: 1;
+	text-align: center;
 }
 
-.banner {
-    width: 100%;
-    height: 500px;
-    top: 50px; /* 50px header */ 
-    position: fixed;
-    /* Background picture darker to read text easier */ 
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), 
-        url('../../assets/images/banner-small.png');
-    background-size: cover;  /* Cover the whole area */ 
-    text-align: center;
-    z-index: -1;
+.flexbox:after { 
+	/* hack for clearing floats */
+	content: " "; 
+	display: block; 
+	clear: both; 
 }
 
-.banner h1 {
-    display: block;
+.modal-box {
+	width: 80%;
+	margin: 0 auto;
+	background-color: white; 
+	border-radius: 1em;
+	box-shadow: 0 0 1em 2px grey;
+	border: 2px solid grey;
+}
+
+.modal-box > * {
+	display: block;
+	text-align: center;
+	margin: 1em auto;
+}
+
+.modal-box img {
+	padding: 1em;
+}
+
+.modal-box h2 {
+	padding-bottom: 0.25em;
+	border-bottom: 1px solid lightgrey;
+}
+
+.right {
+	float: right;
+}
+
+.left {
+	float: left;
+}
+
+.error {
+    color: red;
+}
+
+/* Styles section
+------------------------------------------------------------- */
+
+/* Common elements */
+h1 {
     color: white;
-    padding-top: 200px;
-    padding-left: 100px;
-    padding-right: 100px;
     font-size: 2em;
     text-transform: uppercase;
     font-weight: 500; /* Thinner font */
-    letter-spacing: 3px;
+    letter-spacing: 0.125em;
     line-height: 2;
+    text-align: center;
 }
 
-.container {
-    position: relative;
-    background: #f6f6f1;
-    width: 100%;
-    top: 550px;
-}
-
-.container article {
-    color: #545454;
-    font-size: 16px;
-    line-height: 1.5;
-    margin: 0 auto;
-    padding: 20px;
-    max-width: 1000px;
-}
-
-.container article h1 {
+h2 {
     color: #1976D2;
     font-size: 2em;
     font-weight: 500;
 }
 
-.container article h2 {
-    margin-top: 20px;
+h3 {
+	font-size: 1.5em;
 }
 
-.container article p {
-    margin-top: 20px;
+button, input, select {
+	font-size: 1em;
+    padding: 0.5em 1em;
+	border-radius: 0.5em;
+} 
+
+button { 
+    background-color: #1976D2;
+    color: white;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    margin: 0.5em 1em;
+	transition: background-color 0.4s, opacity 0.4s;
 }
 
-.container article .img1 {
-    float: left;
-    margin-right: 20px;
-    margin-top: 20px;
+button:hover {
+    background-color: #448AFF;
+	opacity: 0.8;
 }
 
-.container article .img2 {
-    float: right;
-    margin-right: 20px;
-    margin-top: 20px;
+main, footer {
+	padding: 1em;
 }
 
-.search-form {
+main {
+	overflow: auto;
+    background-color: #f6f6f1;
+	margin-top: 3em;
+}
+
+input[type="number"], input[type="text"], 
+input[type="password"], input[type="email"], select {
+    color: #595959;
+    background-color: white;
+    border: 1px solid #ccc;
+	margin: 0.5em auto;
+	outline: none;
+}
+
+input[type="number"], input[type="text"]:not(.input-half), 
+input[type="password"], input[type="email"], select {
+	width: 90%;
+}
+
+input[type="number"]:focus, input[type="text"]:focus, select:focus,
+input[type="password"]:focus, input[type="email"]:focus{
+	border: 1px solid #80b3ff;
+	box-shadow: 0 0 0.5em #b3d1ff;
+}
+
+.input-half {
+	width: 44.5%;
+}
+
+/* Nav bar */ 
+.logo img {
+    padding: 0.25em;
+	max-height: 3em; /* nav bar size */
+	
+	transition: opacity 0.4s;
+}
+
+.logo img:hover {
+	opacity: 0.6;
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    background-color: white;
+    z-index: 10;
+    max-height: 3em;
+}
+
+nav button {
+	font-size: 0.5em;
+}
+
+/* Index page */
+header {
     width: 100%;
+	height: 500px;
+    top: 3em; /* header */
+    /* Background picture darker to read text easier */ 
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+				url('../images/banner-small.png') no-repeat center fixed;
+    background-size: cover;  /* Cover the whole area */ 
+    z-index: -1;
+	
+	position: relative;
 }
 
-.search-form .form-group {
+header h1 {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(calc(-50% - 1em), calc(-50% - 1em));
+}
+
+.front-article {
+    color: #545454;
+    line-height: 1.5;
+}
+
+.front-article > * {
+    margin: 1em 0;
+}
+
+.front-article img {
+    margin: 1em 1em;
+	max-height: 4em;
+	max-width: 4em;
+}
+
+.inline-form {
     display: inline-block;
     vertical-align: middle;
 }
 
-.search-form .form-group .form-control {
-    display: block;
-    height: 15px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    padding-left: 8px;
-    padding-right: 300px;
-    font-size: 14px;
-    color: #555;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+/* Profile page */
+
+.profile-sidebar, .profile-content {
+    padding: 1em;
+    background-color: white;
 }
 
+.profile-title {
+    margin-bottom: 1em;
+	color: grey;
+}
+
+.post {
+    margin: 1em auto;
+    padding: 1em;
+	border: 1px solid black;
+	border-radius: 0.5em;
+    max-height: 20%;
+    overflow: scroll-y;
+}
+
+.post h2 {
+	text-align: center;
+}
+
+legend {
+    font-size: 1.5em;
+    padding: 0 0.5em;
+}
+
+fieldset {
+    margin: 0.25em;
+    padding: 1em;
+    border: 1px solid lightgrey;
+	border-radius: 0.5em;
+}
+
+
+/* Footer */
 footer {
-    position: relative;
-    background: #2D2D2D;   
+    background-color: #2D2D2D;   
 }
 
 footer p {
     color: white;
-    margin: 0 auto;
-    max-width: 1000px;
-    padding: 30px;
+    margin: 1em auto;
+	text-align: center;
 }
 
 footer a:link {
     color: #70B5D1;
-    bottom: 0;
 }
 
-/* Screen width breakpoint, tablet size 768px. */
+/* Media queries - Mobile-first approach
+----------------------------------------------- */
 
-/* Note: Responsize design currently INCOMPLETE */
+@media screen and (min-width: 450px) {
+	nav button {
+		font-size: 1em;
+	}
+}
 
+/* Mobile, landscape */
+@media screen and (min-width: 480px) {
+}
+
+@media screen and (min-width: 580px) {
+	.profile-sidebar {
+		float: left;
+		width: 25%;
+	}
+	
+	.profile-content {
+		float: left;
+		width: 75%;
+	}
+}
+
+/* Tablet devices: portrait */
 @media screen and (min-width: 768px) {
     
-    .banner {
-        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), 
-            url('../../assets/images/banner-large.jpg');
+    header {
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+				url('../images/banner-large.jpg') no-repeat center fixed;
+		background-size: cover;
     }
     
-    .banner h1 {
-        font-size: 3em;
-    }
+	body {
+		font-size: 125%;
+	}
+}
+
+/* Tablet devices: landscape */
+@media screen and (min-width: 1024px) {
+	
+}
+
+/* Desktop */
+@media screen and (min-width: 1280px) {
+	body {
+		font-size: 150%;
+	}
 }
 
 @media screen and (min-width: 1600px) {
-    
-    .banner {
+	/* stretch */
+    header {
         background-repeat: round;
     }
 }

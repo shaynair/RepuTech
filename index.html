@@ -1,95 +1,87 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
+		<!-- Responsive Design Tags -->
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="ie=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+		
+		<!-- Copyright information. -->
+		<meta name="author" content="Akshay Nair, Seyed Hossein Fazeli, Anson Chen, Kevin Thich" />
+		<meta name="Copyright" content="Akshay Nair, Seyed Hossein Fazeli, Anson Chen, Kevin Thich" />
+		
+		<!-- Title of the page -->
         <title>RepuTech</title>
-        <meta name="description" content="A sharing economy tech aid service.">
+        <meta name="description" content="Reputable technology aid services">
+		
+		<!-- Assets, CSS, JS -->
+		<script defer src="assets/scripts/jquery-3.0.0.min.js"></script>
         <link rel="stylesheet" href="assets/css/style.css">
     </head>
     <body>
         <!--Navigation menu at top-->
-        <div class="nav-container">
-            <nav>
-                <a href="index.html" class="logo"> <!--Link to index of webpage-->
-                    <img border="0" alt="RepuTech" src="assets/images/logo.png" width="200" height="40">
-                </a>
+        <nav>
+            <a href="index.html" class="logo"> <!--Link to index of webpage-->
+                <img alt="Logo" src="assets/images/logo.png" />
+            </a>
                 
-                <!--Should display View Profile button after logging in-->
-                <a href="login.html" class="button" style="float:right">Log In</a>
-                <a href="sign-up.html" class="button" style="float:right">Sign Up</a>
-                
-                <a href="profile.html" class="button" style="float:right">Temp Profile</a>
-                
-                <!--Code for username and password input in header-->
-                
-                <!--<form class="login-form" method="post" action="/signin" style="float:right">
-                    <div class="form-group">
-                        <input name="username" type="text" placeholder="Username" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <input name="password" type="password" placeholder="Password" class="form-control">
-                    </div>
-                    <button type="submit" class="button">Sign In</button>
-                </form>-->
-            </nav>
-        </div>
+            <a href="signup.html" class="right"><button>Sign Up</button></a>
+			<a href="login.html" class="right"><button>Sign In</button></a>
+        </nav>
 
         <!--Banner-->
-        <div class="banner-container">
-            <div class="banner">
-                <h1>Reliable service for all your devices</h1>
-            </div>
-        </div>
+        <header>
+            <h1>Reliable service for all your devices</h1>
+        </header>
         
-        <div class="container">
-            <article>
-                <h1>What is RepuTech?</h1>
+		<!-- Main article information -->
+        <main>
+            <article class="front-article">
+                <h2>What is RepuTech?</h2>
                 <p>We are a service following the <strong>sharing economy</strong> paradigm, a socio-economic system built around the sharing of human and physical resources.</p>
                 
                 <p>In our case, users can offer their knowledge of various devices (PCs, laptops, Macs, smartphones) in order to help others in need regarding technological problems.</p>
                 
                 <p>We enable people to help out others in their community.</p>
-                
             </article>
             
-            <article>
-                <h1>How it works:</h1>
-                    <img class="img1" border="0" alt="Profile" src="assets/svg/user.svg" width="100" height="100">
-                    <h2>Create a profile</h2>
-                    <p>Sign up with your information and get verified to begin.</p>
-                    <br>
-                
-                    <img class="img2" border="0" alt="Profile" src="assets/svg/search.svg" width="100" height="100">
-                    <h2>Search for services</h2>
-                    <p>Whether you're looking for tech support or are offering your own time, use our search engine to discover an opportunity that suits you.</p>
-                    <br>
-                
-                    <img class="img1" border="0" alt="Profile" src="assets/svg/calendar.svg" width="100" height="100">
-                    <h2>Schedule a meeting</h2>
-                    <p>Use our built-in messenging program to arrange a meeting with another user.</p>
-                    <br>
+            <article class="front-article">
+                <h2>How it works</h2>
+                <img class="left" alt="User" src="assets/svg/user.svg">
+                <h3>Create a profile</h3>
+                <p>Sign up with your information and get verified to begin.</p>
+
+                <img class="right" alt="Search" src="assets/svg/search.svg">
+                <h3>Search for services</h3>
+                <p>Whether you're looking for tech support or are offering your own time, use our search engine to discover an opportunity that suits you.</p>
+
+                <img class="left" alt="Calendar" src="assets/svg/calendar.svg">
+                <h3>Schedule a meeting</h3>
+                <p>Use our built-in messaging program to arrange a meeting with another member.</p>
             </article>
             
-            <article>
-                <h1>Search placeholder</h1>
-                <form class="search-form" method="post" action="/signin">
-                    <div class="form-group">
-                        <input name="username" type="text" placeholder="Service" class="form-control">
-                    </div>
-                    <button type="submit" class="button">Search</button>
+           <article class="front-article">
+                <h2>Search</h2>
+                <form id="search-form" method="post" action="/search.html">
+                    <section class="inline-form">
+                        <input name="search" type="text" placeholder="Keywords...">
+                    </section>
+                    <button type="submit">Search</button>
                 </form>
             </article>
-            
-            <article>
-                <h1>Additional information placeholder</h1>
-            </article>
-            
-            <footer>
-                <p>
-                    Banner image from <a href="http://connectnc.com/wp-content/uploads/2015/06/computerrepair.jpg">Link</a><br>
-                    <br>Icons from <a href="http://www.flaticon.com">Flaticon</a>
-                </p>
-            </footer>
-        </div>
+        </main>
+		
+		<!-- Footer, copyright -->
+        <footer>
+            <p>
+                Banner image from <a href="http://connectnc.com/wp-content/uploads/2015/06/computerrepair.jpg">here</a>
+			</p>
+			<p>
+                Icons from <a href="http://www.flaticon.com">Flaticon</a>
+            </p>
+			<p>
+				&copy; Akshay Nair, Seyed Hossein Fazeli, Anson Chen, Kevin Thich | Made for <a href="http://www.cdf.toronto.edu/~csc309h/summer">CSC309, Summer 2016</a>.
+			</p>
+        </footer>
     </body>
 </html>

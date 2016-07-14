@@ -1,120 +1,104 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Account Information</title>
-        <meta charset="utf-8">
-        <link rel="stylesheet" href="assets/css/style.css" type="text/css">
-        <link rel="stylesheet" href="assets/css/profile.css" type="text/css">
-        <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+		<!-- Responsive Design Tags -->
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="ie=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+		
+		<!-- Copyright information. -->
+		<meta name="author" content="Akshay Nair, Seyed Hossein Fazeli, Anson Chen, Kevin Thich" />
+		<meta name="Copyright" content="Akshay Nair, Seyed Hossein Fazeli, Anson Chen, Kevin Thich" />
+		
+		<!-- Title of the page -->
+        <title>RepuTech - Account Info</title>
+        <meta name="description" content="Reputable technology aid services">
+		
+		<!-- Assets, CSS, JS -->
+		<script defer src="assets/scripts/jquery-3.0.0.min.js"></script>
+        <link rel="stylesheet" href="assets/css/style.css">
 
     </head>
     <body>
-        <header>
-           <div class="nav-container">
-                 <nav>
-                     <a href="index.html" class="logo"> <!--Link to index of webpage-->
-                         <img border="0" alt="RepuTech" src="assets/images/logo.png" width="200" height="40">
-                     </a>
-                     <a href="login.html" class="button" style="float:right">Log In</a>
-                     <a href="sign-up.html" class="button" style="float:right">Sign Up</a>
-                     <!--Should display View Profile button after logging in-->
-                     <a href="profile.html" class="button" style="float:right">Temp Profile</a>
-                 </nav>
-            </div>
-        </header>
-        <div class="profile-container">
-            <section class="profile-sidebar">
+        <!--Navigation menu at top-->
+        <nav>
+            <a href="index.html" class="logo"> <!--Link to index of webpage-->
+                <img alt="Logo" src="assets/images/logo.png" />
+            </a>
+        </nav>
+		
+       <main>
+            <section class="profile-sidebar flexbox flexbox-column">
                 
-                    <div class="profile-pic">
-                        <img src="http://placehold.it/100x100">
-                    </div>
+                <section class="profile-pic">
+                    <img alt="Placeholder" src="http://placehold.it/100x100">
+                </section>
                 
-                    <section class="profile-rating">
-                        <span class="star1">&#9733</span>
-                        <span class="star2">&#9733</span>
-                        <span class="star3">&#9733</span>
-                        <span class="star4">&#9733</span>
-                        <span class="star5">&#9734</span>
-                    </section>
+                <p>&#9733&#9733&#9733&#9733&#9734</p>
                 
-                    <section class="profile-title">
-                        <div class="profile-title-name">
-                            John Doe
-                        </div>
-                        <div class="profile-title-job">
-                            Smartphone Technician
-                        </div>
-                    </section>
+                <section class="profile-title">
+                    <h3>John Doe</h3>
+                    <p>Smartphone Technician</p>
+                </section>
                 
-                    <section class="profile-buttons">
-                        <button>Follow</button>
-                        <button>Message</button>
-                    </section>
-
-                    <section class="profile-menu">
-                        <ul class="nav">
-                            <li>
-                                <a href="profile.html" class="self">
-                                Profile</a>
-                            </li>
-                            <li>
-                                <a href="messages.html" class="self">
-                                Messages</a>
-                            </li>
-                            <li>
-                                <a href="account_info.html" class="self">
-                                Account Settings</a>
-                            </li>
-                        </ul>
-                    </section>
+                <section class="profile-buttons">
+                    <button>Follow</button>
+                    <button>Message</button>
+                </section>
+				<section class="profile-menu">
+                    <a href="messages.html" class="self"><button>Messages</button></a>
+                    <a href="account_info.html" class="self"><button>Account Settings</button></a>
+                </section>
             </section>
 
             <section class="profile-content">
-                <form>
+                <form method="post" id="update-info">
                     <fieldset>
                         <legend>Personal Information:</legend>
-                        First name:
-                        <input type="text" id="firstname" value="John">
-                        Last name:
-                        <input type="text" id="lastname" value="Doe"><br>
-                        Country:
-                        <input type="text" id="country" value="Canada">
-                        Province/State:
-                        <input type="text" id="province-state" value="Ontario">
-                        City:
-                        <input type="text" id="city" value="Toronto"><br>
-                        House #:
-                        <input type="text" id="housenum" value="123">
-                        Unit #: 
-                        <input type="text" id="unit">
-                        Street:
-                        <input type="text" id="street" value="Street Ave.">
-                        Postal Code:
-                        <input type="text" id="postalcode" value="A1A 2B2"><br>
-                        Phone #:
-                        <input type="text" id="phonenum" value="111-111-1111"><br>
+                        <p>First name:</p>
+                        <input type="text" id="firstname" value="John"/>
+                        <p>Last name:</p>
+                        <input type="text" id="lastname" value="Doe"/>
+                        <p>Country:</p>
+                        <input type="text" id="country" value="Canada"/>
+                        <p>Province/State:</p>
+                        <input type="text" id="province-state" value="Ontario"/>
+                        <p>City:</p>
+                        <input type="text" id="city" value="Toronto"/>
+                        <p>Phone #:</p>
+                        <input type="text" id="phonenum" value="111-111-1111"/>
                     </fieldset>
-                    <br>
                     <fieldset>
                         <legend>Account Information:</legend>
-                        Email:<br>
-                        <input type="text" id="email" value="john.doe@email.com"><br>
-                        Current Password (must be entered to make any account changes): <br>
-                        <input type="text" id="currentpass"><br>
-                        New Password:<br>
-                        <input type="text" id="newpass"><br>
-                        Retype New Password (must be same as above): <br>
-                        <input type="text" id="newpass-confirmation"><br>
+                        <p>Email:</p>
+                        <input type="text" id="email" value="john.doe@email.com" />
+                        <p>Current Password (must be entered to make any changes): </p>
+                        <input type="password" id="currentpass" />
+                        <p>New Password:</p>
+                        <input type="password" id="newpass" />
+                        <p>Retype New Password (same as above): </p>
+                        <input type="password" id="newpass-confirmation" />
                     </fieldset>
-                    <br>
-                    <input type="submit" value="Update" class="update">
+                    <button type="submit" form="update-info"value="Update">Update</button>
                     
                 </form>
 
             </section>
-        </div>
+        </main>
 
-        
+		
+		<!-- Footer, copyright -->
+        <footer>
+            <p>
+                Banner image from <a href="http://connectnc.com/wp-content/uploads/2015/06/computerrepair.jpg">here</a>
+			</p>
+			<p>
+                Icons from <a href="http://www.flaticon.com">Flaticon</a>
+            </p>
+			<p>
+				&copy; Akshay Nair, Seyed Hossein Fazeli, Anson Chen, Kevin Thich | Made for <a href="http://www.cdf.toronto.edu/~csc309h/summer">CSC309, Summer 2016</a>.
+			</p>
+        </footer>
     </body>
     
 </html>
