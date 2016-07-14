@@ -21,6 +21,7 @@ var posts = [
         "author": "Jane D",
         "title": "Looking for someone to fix an iPhone 4",
         "type": "Searching",
+		"urgency": "4/5",
         "picture": "",
         "contact_info": "416-000-1234",
         "description": "hi, im looking for someone who can fix my iPhone 4 and replace the screen for me. pls msg me if you can help!",
@@ -37,11 +38,12 @@ function initialize() {
     for (i = 0; i < posts.length; i ++) {
         $('.profile-content').append($('<article/>', {class: 'post', id: 'post-' + i}));
         var curr_id = '#post-' + i;
-        $(curr_id).append($('<h2/>', {class: 'title', text: posts[i].title}));
+        $(curr_id).append($('<a/>', {href: "post.html"}).append($('<h2/>', {class: 'title', text: posts[i].title})));
         $(curr_id).append($('<p/>', {class: 'author', text: 'Posted by: ' + posts[i].author}));
         $(curr_id).append($('<p/>', {class: 'post_type', id: 'type-' + i}));
         if (posts[i].type === 'Searching') {
             $('#type-' + i).text("Searching for service");
+			$(curr_id).append($('<p/>', {class: 'post_type', text: "Urgency: " + posts[i].urgency}));
         } else {
             $('#type-' + i).text("Offering service");
         }

@@ -21,12 +21,19 @@
     <body>
         <!--Navigation menu at top-->
         <nav>
-            <a href="index.html" class="logo"> <!--Link to index of webpage-->
+            <a href="index.html" class="logo left"> <!--Link to index of webpage-->
                 <img alt="Logo" src="assets/images/logo.png" />
             </a>
-                
-            <a href="signup.html" class="right"><button>Sign Up</button></a>
-			<a href="login.html" class="right"><button>Sign In</button></a>
+			<section class="right">
+				<form id="search-form" method="post" action="search.html" class="inline-form">
+					<section class="inline-form">
+						<input name="search" type="text" placeholder="Keywords...">
+					</section>
+					<button type="submit" form="search-form">Search</button>
+				</form>
+				<a href="signup.html"><button>Sign Up</button></a>
+				<a href="login.html"><button>Sign In</button></a>
+			</section>
         </nav>
 
         <!--Banner-->
@@ -58,16 +65,6 @@
                 <img class="left" alt="Calendar" src="assets/svg/calendar.svg">
                 <h3>Schedule a meeting</h3>
                 <p>Use our built-in messaging program to arrange a meeting with another member.</p>
-            </article>
-            
-           <article class="front-article">
-                <h2>Search</h2>
-                <form id="search-form" method="post" action="/search.html">
-                    <section class="inline-form">
-                        <input name="search" type="text" placeholder="Keywords...">
-                    </section>
-                    <button type="submit">Search</button>
-                </form>
             </article>
         </main>
 		

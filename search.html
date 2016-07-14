@@ -11,12 +11,14 @@
 		<meta name="Copyright" content="Akshay Nair, Seyed Hossein Fazeli, Anson Chen, Kevin Thich" />
 		
 		<!-- Title of the page -->
-        <title>RepuTech (Temporary Portal)</title>
+        <title>RepuTech - Search</title>
         <meta name="description" content="Reputable technology aid services">
 		
 		<!-- Assets, CSS, JS -->
 		<script defer src="assets/scripts/jquery-3.0.0.min.js"></script>
         <link rel="stylesheet" href="assets/css/style.css">
+        <script src="assets/scripts/profile.js" defer></script>
+
     </head>
     <body>
         <!--Navigation menu at top-->
@@ -24,23 +26,34 @@
             <a href="index.html" class="logo"> <!--Link to index of webpage-->
                 <img alt="Logo" src="assets/images/logo.png" />
             </a>
+			<section class="right">
+				<a href="signup.html"><button>Sign Up</button></a>
+				<a href="login.html"><button>Sign In</button></a>
+			</section>
         </nav>
         
-		<!-- Main article information -->
-        <main>
-            <article class="front-article">
-                <a href="index.html"><h2>Index</h2></a>
-				<a href="login.html"><h2>Sign In</h2></a>
-				<a href="signup.html"><h2>Sign Up</h2></a>
-				<a href="profile.html"><h2>Profile</h2></a>
-				<a href="messages.html"><h2>Messages</h2></a>
-				<a href="account_info.html"><h2>Account Info</h2></a>
-				<a href="search.html"><h2>Search</h2></a>
-				<a href="admin.html"><h2>Admin</h2></a>
-				<a href="post.html"><h2>Post</h2></a>
-            </article>
+       <main>
+            <section class="sidebar flexbox flexbox-column">
+                <fieldset>
+                    <legend>Criteria:</legend>
+                    <p>Author name:</p>
+                    <input type="text" id="name" value="John Doe"/>
+                    <p>Urgency:</p>
+                    <input type="number" id="country" value="4"/>
+                    <p>Reputation:</p>
+                    <input type="number" id="reputation" value="4"/>
+                    <p>Location:</p>
+                    <input type="text" id="city" value="Toronto"/>
+                    <p>Offering service:</p>
+                    <input type="checkbox" id="offer" checked/>
+                </fieldset>
+                <button>Refine</button>
+            </section>
 
-        </main>
+            <section class="profile-content">
+            </section>
+            
+        </main> 
 		
 		<!-- Footer, copyright -->
         <footer>

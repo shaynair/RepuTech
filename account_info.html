@@ -25,29 +25,43 @@
             <a href="index.html" class="logo"> <!--Link to index of webpage-->
                 <img alt="Logo" src="assets/images/logo.png" />
             </a>
+			<section class="right">
+				<form id="search-form" method="post" action="search.html" class="inline-form">
+					<section class="inline-form">
+						<input name="search" type="text" placeholder="Keywords...">
+					</section>
+					<button type="submit" form="search-form">Search</button>
+				</form>
+				<a href="index.html"><button>Logout</button></a>
+			</section>
         </nav>
 		
        <main>
-            <section class="profile-sidebar flexbox flexbox-column">
+            <section class="sidebar flexbox flexbox-column">
                 
                 <section class="profile-pic">
-                    <img alt="Placeholder" src="http://placehold.it/100x100">
+                    <img alt="Avatar" src="assets/images/avatar.png">
                 </section>
                 
-                <p>&#9733&#9733&#9733&#9733&#9734</p>
+				<section class="profile-status">
+					<p>&#9733&#9733&#9733&#9733&#9734</p>
+					<p>23 Followers</p>
+                </section>
                 
                 <section class="profile-title">
                     <h3>John Doe</h3>
                     <p>Smartphone Technician</p>
+					<p>Toronto, Canada</p>
+					<p>Mood: Tech-tastic</p>
                 </section>
                 
-                <section class="profile-buttons">
-                    <button>Follow</button>
-                    <button>Message</button>
-                </section>
 				<section class="profile-menu">
                     <a href="messages.html" class="self"><button>Messages</button></a>
-                    <a href="account_info.html" class="self"><button>Account Settings</button></a>
+					<a href="post.html" class="self"><button>Create Listing</button></a>
+                </section>
+				<section class="profile-blog">
+					<a href="blog.html"><p>Lorem Ipsum</p></a>
+                    <a href="blog.html" class="self"><button>New Blog</button></a>
                 </section>
             </section>
 

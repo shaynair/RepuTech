@@ -62,10 +62,10 @@ body, nav, footer, header {
 
 .modal-box {
 	width: 80%;
-	margin: 0 auto;
+	margin: 1em auto;
 	background-color: white; 
 	border-radius: 1em;
-	box-shadow: 0 0 1em 2px grey;
+	box-shadow: 0 0 0.5em 2px grey;
 	border: 2px solid grey;
 }
 
@@ -90,6 +90,10 @@ body, nav, footer, header {
 
 .left {
 	float: left;
+}
+
+.nofloat {
+	float: none !important;
 }
 
 .error {
@@ -126,6 +130,17 @@ button, input, select {
 	border-radius: 0.5em;
 } 
 
+a {
+	text-decoration: none;
+}
+a, a > * {
+	transition: opacity 0.4s;
+}
+
+a:hover, a > *:hover {
+	opacity: 0.8;
+}
+
 button { 
     background-color: #1976D2;
     color: white;
@@ -148,7 +163,7 @@ main, footer {
 main {
 	overflow: auto;
     background-color: #f6f6f1;
-	margin-top: 3em;
+	margin-top: 12em;
 }
 
 input[type="number"], input[type="text"], 
@@ -178,7 +193,7 @@ input[type="password"]:focus, input[type="email"]:focus{
 /* Nav bar */ 
 .logo img {
     padding: 0.25em;
-	max-height: 3em; /* nav bar size */
+	max-height: 12em; /* nav bar size */
 	
 	transition: opacity 0.4s;
 }
@@ -192,18 +207,19 @@ nav {
     top: 0;
     background-color: white;
     z-index: 10;
-    max-height: 3em;
+    max-height: 12em;
+	border-bottom: 1px solid lightgrey;
 }
 
-nav button {
-	font-size: 0.5em;
+nav button, nav input {
+	margin: 0.5em 0.5em !important;
 }
 
 /* Index page */
 header {
     width: 100%;
 	height: 500px;
-    top: 3em; /* header */
+    top: 12em; /* header */
     /* Background picture darker to read text easier */ 
     background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
 				url('../images/banner-small.png') no-repeat center fixed;
@@ -242,7 +258,7 @@ header h1 {
 
 /* Profile page */
 
-.profile-sidebar, .profile-content {
+.sidebar, .profile-content {
     padding: 1em;
     background-color: white;
 }
@@ -252,16 +268,21 @@ header h1 {
 	color: grey;
 }
 
-.post {
-    margin: 1em auto;
-    padding: 1em;
+.profile-status {
+    margin-bottom: 1em;
+	color: green;
+}
+
+.profile-blog, .admin-user, .post {
 	border: 1px solid black;
 	border-radius: 0.5em;
+    margin: 1em;
+    padding: 1em;
     max-height: 20%;
     overflow: scroll-y;
 }
 
-.post h2 {
+.post h2, .blog {
 	text-align: center;
 }
 
@@ -277,6 +298,10 @@ fieldset {
 	border-radius: 0.5em;
 }
 
+/* Admin */
+.admin-report {
+	overflow: auto;
+}
 
 /* Footer */
 footer {
@@ -296,18 +321,12 @@ footer a:link {
 /* Media queries - Mobile-first approach
 ----------------------------------------------- */
 
-@media screen and (min-width: 450px) {
-	nav button {
-		font-size: 1em;
-	}
-}
-
 /* Mobile, landscape */
 @media screen and (min-width: 480px) {
 }
 
-@media screen and (min-width: 580px) {
-	.profile-sidebar {
+@media screen and (min-width: 570px) {
+	.sidebar {
 		float: left;
 		width: 25%;
 	}
@@ -315,6 +334,27 @@ footer a:link {
 	.profile-content {
 		float: left;
 		width: 75%;
+	}
+	
+	.logo img {
+		max-height: 9em; /* nav bar size */
+	}
+	
+	main {
+		margin-top: 9em;
+	}
+	
+	nav {
+		max-height: 9em;
+	}
+	
+	header {
+		top: 9em; /* header */
+	}
+	
+	.admin-report .profile-title {
+		width: 50%;
+		float: left;
 	}
 }
 
@@ -328,23 +368,48 @@ footer a:link {
     }
     
 	body {
-		font-size: 125%;
+		font-size: 105%;
 	}
 }
 
+@media screen and (min-width: 830px) {
+
+	.logo img {
+		max-height: 3em; /* nav bar size */
+	}
+	
+	main {
+		margin-top: 3em;
+	}
+	
+	nav {
+		max-height: 3em;
+	}
+	
+	header {
+		top: 3em; /* header */
+	}
+}
+
+
 /* Tablet devices: landscape */
 @media screen and (min-width: 1024px) {
-	
+	body {
+		font-size: 110%;
+	}
 }
 
 /* Desktop */
 @media screen and (min-width: 1280px) {
 	body {
-		font-size: 150%;
+		font-size: 115%;
 	}
 }
 
 @media screen and (min-width: 1600px) {
+	body {
+		font-size: 120%;
+	}
 	/* stretch */
     header {
         background-repeat: round;
