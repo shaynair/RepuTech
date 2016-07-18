@@ -3,97 +3,96 @@
 ------------------------------------------------------------- */
 /* Handle box-sizing cross browsers */
 html {
-	box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 *, *:before, *:after {
-	box-sizing: inherit;
+    box-sizing: inherit;
 }
 
 /* Responsive images */
 img {
-	max-width: 100%;
+    max-width: 100%;
 }
 
 
 /* Global styles section
 ------------------------------------------------------------- */
 html, body {
-	/* Standardize font so we can resize it later */
-	font-size: 100%;
-	height: 100%;
+    /* Standardize font so we can resize it later */
+    font-size: 100%;
+    height: 100%;
 }
 
 body, nav, footer, header {
-	width: 100%;
-	margin: 0 auto;
-	padding: 0 0;
-	font-family: Helvetica, Geneva, Tahoma, sans-serif;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 0;
+    font-family: Helvetica, Geneva, Tahoma, sans-serif;
 }
 
 /* Helper classes */
 .flexbox {
-	/* Flexbox container for responsively changing rows/columns */
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	align-content: center;
+    /* Flexbox container for responsively changing rows/columns */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
 }
 
 .flexbox-row {
-	flex-flow: row wrap;
+    flex-flow: row wrap;
 }
 
 .flexbox-column {
-	flex-flow: column wrap;
+    flex-flow: column wrap;
 }
 
-.flexbox > * {
-	flex: 1;
-	text-align: center;
+.flexbox > section {
+    flex: 1;
+    text-align: center;
 }
 
 .flexbox:after { 
-	/* hack for clearing floats */
-	content: " "; 
-	display: block; 
-	clear: both; 
+    /* hack for clearing floats */
+    content: " "; 
+    display: block; 
+    clear: both; 
 }
 
 .modal-box {
-	width: 80%;
-	margin: 1em auto;
-	background-color: white; 
-	border-radius: 1em;
-	box-shadow: 0 0 0.5em 2px grey;
-	border: 2px solid grey;
+    width: 80%;
+    margin: 1em auto;
+    background-color: white; 
+    border-radius: 1em;
+    box-shadow: 0 0 0.5em 2px grey;
+    border: 2px solid grey;
+    text-align: center;
 }
 
 .modal-box > * {
-	display: block;
-	text-align: center;
-	margin: 1em auto;
+    margin: 1em auto;
 }
 
 .modal-box img {
-	padding: 1em;
+    padding: 1em;
 }
 
 .modal-box h2 {
-	padding-bottom: 0.25em;
-	border-bottom: 1px solid lightgrey;
+    padding-bottom: 0.25em;
+    border-bottom: 1px solid lightgrey;
 }
 
 .right {
-	float: right;
+    float: right;
 }
 
 .left {
-	float: left;
+    float: left;
 }
 
 .nofloat {
-	float: none !important;
+    float: none !important;
 }
 
 .error {
@@ -121,24 +120,25 @@ h2 {
 }
 
 h3 {
-	font-size: 1.5em;
+    font-size: 1.5em;
 }
 
 button, input, select {
-	font-size: 1em;
+    font-size: 1em;
     padding: 0.5em 1em;
-	border-radius: 0.5em;
+    border-radius: 0.5em;
 } 
 
 a {
-	text-decoration: none;
-}
-a, a > * {
-	transition: opacity 0.4s;
+    text-decoration: none;
 }
 
-a:hover, a > *:hover {
-	opacity: 0.6;
+a {
+    transition: opacity 0.4s;
+}
+
+a:hover {
+    opacity: 0.6;
 }
 
 button { 
@@ -148,7 +148,7 @@ button {
     cursor: pointer;
     text-decoration: none;
     margin: 0.5em 1em;
-	transition: background-color 0.4s;
+    transition: background-color 0.4s;
 }
 
 button:hover {
@@ -156,13 +156,13 @@ button:hover {
 }
 
 main, footer {
-	padding: 1em;
+    padding: 1em;
 }
 
 main {
-	overflow: auto;
+    overflow: auto;
     background-color: #f6f6f1;
-	margin-top: 12em;
+    margin-top: 12em;
 }
 
 input[type="number"], input[type="text"], 
@@ -170,29 +170,29 @@ input[type="password"], input[type="email"], select {
     color: #595959;
     background-color: white;
     border: 1px solid #ccc;
-	margin: 0.5em auto;
-	outline: none;
+    margin: 0.5em auto;
+    outline: none;
 }
 
 input[type="number"], input[type="text"]:not(.input-half), 
 input[type="password"], input[type="email"], select {
-	width: 90%;
+    width: 90%;
 }
 
 input[type="number"]:focus, input[type="text"]:focus, select:focus,
 input[type="password"]:focus, input[type="email"]:focus{
-	border: 1px solid #80b3ff;
-	box-shadow: 0 0 0.5em #b3d1ff;
+    border: 1px solid #80b3ff;
+    box-shadow: 0 0 0.5em #b3d1ff;
 }
 
 .input-half {
-	width: 44.5%;
+    width: 44.5%;
 }
 
 /* Nav bar */ 
 .logo img {
     padding: 0.25em;
-	max-height: 12em; /* nav bar size */
+    max-height: 12em; /* nav bar size */
 }
 
 nav {
@@ -201,32 +201,32 @@ nav {
     background-color: white;
     z-index: 10;
     max-height: 12em;
-	border-bottom: 1px solid lightgrey;
+    border-bottom: 1px solid lightgrey;
 }
 
 nav button, nav input {
-	margin: 0.5em 0.5em !important;
+    margin: 0.5em 0.5em !important;
 }
 
 /* Index page */
 header {
     width: 100%;
-	height: 500px;
+    height: 500px;
     top: 12em; /* header */
     /* Background picture darker to read text easier */ 
     background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-				url('../images/banner-small.png') no-repeat center fixed;
+		url('../images/banner-small.png') no-repeat center fixed;
     background-size: cover;  /* Cover the whole area */ 
     z-index: -1;
 	
-	position: relative;
+    position: relative;
 }
 
 header h1 {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(calc(-50% - 1em), calc(-50% - 1em));
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(calc(-50% - 1em), calc(-50% - 1em));
 }
 
 .front-article {
@@ -240,8 +240,8 @@ header h1 {
 
 .front-article img {
     margin: 1em 1em;
-	max-height: 4em;
-	max-width: 4em;
+    max-height: 4em;
+    max-width: 4em;
 }
 
 .inline-form {
@@ -251,31 +251,33 @@ header h1 {
 
 /* Profile page */
 
-.sidebar, .profile-content, .topbar, .post-comments, .post-reviews {
+.sidebar, .profile-content, .topbar, 
+.post-comments, .post-reviews {
     padding: 1em;
     background-color: white;
 }
 
 .blog {
-	padding: 3em;
-	background-color: white;
-	text-align: center;
-	overflow: scroll-y;
+    padding: 3em;
+    background-color: white;
+    text-align: center;
+    overflow: scroll-y;
 }
 
 .profile-title {
     margin-bottom: 1em;
-	color: grey;
+    color: grey;
 }
 
 .profile-status, .post-review {
     margin-bottom: 1em;
-	color: green;
+    color: green;
 }
 
-.profile-blog, .admin-user, .post, .post-similar, .post-review, .post-comment {
-	border: 1px solid grey;
-	border-radius: 0.5em;
+.profile-blog, .admin-user, .post, 
+.post-similar, .post-review, .post-comment {
+    border: 1px solid grey;
+    border-radius: 0.5em;
     margin: 1em;
     padding: 1em;
     max-height: 20%;
@@ -283,28 +285,29 @@ header h1 {
 }
 
 .post, .post-similar, .post-review, .post-comment {
-	transition: border 0.5s, transform 0.5s;
+    transition: border 0.5s, transform 0.5s;
 }
 
-.post:hover, .post-similar:hover, .post-review:hover, .post-comment:hover {
-	border: 1px solid lightgrey;
-	transform: scale(1.01);
+.post:hover, .post-similar:hover, 
+.post-review:hover, .post-comment:hover {
+    border: 1px solid lightgrey;
+    transform: scale(1.005);
 }
 
 .post-full {
-	padding: 2em;
+    padding: 2em;
 }
 
 .post-img {
-	border-radius: 1em;
+    border-radius: 1em;
 }
 
 .post-similar {
-	float: left;
+    float: left;
 }
 
 .post h2, .post-full h2, .portal {
-	text-align: center;
+    text-align: center;
 }
 
 legend {
@@ -316,12 +319,12 @@ fieldset {
     margin: 0.25em;
     padding: 1em;
     border: 1px solid lightgrey;
-	border-radius: 0.5em;
+    border-radius: 0.5em;
 }
 
 /* Admin */
 .admin-report {
-	overflow: auto;
+    overflow: auto;
 }
 
 /* Footer */
@@ -332,7 +335,7 @@ footer {
 footer p {
     color: white;
     margin: 1em auto;
-	text-align: center;
+    text-align: center;
 }
 
 footer a:link {
@@ -347,91 +350,89 @@ footer a:link {
 }
 
 @media screen and (min-width: 570px) {
-	.sidebar {
-		float: left;
-		width: 25%;
-	}
+    .sidebar {
+        float: left;
+        width: 25%;
+    }
 	
-	.profile-content {
-		float: left;
-		width: 75%;
-	}
+    .profile-content {
+        float: left;
+        width: 75%;
+    }
 	
-	.logo img {
-		max-height: 9em; /* nav bar size */
-	}
+    .logo img {
+        max-height: 9em; /* nav bar size */
+    }
 	
-	main {
-		margin-top: 9em;
-	}
+    main {
+        margin-top: 9em;
+    }
 	
-	nav {
-		max-height: 9em;
-	}
+    nav {
+        max-height: 9em;
+    }
 	
-	header {
-		top: 9em; /* header */
-	}
+    header {
+        top: 9em; /* header */
+    }
 	
-	.admin-report-user {
-		width: 50%;
-		float: left;
-	}
+    .admin-report-user {
+        width: 50%;
+        float: left;
+    }
 }
 
 /* Tablet devices: portrait */
-@media screen and (min-width: 768px) {
-    
+@media screen and (min-width: 768px) {    
     header {
         background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-				url('../images/banner-large.jpg') no-repeat center fixed;
-		background-size: cover;
+            url('../images/banner-large.jpg') no-repeat center fixed;
+        background-size: cover;
     }
     
-	body {
-		font-size: 105%;
-	}
+    body {
+        font-size: 105%;
+    }
 }
 
 @media screen and (min-width: 830px) {
-
-	.logo img {
-		max-height: 3em; /* nav bar size */
-	}
+    .logo img {
+        max-height: 3em; /* nav bar size */
+    }
 	
-	main {
-		margin-top: 3em;
-	}
+    main {
+        margin-top: 3em;
+    }
 	
-	nav {
-		max-height: 3em;
-	}
+    nav {
+        max-height: 3em;
+    }
 	
-	header {
-		top: 3em; /* header */
-	}
+    header {
+        top: 3em; /* header */
+    }
 }
 
 
 /* Tablet devices: landscape */
 @media screen and (min-width: 1024px) {
-	body {
-		font-size: 110%;
-	}
+    body {
+        font-size: 110%;
+    }
 }
 
 /* Desktop */
 @media screen and (min-width: 1280px) {
-	body {
-		font-size: 115%;
-	}
+    body {
+        font-size: 115%;
+    }
 }
 
 @media screen and (min-width: 1600px) {
-	body {
-		font-size: 120%;
-	}
-	/* stretch */
+    body {
+        font-size: 120%;
+    }
+    /* stretch */
     header {
         background-repeat: round;
     }
