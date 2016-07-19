@@ -215,7 +215,7 @@ header {
     top: 12em; /* header */
     /* Background picture darker to read text easier */ 
     background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-		url('../images/banner-small.png') no-repeat center fixed;
+		url('../images/banner-small.jpg') no-repeat center fixed;
     background-size: cover;  /* Cover the whole area */ 
     z-index: -1;
 	
@@ -257,7 +257,7 @@ header h1 {
     background-color: white;
 }
 
-.blog {
+.wiki {
     padding: 3em;
     background-color: white;
     text-align: center;
@@ -274,7 +274,7 @@ header h1 {
     color: green;
 }
 
-.profile-blog, .admin-user, .post, 
+.profile-wiki, .admin-user, .post, 
 .post-similar, .post-review, .post-comment {
     border: 1px solid grey;
     border-radius: 0.5em;
@@ -431,9 +431,5 @@ footer a:link {
 @media screen and (min-width: 1600px) {
     body {
         font-size: 120%;
-    }
-    /* stretch */
-    header {
-        background-repeat: round;
     }
 }
