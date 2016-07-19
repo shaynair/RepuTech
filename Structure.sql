@@ -112,22 +112,25 @@ CREATE TABLE reviews(
   post INTEGER NOT NULL,
   reviewer INTEGER NOT NULL,
   content TEXT NOT NULL,
-  rating INTEGER UNSIGNED NOT NULL,
+  rating SMALLINT UNSIGNED NOT NULL,
   review_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   
-  PRIMARY KEY(post, reviewer),
+  PRIMARY KEY (post, reviewer),
   FOREIGN KEY (post) REFERENCES posts(p_id) ON DELETE CASCADE,  
   FOREIGN KEY (reviewer) REFERENCES users(u_id) ON DELETE CASCADE,
   
-  CHECK(rating < 6)
+  CHECK(rating > 0 AND rating < 6)
 );
 
-CREATE TABLE comments(
+CREATE TABLE comments (
+   c_id SERIAL NOT NULL,
    post INTEGER NOT NULL,
+   reply_to INTEGER DEFAULT NULL REFERENCES comments(c_id),
    commenter INTEGER NOT NULL,
    content TEXT NOT NULL,
    comment_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
    
+   PRIMARY KEY (c_id),
    FOREIGN KEY (post) REFERENCES posts(p_id) ON DELETE CASCADE,  
    FOREIGN KEY (commenter) REFERENCES users(u_id) ON DELETE CASCADE  
 );
@@ -142,10 +145,12 @@ CREATE TABLE likes(
 );
 
 CREATE TABLE wiki (
+  w_id SERIAL NOT NULL,
   poster INTEGER NOT NULL,
   content TEXT NOT NULL,
   post_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   
+  PRIMARY KEY (w_id),
   FOREIGN KEY (poster) REFERENCES users(u_id) ON DELETE CASCADE
 );
 
