@@ -25,15 +25,35 @@ CREATE TABLE auth(
   FOREIGN KEY (u_id) REFERENCES login(u_id) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS address CASCADE;
-CREATE TABLE address(
-  a_id SERIAL NOT NULL,
+DROP TABLE IF EXISTS address_country CASCADE;
+CREATE TABLE address_country (
+  country_id SERIAL NOT NULL,
   country VARCHAR(50) NOT NULL,
-  province VARCHAR(50) NOT NULL, 
+  
+  PRIMARY KEY (country_id), 
+  UNIQUE KEY (country)
+);
+
+DROP TABLE IF EXISTS address_region CASCADE;
+CREATE TABLE address_region (
+  region_id SERIAL NOT NULL,
+  country_id INTEGER NOT NULL,
+  region VARCHAR(50) NOT NULL,
+  
+  PRIMARY KEY (region_id),  
+  UNIQUE KEY (country_id, region),
+  FOREIGN KEY (country_id) REFERENCES address_country(country_id) ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS address_city CASCADE;
+CREATE TABLE address_city (
+  city_id SERIAL NOT NULL,
+  region_id INTEGER NOT NULL,
   city VARCHAR(50) NOT NULL,
   
-  PRIMARY KEY (a_id), 
-  UNIQUE KEY address_key (country, province, city)
+  PRIMARY KEY (city_id),  
+  UNIQUE KEY (region_id, city),
+  FOREIGN KEY (region_id) REFERENCES address_region(region_id) ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS users CASCADE;
@@ -47,7 +67,8 @@ CREATE TABLE users(
   
   PRIMARY KEY (u_id), 
   FOREIGN KEY (u_id) REFERENCES login(u_id) ON DELETE CASCADE,
-  FOREIGN KEY (address) REFERENCES address(a_id) ON DELETE SET NULL ON UPDATE CASCADE
+  FOREIGN KEY (address) REFERENCES address_city(city_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  INDEX (firstname, lastname)
 );
 
 DROP TABLE IF EXISTS user_images CASCADE;
@@ -57,7 +78,9 @@ CREATE TABLE user_images(
   is_active BOOLEAN NOT NULL DEFAULT FALSE,
   
   PRIMARY KEY (img_url), 
-  FOREIGN KEY (user_id) REFERENCES users(u_id) ON DELETE CASCADE  
+  FOREIGN KEY (user_id) REFERENCES users(u_id) ON DELETE CASCADE,
+  
+  INDEX (user_id, is_active)
 );
 
 DROP TABLE IF EXISTS followers CASCADE;
@@ -75,11 +98,13 @@ CREATE TABLE posts(
   p_id SERIAL NOT NULL,
   poster INTEGER NOT NULL,
   content TEXT NOT NULL,
-  privacy ENUM('All', 'Registered', 'High', 'Medium') NOT NULL,   
+  privacy ENUM('All', 'Registered', 'High', 'Medium') NOT NULL,
   post_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   
   PRIMARY KEY (p_id),
-  FOREIGN KEY (poster) REFERENCES users(u_id) ON DELETE CASCADE
+  FOREIGN KEY (poster) REFERENCES users(u_id) ON DELETE CASCADE,
+  
+  INDEX (privacy)
 );
 
 DROP TABLE IF EXISTS post_images CASCADE;
@@ -117,7 +142,9 @@ CREATE TABLE comments (
    
    PRIMARY KEY (c_id),
    FOREIGN KEY (post) REFERENCES posts(p_id) ON DELETE CASCADE,  
-   FOREIGN KEY (commenter) REFERENCES users(u_id) ON DELETE CASCADE  
+   FOREIGN KEY (commenter) REFERENCES users(u_id) ON DELETE CASCADE,
+   
+   INDEX (reply_to)
 );
 
 DROP TABLE IF EXISTS likes CASCADE;
