@@ -61,4 +61,4 @@ $(document).ready(initialize);
 
 $('#messages').click(display_messages);
 $('#setttings').click(display_settings);
-$('#create-listing').click(diplay_create_listing);
+$('#create-listing').click(display_create_listing);
