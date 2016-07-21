@@ -44,11 +44,11 @@ function display_messages() {
     $('.profile-content').empty();
 }
 
-function display_settings() {
+/*function display_settings() {
     $('.profile-content').empty();
     // DYNAMICALLY CREATE FORM SIMILAR TO account_info.html
     // GET USER'S DATA AND DISPLAY ON FORM
-}
+}*/
 
 function display_create_listing() {
     $('.profile-content').empty();
@@ -60,5 +60,5 @@ function display_create_listing() {
 $(document).ready(initialize);
 
 $('#messages').click(display_messages);
-$('#setttings').click(display_settings);
+//$('#settings').click(display_settings);
 $('#create-listing').click(display_create_listing);

@@ -342,6 +342,67 @@ footer a:link {
     color: #70B5D1;
 }
 
+/* Start of slider */
+
+section#gallery ul {
+    position: relative;
+    display: block;
+    margin: 3em auto;
+    padding: 0;
+    overflow: hidden;
+    width: 80%;
+    height: 325px;
+}
+
+section#gallery ul li {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 250px;
+    height: 325px;
+}
+
+section#gallery ul li.hidden {
+    display: none;
+}
+section#gallery ul li.showcase {
+    width: 500px;
+}
+
+section#gallery ul li img {
+    width: 100%;
+}
+
+/* Start of slider controller */
+
+.ui-widget-content {
+    background: #000;
+    border: none;
+    margin: 3rem auto;
+    width: 33.333%;
+}
+.ui-slider-horizontal {
+    height: 5px;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    border: none;
+    border-radius: 100%;
+    background: #1976D2;
+}
+.ui-slider .ui-slider-handle {
+    cursor: pointer;
+    outline: none;
+    width: 30px;
+    height: 30px;
+}
+.ui-slider-horizontal .ui-slider-handle {
+    top: -15px;
+}
+
 /* Media queries - Mobile-first approach
 ----------------------------------------------- */
 
