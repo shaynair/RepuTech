@@ -147,6 +147,19 @@ CREATE TABLE comments (
    INDEX (reply_to)
 );
 
+DROP TABLE IF EXISTS messages CASCADE;
+CREATE TABLE messages (
+   m_id SERIAL NOT NULL,
+   receiver INTEGER NOT NULL,
+   sender INTEGER NOT NULL,
+   content TINYTEXT NOT NULL,
+   message_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   
+   PRIMARY KEY (m_id),
+   FOREIGN KEY (receiver) REFERENCES users(u_id) ON DELETE CASCADE,  
+   FOREIGN KEY (sender) REFERENCES users(u_id) ON DELETE CASCADE
+);
+
 DROP TABLE IF EXISTS likes CASCADE;
 CREATE TABLE likes(
    post INTEGER NOT NULL,
