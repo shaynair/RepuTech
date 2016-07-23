@@ -1,23 +1,4 @@
-var posts = [
-    {
-        "author": "John Doe",
-        "title": "Looking to get your smartphone repaired?!",
-        "type": "Offering",
-		"rating": "4/5",
-        "picture": "",
-        "contact_info": "111-111-1111",
-        "description": "If you're looking to get your smartphone repaired, look no further! I have been repairing smartphone for the past 5 years and I can guarantee that your smartphone will be fixed in less than 5 business days!"
-    },
-    {
-        "author": "Jane D",
-        "title": "Looking for someone to fix an iPhone 4",
-        "type": "Searching",
-		"rating": "4/5",
-        "picture": "",
-        "contact_info": "416-000-1234",
-        "description": "hi, im looking for someone who can fix my iPhone 4 and replace the screen for me. pls msg me if you can help!"
-    }
-];
+
 
 var msgs = [
     [
