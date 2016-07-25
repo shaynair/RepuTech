@@ -1,5 +1,4 @@
 
-
 var msgs = [
     [
         ["John Doe", "Hi there!"],
@@ -47,7 +46,7 @@ var profile = [
 
 function get_profile() {
     var url = 'profile';
-    $.ajax({
+    /*$.ajax({
         method: "GET",
         dataType: "json",
         url: url,
@@ -57,12 +56,14 @@ function get_profile() {
         error: function (err) {
             console.log(err);
         }
-    });
+    });*/
+
+	render_profile(profile);
 }
 
 function get_messages() {
     var url = 'messages';
-    $.ajax({
+    /*$.ajax({
         method: "GET",
         dataType: "json",
         url: url,
@@ -72,7 +73,8 @@ function get_messages() {
         error: function (err) {
             console.log(err);
         }
-    });
+    });*/
+	render_messages(msgs);
 }
 
 
@@ -145,13 +147,28 @@ function render_profile(data) {
 
 function render_listing_form() {
     $('.profile-content').empty();
-    
-    
+
+    ReactDOM.render(<ListingForm/>,
+	document.getElementById('profile-content')
+    );   
 }
 
+var ListingForm = React.createClass({
+    render: function() {
+	return (
+	    <form method="post" id="listing-form">
+		<p>Title:</p>
+                <input type="text" id="post-title"/>
+		<p>Post Type:</p>
+		<input type="radio" name="post-type" value="requesting" checked> Requesting Service<br>
+  		<input type="radio" name="post-type" value="searching"> Offering Service<br>
+		<p>Description:</p>
+                <input type="text" id="post-description"/>
+		
 
 $(document).ready(get_profile);
 
 $('#messages').click(get_messages);
 $('#settings').click(render_settings);
 $('#create-listing').click(render_listing_form);
+
