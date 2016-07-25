@@ -12,18 +12,44 @@ var data = [
 ];
 
 var ListingForm = React.createClass({
+    
+    getInitialState: function() {
+        return {
+            selectedOption: "Searching"
+        };
+    },
+    
+    handleOptionChange: function (changeEvent) {
+        this.setState({
+            selectedOption: changeEvent.target.value
+        });
+    },
+    
     render: function() {
-	return (
-	    <form method="post" id="listing-form">
-		<p>Title:</p>
+        return (
+            <form method="post" id="listing-form">
+                <p>Title:</p>
                 <input type="text" id="post-title"/>
-		<p>Post Type:</p>
-		<input type="radio" name="post-type" value="Searching" checked> Searching for Service<br>
-  		<input type="radio" name="post-type" value="Offering"> Offering Service<br>
-		<p>Description:</p>
-        <input type="text" id="post-description"/>);
-        <button type="submit" form="listing-form" value="Submit">Submit</button>
-        </form>
+                <p>Post Type:</p>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name='post-type' value="Searching" checked={this.state.selectedOption === 'Searching'}
+                        onChange={this.handleOptionChange}/>
+                        Searching for Service
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name='post-type' value="Offering" checked={this.state.selectedOption === 'Offering'}
+                        onChange={this.handleOptionChange}/>
+                        Offering Service
+                    </label>
+                </div>
+                <p>Description:</p>
+                <textarea id="post-description" rows="7"></textarea>
+                <button type="submit" form="listing-form" value="Submit">Submit</button>
+            </form>
+            );
     }
 });
 

@@ -11,7 +11,7 @@ var msgs = [
     ]
 ];
 
-var profile = [
+var data = [
     {
         "img": "../assets/images/avatar.png",
         "rating": 4,
@@ -44,6 +44,7 @@ var profile = [
 ];
 
 
+
 function get_profile() {
     var url = 'profile';
     /*$.ajax({
@@ -58,7 +59,6 @@ function get_profile() {
         }
     });*/
 
-	render_profile(profile);
 }
 
 function get_messages() {
@@ -74,11 +74,10 @@ function get_messages() {
             console.log(err);
         }
     });*/
-	render_messages(msgs);
 }
 
 
-function render_messages(data) {
+function render_messages() {
     $('.profile-content').empty();
     $('.profile-content').append($('<section/>', {id: 'messages'}));
     for (i = 0; i < msgs.length; i ++) {
@@ -90,13 +89,16 @@ function render_messages(data) {
     }
 }
 
-function render_profile(data) {
+function render_profile() {
+    
+
     
     $('.profile-pic').empty();
     $('.profile-status').empty();
     $('.profile-title').empty();
     $('.profile-content').empty();
     
+    data = data[0];
     // Renders the sidebar for the profile
     $('.profile-pic').append($('<img/>', {src: data.img, alt: 'Avatar'}));
 
@@ -139,36 +141,10 @@ function render_profile(data) {
     }
 }
 
-/*function render_settings() {
-    $('.profile-content').empty();
-    // DYNAMICALLY CREATE FORM SIMILAR TO account_info.html
-    // GET USER'S DATA AND DISPLAY ON FORM
-}*/
 
-function render_listing_form() {
-    $('.profile-content').empty();
 
-    ReactDOM.render(<ListingForm/>,
-	document.getElementById('profile-content')
-    );   
-}
-
-var ListingForm = React.createClass({
-    render: function() {
-	return (
-	    <form method="post" id="listing-form">
-		<p>Title:</p>
-                <input type="text" id="post-title"/>
-		<p>Post Type:</p>
-		<input type="radio" name="post-type" value="requesting" checked> Requesting Service<br>
-  		<input type="radio" name="post-type" value="searching"> Offering Service<br>
-		<p>Description:</p>
-                <input type="text" id="post-description"/>
 		
 
-$(document).ready(get_profile);
+$(document).ready(render_profile);
 
-$('#messages').click(get_messages);
-$('#settings').click(render_settings);
-$('#create-listing').click(render_listing_form);
-
+$('#messages').click(render_messages);
