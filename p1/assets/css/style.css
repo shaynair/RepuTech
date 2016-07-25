@@ -123,7 +123,7 @@ h3 {
     font-size: 1.5em;
 }
 
-button, input, select {
+button, input, textarea, select {
     font-size: 1em;
     padding: 0.5em 1em;
     border-radius: 0.5em;
@@ -166,7 +166,8 @@ main {
 }
 
 input[type="number"], input[type="text"], 
-input[type="password"], input[type="email"], select {
+input[type="password"], input[type="email"],
+textarea, select {
     color: #595959;
     background-color: white;
     border: 1px solid #ccc;
@@ -175,12 +176,14 @@ input[type="password"], input[type="email"], select {
 }
 
 input[type="number"], input[type="text"]:not(.input-half), 
-input[type="password"], input[type="email"], select {
+input[type="password"], input[type="email"], 
+textarea, select {
     width: 90%;
 }
 
 input[type="number"]:focus, input[type="text"]:focus, select:focus,
-input[type="password"]:focus, input[type="email"]:focus{
+input[type="password"]:focus, input[type="email"]:focus,
+textarea:focus {
     border: 1px solid #80b3ff;
     box-shadow: 0 0 0.5em #b3d1ff;
 }
