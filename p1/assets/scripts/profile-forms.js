@@ -55,6 +55,13 @@ var ListingForm = React.createClass({
 
 
 var AccountInfo = React.createClass({
+    
+    handleChange: function(event) {
+        user.setState({
+            firstname: event.target.value
+        });
+    },
+    
     render: function() {
         var userNodes = this.props.data.map(function(user) {
             return (
@@ -62,22 +69,26 @@ var AccountInfo = React.createClass({
                     <fieldset>
                         <legend>Personal Information:</legend>
                         <p>First name:</p>
-                        <input type="text" id="firstname" value={user.firstname}/>
+                        <input type="text" id="firstname" defaultValue={user.firstname}/>
                         <p>Last name:</p>
-                        <input type="text" id="lastname" value={user.lastname}/>
+                        <input type="text" id="lastname" defaultValue={user.lastname}/>
                         <p>Country:</p>
-                        <input type="text" id="country" value={user.country}/>
-                        <p>Province/State:</p>
-                        <input type="text" id="prov_state" value={user.prov_state}/>
+                        <select id="country" required name="country">
+				            <option selected>{user.country}</option>
+				        </select>
+				        <p>Province/State:</p>
+				        <select id="state" required name="state">
+                            <option selected>{user.prov_state}</option>
+				        </select>
                         <p>City:</p>
-                        <input type="text" id="city" value={user.city}/>
+                        <input type="text" id="city" defaultValue={user.city}/>
                         <p>Phone Number:</p>
-                        <input type="text" id="phonenum" value={user.phonenum}/>
+                        <input type="text" id="phonenum" defaultValue={user.phonenum}/>
                     </fieldset>
                     <fieldset>
                         <legend>Account Information:</legend>
                         <p>Email:</p>
-                        <input type="text" id="email" value={user.email} />
+                        <input type="text" id="email" defaultValue={user.email} />
                         <p>Current Password (must be entered to make any changes): </p>
                         <input type="password" id="currentpass" />
                         <p>New Password:</p>
