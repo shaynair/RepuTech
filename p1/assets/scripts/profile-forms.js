@@ -6,7 +6,7 @@ var data = [
         "country": "Canada",
 		"prov_state": "Ontario",
         "city": "Toronto",
-        "phonenum": "1234567890",
+        "phonenum": "111-111-1111",
         "email": "john.doe@email.com"
     }
 ];
@@ -69,9 +69,9 @@ var AccountInfo = React.createClass({
                     <fieldset>
                         <legend>Personal Information:</legend>
                         <p>First name:</p>
-                        <input type="text" id="firstname" defaultValue={user.firstname} pattern="[a-zA-Z]+" title="This field can only consist of letters."/>
+                        <input type="text" id="firstname" defaultValue={user.firstname}/>
                         <p>Last name:</p>
-                        <input type="text" id="lastname" defaultValue={user.lastname} pattern="[a-zA-Z]+" title="This field can only consist of letters."/>
+                        <input type="text" id="lastname" defaultValue={user.lastname}/>
                         <p>Country:</p>
                         <select id="country" required name="country">
 				            <option selected>{user.country}</option>
@@ -81,20 +81,20 @@ var AccountInfo = React.createClass({
                             <option selected>{user.prov_state}</option>
 				        </select>
                         <p>City:</p>
-                        <input type="text" id="city" defaultValue={user.city} pattern="[a-zA-Z]{2,}" title="This field can only consist of letters."/>
+                        <input type="text" id="city" defaultValue={user.city}/>
                         <p>Phone Number:</p>
-                        <input type="text" id="phonenum" defaultValue={user.phonenum} pattern="[0-9]{10,12}" title="This field can only consist of numbers."/>
+                        <input type="text" id="phonenum" defaultValue={user.phonenum}/>
                     </fieldset>
                     <fieldset>
                         <legend>Account Information:</legend>
                         <p>Email:</p>
-                        <input type="text" id="email" defaultValue={user.email} pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}" title="E-mail address must be valid."/>
+                        <input type="text" id="email" defaultValue={user.email} />
                         <p>Current Password (must be entered to make any changes): </p>
-                        <input type="password" id="currentpass"/>
+                        <input type="password" id="currentpass" />
                         <p>New Password:</p>
-                        <input type="password" id="newpass" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
+                        <input type="password" id="newpass" />
                         <p>Retype New Password (same as above): </p>
-                        <input type="password" id="newpass-confirmation" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
+                        <input type="password" id="newpass-confirmation" />
                     </fieldset>
                     <button type="submit" form="update-info" value="Update">Update</button>
                 </form>
