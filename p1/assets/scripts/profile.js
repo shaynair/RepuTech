@@ -89,37 +89,39 @@ function render_messages() {
     }
 }
 
-function render_profile() {
+function render_posts() {
     
 
     
-    $('.profile-pic').empty();
+/*    $('.profile-pic').empty();
     $('.profile-status').empty();
     $('.profile-title').empty();
     $('.profile-content').empty();
     
     data = data[0];
     // Renders the sidebar for the profile
-    $('.profile-pic').append($('<img/>', {src: data.img, alt: 'Avatar'}));
+    $('.profile-pic').append($('<img/>', {src: data.img, alt: 'Avatar', width:'100%'}));
 
+    // Note: problem displaying the HTML stars when altered with JS
     if (data.rating === 1) {
-        $('.profile-status').append($('<p/>', {text: '&#9733&#9734&#9734&#9734&#9734'}));
+        $('.profile-status').append($('<p/>', {text: '&#9733;&#9734;&#9734;&#9734;&#9734;'}));
     } else if (data.rating === 2) {
-        $('.profile-status').append($('<p/>', {text: '&#9733&#9733&#9734&#9734&#9734'}));
+        $('.profile-status').append($('<p/>', {text: '&#9733;&#9733;&#9734;&#9734;&#9734;'}));
     } else if (data.rating === 3) {
-        $('.profile-status').append($('<p/>', {text: '&#9733&#9733&#9733&#9734&#9734'}));
+        $('.profile-status').append($('<p/>', {text: '&#9733;&#9733;&#9733;&#9734;&#9734;'}));
     } else if (data.rating === 4) {
-        $('.profile-status').append($('<p/>', {text: '&#9733&#9733&#9733&#9733&#9734'}));
+        $('.profile-status').append($('<p/>', {text: '&#9733; &#9733; &#9733; &#9733; &#9734;'}));
     } else if (data.rating === 5) {
-        $('.profile-status').append($('<p/>', {text: '&#9733&#9733&#9733&#9733&#9733'}));
+        $('.profile-status').append($('<p/>', {text: '&#9733;&#9733;&#9733;&#9733;&#9733;'}));
     }
     $('.profile-status').append($('<p/>', {text: data.num_followers + ' Followers'}));
     $('.profile-title').append($('<h3/>', {text: data.name}));
     $('.profile-title').append($('<p/>', {text: data.job}));
     $('.profile-title').append($('<p/>', {text: data.location}));
-    $('.profile-title').append($('<p/>', {text: data.mood}));
+    $('.profile-title').append($('<p/>', {text: data.mood}));*/
     
-    var posts = data.posts;
+    $('.profile-content').empty();
+    var posts = data[0].posts;
     // Renders posts for the profile
     for (i = 0; i < posts.length; i ++) {
         $('.profile-content').append($('<article/>', {class: 'post', id: 'post-' + i}));
@@ -145,6 +147,6 @@ function render_profile() {
 
 		
 
-$(document).ready(render_profile);
+//$(document).ready(render_profile);
 
-$('#messages').click(render_messages);
+//$('#posts').click(render_posts);

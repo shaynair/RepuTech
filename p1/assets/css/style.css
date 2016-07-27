@@ -254,34 +254,77 @@ header h1 {
 
 /* Profile page */
 
-.sidebar, .profile-content, .topbar, 
-.post-comments, .post-reviews {
-    padding: 1em;
+.sidebar, .topbar {
+    padding: 0em;
     background-color: white;
 }
 
-.wiki {
-    padding: 3em;
+.sidebar button { 
+    background-color: #ededed;
+    color: #7e7e7e;
+    margin: 0;
+    transition: background-color 0.4s;
+    width: 100%;
+    font-size: 1em;
+    padding: 1em 2em;
+    border-radius: 0;
+    text-align: left;
+}
+
+.sidebar button.active {
+    background-color: white;
+    color: #1976D2;
+}
+
+.profile-content {
+    padding: 0em;
+    background-color: white;
+    min-height: 50em;
+}
+
+#listing-form {
+    margin-left: 2em;
+}
+
+#profile-wiki {
+    padding: 2em;
     background-color: white;
     text-align: center;
     overflow: scroll-y;
 }
 
-.profile-title {
-    margin-bottom: 1em;
-    color: grey;
+#profile-general h3 {
+    margin: 0;
+    padding: 0.5em;
+    font-size: 2.5em;
+    font-weight: lighter;
+    color: white;
+    background: #1976D2;
+}
+
+#profile-general p {
+    margin-bottom: 0.5em;
+    padding-left: 1.5em;
+}
+
+#gallery h3 {
+    color: #1976D2;
+    font-size: 2em;
+    font-weight: 500;
+    margin-left: 0.5em;
 }
 
 .profile-status, .post-review {
     margin-bottom: 1em;
     color: green;
+    text-rendering: auto;
 }
 
 .profile-wiki, .admin-user, .post, 
 .post-similar, .post-review, .post-comment {
     border: 1px solid grey;
     border-radius: 0.5em;
-    margin: 1em;
+    margin: 2em;
     padding: 1em;
     max-height: 20%;
     overflow: scroll-y;
@@ -315,14 +358,21 @@ header h1 {
 
 legend {
     font-size: 1.5em;
-    padding: 0 0.5em;
+    padding: 1 0.5em;
+    padding-top: 1em;
+    color: #1976D2;
 }
 
 fieldset {
-    margin: 0.25em;
-    padding: 1em;
-    border: 1px solid lightgrey;
+    padding-left: 2em;
+    border: 0px solid lightgrey;
     border-radius: 0.5em;
+}
+
+.profile-content fieldset p {
+    font-size: 1em;
+    margin-top: 1em;
+    margin-bottom: 0em;
 }
 
 /* Admin */
@@ -387,6 +437,7 @@ section#gallery ul li img {
     margin: 3rem auto;
     width: 33.333%;
 }
+
 .ui-slider-horizontal {
     height: 5px;
 }

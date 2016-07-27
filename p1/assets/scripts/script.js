@@ -1,5 +1,4 @@
-$(document).ready(function()
-{
+function LoadImageSlider() {
     // Dynamic image slider
      
     var images = [
@@ -32,8 +31,7 @@ $(document).ready(function()
 
     var leftOffset = 0;
     
-    $.each( images, function(index, item)
-    {
+    $.each( images, function(index, item) {
         if ( index == 1 ) leftOffset += 250;
         
         var $li = $('<li/>', {
@@ -75,10 +73,8 @@ $(document).ready(function()
         min: 0,
         max: 100,
         step: step_size,
-        slide: function( event, ui )
-        {
+        slide: function( event, ui ) {
             var slider_index = ui.value / step_size;
-            
             var direction = "+";
             
             if ( last_index < slider_index ) // going right
@@ -91,8 +87,7 @@ $(document).ready(function()
             if (direction == "+" ) $showcase = $("section#gallery ul li:last-child");
             
             // First we animate, then we actually move elements around in the DOM.
-            function animateItems()
-            {
+            function animateItems() {
                 // Animate the showcase:
                 $showcase.animate({
                     left: direction+"=500",
@@ -101,8 +96,7 @@ $(document).ready(function()
                 
                 
                 // We animate the rest differently based on direction.
-                if (direction == "-" )
-                {
+                if (direction == "-" ) {
                     // Move all items to the right of the showcase
                     $showcase.nextAll().each(function(index) {
                         
@@ -114,9 +108,7 @@ $(document).ready(function()
                             width: amount
                         }, { duration: 200, queue: true });
                     });
-                }
-                else
-                {
+                } else {
                     // Move all items to the left of the showcase
                     $("section#gallery ul li:lt("+$showcase.index()+")").each(function(index) {
                         
@@ -147,4 +139,6 @@ $(document).ready(function()
     
     $("section#gallery").append($controller);
     
-});
+}
+
+$(document).ready(LoadImageSlider());

@@ -15,9 +15,13 @@
         <meta name="description" content="Reputable technology aid services">
 		
 		<!-- Assets, CSS, JS -->
-		<script defer src="../assets/scripts/jquery-3.0.0.min.js"></script>
+        <link href="../assets/jquery-ui/css/jquery-ui.css" type="text/css" rel="stylesheet">
         <link rel="stylesheet" href="../assets/css/style.css">
+        
+        <script defer src="../assets/scripts/jquery-3.0.0.min.js"></script>
+        <script type="text/javascript" src="../assets/jquery-ui/scripts/jquery-ui.min.js" defer></script>
         <script src="../assets/scripts/profile.js" defer></script>
+        <script src="../assets/scripts/script.js" defer></script>
         
         <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react-dom.js"></script>
@@ -50,32 +54,22 @@
                 <section class="profile-pic">
                     <img alt="Avatar" src="../assets/images/avatar.png">
                 </section>
-                
-				<section class="profile-status">
-					<p>&#9733&#9733&#9733&#9733&#9734</p>
-					<p>23 Followers</p>
-                </section>
-                <section class="profile-title">
-                    <h3>John Doe</h3>
-                    <p>Smartphone Technician</p>
-					<p>Toronto, Canada</p>
-					<p>Mood: Tech-tastic</p>
-                </section>
-                
-                <section class="profile-buttons">
+                <!--<section class="profile-buttons">
                     <button>Follow</button>
-                </section>
+                </section>-->
 				<section class="profile-menu">
+                    <button id='general'>General Info</button>
+                    <button id='posts'>Posts</button>
                     <button id='messages'>Messages</button>
-                    <button id='settings'>Settings</button>
                     <button id='create-listing'>Create Listing</button>
+                    <button id='wiki'>Wiki Posts</button>
+                    <button id='settings'>Update Account Info</button>
                 </section>
-				<section class="profile-wiki">
+				<!--<section class="profile-wiki">
 					<p>Current Wiki Posts:</p>
 					<a href="wiki.html"><p>Lorem Ipsum</p></a>
                     <a href="wiki.html" class="self"><button>New Wiki Post</button></a>
-                </section>
-				
+                </section>-->
             </section>
 
             <section class="profile-content" id="profile-content">

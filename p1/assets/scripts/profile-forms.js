@@ -7,9 +7,42 @@ var data = [
 		"prov_state": "Ontario",
         "city": "Toronto",
         "phonenum": "1234567890",
-        "email": "john.doe@email.com"
+        "email": "john.doe@email.com",
+        "rating": 4,
+        "followers": 23,
+        "job": "Smartphone Technician",
+        "mood": "Tech-tastic"
     }
 ];
+
+var GeneralInfo = React.createClass({
+    render: function() {
+        var userNodes = this.props.data.map(function(user) {
+            return (
+                <div>
+                <section id="profile-general">
+                    <h3>{user.firstname} {user.lastname}</h3>
+                    <p>Rating: {user.rating}</p>
+                    <p>Followers: {user.followers}</p>
+                    <section class="profile-buttons">
+                        <button>Follow</button>
+                    </section>
+                    <br/>
+                    <p>Job: {user.job}</p>
+                    <p>Located in: {user.city}, {user.country}</p>
+                    <p>Mood: {user.mood}</p>
+                </section>
+                <section id="gallery"><h3>My Images:</h3></section>
+                </div>
+            );
+        });
+        return (
+            <div className="GeneralInfo">
+                {userNodes}
+            </div>
+        );
+    }
+});
 
 var ListingForm = React.createClass({
     
@@ -46,22 +79,15 @@ var ListingForm = React.createClass({
                     </label>
                 </div>
                 <p>Description:</p>
-                <textarea id="post-description" rows="7"></textarea>
+                <textarea id="post-description" rows="15"></textarea>
                 <button type="submit" form="listing-form" value="Submit">Submit</button>
             </form>
-            );
+        );
     }
 });
 
 
 var AccountInfo = React.createClass({
-    
-    handleChange: function(event) {
-        user.setState({
-            firstname: event.target.value
-        });
-    },
-    
     render: function() {
         var userNodes = this.props.data.map(function(user) {
             return (
@@ -101,13 +127,35 @@ var AccountInfo = React.createClass({
             );
         });
         return (
-        <div className="AccountInfo">
-            {userNodes}
-        </div>
-    );
-  }
+            <div className="AccountInfo">
+                {userNodes}
+            </div>
+        );
+    }
 });
 
+var Wiki = React.createClass({
+    render: function() {
+        return (
+            <section id="profile-wiki">
+                <a href="" class="self"><button>New Wiki Post</button></a>
+				<h3>Lorem Ipsum</h3>
+				<p>
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam molestie sagittis porttitor. Pellentesque ipsum est, scelerisque ultricies vulputate a, dapibus sit amet dolor. Curabitur euismod libero sit amet quam consequat, vitae tempor augue gravida. Praesent sit amet libero sed neque bibendum imperdiet vel quis ligula. Proin interdum porta interdum. Quisque vitae facilisis ex, ac ornare enim. Suspendisse accumsan tellus nec ex auctor tincidunt. Pellentesque placerat dapibus turpis, ac consequat ex sodales vitae. Etiam auctor maximus auctor. Pellentesque gravida, leo nec faucibus posuere, magna metus placerat ex, sed bibendum nibh urna at lectus. Duis nunc mauris, molestie et dui non, auctor dictum urna. Aliquam arcu lacus, faucibus sit amet vestibulum aliquam, tincidunt eget ex. Morbi et sem id ante consequat aliquet. Nulla nibh arcu, aliquet in ultricies lacinia, bibendum a nisl. Pellentesque a finibus neque.
+				</p>
+            </section>
+        );
+    }
+});
+
+
+function render_general_info() {
+    $('.profile-content').empty();
+    
+    ReactDOM.render(<GeneralInfo data={data} />,
+        document.getElementById('profile-content')
+    );
+}
 
 function render_settings_form() {
     $('.profile-content').empty();
@@ -121,9 +169,62 @@ function render_listing_form() {
     $('.profile-content').empty();
 
     ReactDOM.render(<ListingForm/>,
-	document.getElementById('profile-content')
+	   document.getElementById('profile-content')
     );   
 }
 
-$('#create-listing').click(render_listing_form);
-$('#settings').click(render_settings_form);
+function render_wiki() {
+    $('.profile-content').empty();
+
+    ReactDOM.render(<Wiki/>,
+	   document.getElementById('profile-content')
+    );   
+}
+
+var $old; // Holds previously clicked button
+$('#general').click(function() {
+    render_general_info();
+    if ($old != null) {
+        $old.toggleClass('active');
+    }
+    $(this).toggleClass('active');
+    $old = $(this);
+    LoadImageSlider();
+});
+
+$('#posts').click(function() {
+    render_posts();
+    $old.toggleClass('active');
+    $(this).toggleClass('active');
+    $old = $(this);
+});
+
+$('#messages').click(function() {
+    render_messages();
+    $old.toggleClass('active');
+    $(this).toggleClass('active');
+    $old = $(this);
+});
+
+$('#settings').click(function() {
+    render_settings_form();
+    $old.toggleClass('active');
+    $(this).toggleClass('active');
+    $old = $(this);
+});
+
+$('#create-listing').click(function() {
+    render_listing_form();
+    $old.toggleClass('active');
+    $(this).toggleClass('active');
+    $old = $(this);
+});
+
+$('#wiki').click(function() {
+    render_wiki();
+    $old.toggleClass('active');
+    $(this).toggleClass('active');
+    $old = $(this);
+});
+
+$(document).ready($('#general').click());
