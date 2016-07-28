@@ -17,6 +17,7 @@
 		<!-- Assets, CSS, JS -->
 		<script defer src="../assets/scripts/jquery-3.0.0.min.js"></script>
         <link rel="stylesheet" href="../assets/css/style.css">
+        <script src="../assets/scripts/admin.js" defer></script>
     </head>
 
 	<body>
@@ -40,16 +41,13 @@
 
 		<!-- Main login form -->
 		<main>
-			<section class="modal-box">
+			<section class="modal-box" id="stats">
 				<h2 class="title">Statistics</h2>
 				<section class="admin-stats">
-					<p>24 Users registered</p>
-					<p>10 Posts active</p>
-					<p>8 Posts expired</p>
-					<p>1 Wiki post created</p>
 				</section>
 			</section>
-			<section class="modal-box">
+            
+			<section class="modal-box" id="users">
 				<h2 class="title">Users</h2>
 				<form id="search-user" method="post" action="search.html">
 					<section class="inline-form">
@@ -58,55 +56,14 @@
 					<button type="submit" form="search-user">Search</button>
 				</form>
 				<section class="admin-users">
-					<section class="admin-user">
-						<section class="profile-status">
-							<p>&#9733&#9733&#9733&#9733&#9734</p>
-							<p>23 Followers</p>
-						</section>
-						<section class="profile-title">
-							<h3>John Doe</h3>
-							<p>Smartphone Technician</p>
-							<p>Toronto, Canada</p>
-							<p>Mood: Tech-tastic</p>
-						</section>
-						
-						<section class="profile-menu">
-							<a href="profile.html"><button>View</button></a>
-							<a href="index.html"><button>Delete</button></a>
-							<a href="account_info.html"><button>Edit</button></a>
-						</section>
-					</section>
 				</section>
 				<a href="signup.html" class="self"><button>Add New User</button></a>
 			</section>
-			<section class="modal-box">
+            
+			<section class="modal-box" id="reports">
 				<h2 class="title">Reports</h2>
 				<section class="admin-reports">
-					<section class="admin-report">
-						<section class="admin-report-user profile-title">
-							<h3>Reporter: A A</h3>
-							<p>Technomaniac</p>
-							<p>Vancouver, Canada</p>
-							<section class="profile-status">
-								<p>&#9733&#9733&#9733&#9733&#9733</p>
-								<p>1194 Followers</p>
-							</section>
-						</section>
-						<section class="admin-report-user profile-title">
-							<h3>Accused: Jane D</h3>
-							<p>New User</p>
-							<p>Ottawa, Canada</p>
-							<section class="profile-status">
-								<p>&#9733&#9733&#9734&#9734&#9734</p>
-								<p>2 Followers</p>
-							</section>
-						</section>
-						<section class="profile-menu">
-							<a href="post.html"><button>View Post</button></a>
-							<a href="index.html"><button>Ban Accused</button></a>
-							<a href="admin.html"><button>Dismiss</button></a>
-						</section>
-					</section>
+					
 				</section>
 			</section>
 		</main>
