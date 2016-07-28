@@ -282,6 +282,10 @@ header h1 {
     min-height: 50em;
 }
 
+.profile-menu {
+    clear: both;
+}
+
 #listing-form {
     margin-left: 2em;
 }
