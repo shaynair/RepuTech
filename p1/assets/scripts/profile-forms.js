@@ -32,17 +32,15 @@ var GeneralInfo = React.createClass({
                 <div>
                 <section id="profile-general">
                     <h3>{user.firstname} {user.lastname}</h3>
+                    <h4>Reputation:</h4>
                     <p>Rating: {user.rating}</p>
-                    <p>Followers: {user.followers}</p>
-                    <section class="profile-buttons">
-                        <button>Follow</button>
-                    </section>
+                    <p>Followers: {user.followers}<button class="follow">Follow</button></p>
                     <br/>
                     <p>Job: {user.job}</p>
                     <p>Located in: {user.city}, {user.country}</p>
                     <p>Mood: {user.mood}</p>
                 </section>
-                <section id="gallery"><h3>My Images:</h3></section>
+                <section id="gallery"><h4>My Images:</h4></section>
                 </div>
             );
         });
