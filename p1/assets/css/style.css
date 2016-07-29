@@ -286,14 +286,14 @@ header h1 {
     clear: both;
 }
 
-#listing-form {
+#listing-form, #wiki-form {
     margin-left: 2em;
 }
 
 #profile-wiki {
     padding: 2em;
     background-color: white;
-    text-align: center;
+    /*text-align: center;*/
     overflow: scroll-y;
 }
 

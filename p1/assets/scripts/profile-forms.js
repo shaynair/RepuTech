@@ -1,4 +1,4 @@
-// Should pull this info from the database;
+// Should pull this info from the database
 var data = [
     {
         "firstname": "John",
@@ -11,7 +11,17 @@ var data = [
         "rating": 4,
         "followers": 23,
         "job": "Smartphone Technician",
-        "mood": "Tech-tastic"
+        "mood": "Tech-tastic",
+        "wiki": [
+            {
+                "title": "Lorem Ipsum",
+                "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam molestie sagittis porttitor. Pellentesque ipsum est, scelerisque ultricies vulputate a, dapibus sit amet dolor. Curabitur euismod libero sit amet quam consequat, vitae tempor augue gravida. Praesent sit amet libero sed neque bibendum imperdiet vel quis ligula. Proin interdum porta interdum. Quisque vitae facilisis ex, ac ornare enim. Suspendisse accumsan tellus nec ex auctor tincidunt. Pellentesque placerat dapibus turpis, ac consequat ex sodales vitae. Etiam auctor maximus auctor. Pellentesque gravida, leo nec faucibus posuere, magna metus placerat ex, sed bibendum nibh urna at lectus. Duis nunc mauris, molestie et dui non, auctor dictum urna. Aliquam arcu lacus, faucibus sit amet vestibulum aliquam, tincidunt eget ex. Morbi et sem id ante consequat aliquet. Nulla nibh arcu, aliquet in ultricies lacinia, bibendum a nisl. Pellentesque a finibus neque."
+            },
+            {
+                "title": "Lorem Ipsum 2",
+                "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam molestie sagittis porttitor. Pellentesque ipsum est, scelerisque ultricies vulputate a, dapibus sit amet dolor. Curabitur euismod libero sit amet quam consequat, vitae tempor augue gravida. Praesent sit amet libero sed neque bibendum imperdiet vel quis ligula. Proin interdum porta interdum. Quisque vitae facilisis ex, ac ornare enim. Suspendisse accumsan tellus nec ex auctor tincidunt. Pellentesque placerat dapibus turpis, ac consequat ex sodales vitae. Etiam auctor maximus auctor. Pellentesque gravida, leo nec faucibus posuere, magna metus placerat ex, sed bibendum nibh urna at lectus. Duis nunc mauris, molestie et dui non, auctor dictum urna. Aliquam arcu lacus, faucibus sit amet vestibulum aliquam, tincidunt eget ex. Morbi et sem id ante consequat aliquet. Nulla nibh arcu, aliquet in ultricies lacinia, bibendum a nisl. Pellentesque a finibus neque."
+            }
+        ]
     }
 ];
 
@@ -136,13 +146,36 @@ var AccountInfo = React.createClass({
 
 var Wiki = React.createClass({
     render: function() {
+        var userNodes = this.props.data.map(function(user) {
+            for (var i = 0; i < user["wiki-posts"].length; i++) {
+                return (
+                    <section id="profile-wiki">
+                        <button id="wiki-new">New Wiki Post</button>
+                        <h3>{user["wiki-posts"][i].title}</h3>
+                        <p>{user["wiki-posts"][i].content}</p>
+                    </section>
+                );
+            }
+        });
         return (
-            <section id="profile-wiki">
-                <a href="" class="self"><button>New Wiki Post</button></a>
-				<h3>Lorem Ipsum</h3>
-				<p>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam molestie sagittis porttitor. Pellentesque ipsum est, scelerisque ultricies vulputate a, dapibus sit amet dolor. Curabitur euismod libero sit amet quam consequat, vitae tempor augue gravida. Praesent sit amet libero sed neque bibendum imperdiet vel quis ligula. Proin interdum porta interdum. Quisque vitae facilisis ex, ac ornare enim. Suspendisse accumsan tellus nec ex auctor tincidunt. Pellentesque placerat dapibus turpis, ac consequat ex sodales vitae. Etiam auctor maximus auctor. Pellentesque gravida, leo nec faucibus posuere, magna metus placerat ex, sed bibendum nibh urna at lectus. Duis nunc mauris, molestie et dui non, auctor dictum urna. Aliquam arcu lacus, faucibus sit amet vestibulum aliquam, tincidunt eget ex. Morbi et sem id ante consequat aliquet. Nulla nibh arcu, aliquet in ultricies lacinia, bibendum a nisl. Pellentesque a finibus neque.
-				</p>
+            <div className="Wiki">
+                {userNodes}
+            </div>
+        );
+    }
+});
+
+var WikiNew = React.createClass({
+    render: function() {
+        return (
+            <section id="profile-wiki-new">
+                <form data-reactroot="" method="post" id="wiki-form">
+                    <p>Title:</p>
+                    <input type="text" id="wiki-title"></input>
+                    <p>Content:</p>
+                    <textarea id="wiki-content" rows="15"></textarea>
+                    <button type="submit" form="wiki-form" value="Submit">Submit</button>
+                </form>
             </section>
         );
     }
@@ -151,35 +184,49 @@ var Wiki = React.createClass({
 
 function render_general_info() {
     $('.profile-content').empty();
-    
     ReactDOM.render(<GeneralInfo data={data} />,
-        document.getElementById('profile-content')
+                    document.getElementById('profile-content')
     );
 }
 
 function render_settings_form() {
     $('.profile-content').empty();
-    
     ReactDOM.render(<AccountInfo data={data} />,
-        document.getElementById('profile-content')
+                    document.getElementById('profile-content')
     );
 }
 
 function render_listing_form() {
     $('.profile-content').empty();
-
     ReactDOM.render(<ListingForm/>,
-	   document.getElementById('profile-content')
+                    document.getElementById('profile-content')
     );   
 }
 
 function render_wiki() {
     $('.profile-content').empty();
-
-    ReactDOM.render(<Wiki/>,
-	   document.getElementById('profile-content')
-    );   
+    var wiki = data[0].wiki;
+    $('.profile-content').append($('<section/>', {id: 'profile-wiki'}));
+    $('#profile-wiki').append($('<button/>', {id: 'wiki-new', text: 'New Wiki Post'}));
+    for (var i = 0; i < wiki.length; i++) {
+        $('#profile-wiki').append($('<h3/>', {text: wiki[i].title}));
+        $('#profile-wiki').append($('<p/>', {text: wiki[i].content}));
+    }
+    // Click to create new wiki form
+    $('#wiki-new').click(function() {
+        render_wiki_new();
+    });
 }
+
+function render_wiki_new() {
+    $('.profile-content').empty();
+    ReactDOM.render(<WikiNew/>,
+                    document.getElementById('profile-content')
+    ); 
+}
+
+
+// Click functions for each menu item on profile
 
 var $old; // Holds previously clicked button
 $('#general').click(function() {
@@ -227,4 +274,5 @@ $('#wiki').click(function() {
     $old = $(this);
 });
 
+// Profile loads General Info page by default
 $(document).ready($('#general').click());
