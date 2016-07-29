@@ -79,8 +79,6 @@ function initialize() {
         $button = $("<button/>", {text: "Edit", class: "edit"});
         $(menu_id).append($button);
         
-        // MIGHT NOT NEED THESE IF A CLICK FUNCTION IS ADDED TO THE BUTTONS
-        $(".delete").wrap("<a href=\"index.html\"></a>");
         $(".edit").wrap("<a href=\"account_info.html\"></a>");
         $(".view").wrap("<a href=\"profile.html\"></a>");
     }
@@ -137,19 +135,84 @@ function initialize() {
         $button = $("<button/>", {text: "Dismiss", class: "dismiss"});
         $(report_menu_id).append($button);
         
-        // MIGHT NOT NEED THIS IF A CLICK FUNCTION IS ADDED TO THE BUTTONS
         $(".view-post").wrap("<a href=\"post.html\"></a>");
-        $(".ban").wrap("<a href=\"#\"></a>");
-        $(".dismiss").wrap("<a href=\"#\"></a>");
         
     }
+    
+    
+    $(".delete").click(function() {
+        var id = $(this).parent().attr("id");
+        delete_user(id);
+    });
+
+    $(".ban").click(function() {
+        var id = $(this).parent().prev().children(":first").attr("id");
+        ban_user(id);
+    });
+    
+    $(".dismiss").click(function() {
+        var id = $(this).parent().parent().attr("id");
+        dismiss(id);
+    });
+    
 }
 
 
 
 
+function delete_user(id) {
+    
+    $.ajax({
+        type: "POST",
+        // SOME URL
+        url: "",
+        data: id,
+        dataType: "text",
+        success: function (data) {
+            $("#" + id).parent().remove();
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    });
+}
 
+function ban_user(id) {
+    
+    $.ajax({
+        type: "POST",
+        // SOME URL
+        url: "",
+        data: id,
+        dataType: "text",
+        success: function (data) {
+            console.log("User " + id + " has been banned" )
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    });
+    
+}
 
+function dismiss(id) {
+
+    $.ajax({
+        type: "POST",
+        // SOME URL
+        url: "",
+        data: id,
+        dataType: "text",
+        success: function (data) {
+            $("#" + id).remove();
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    });
+    
+}
 
 $(document).ready(initialize);
+
 
