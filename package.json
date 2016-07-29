@@ -1,0 +1,35 @@
+{
+  "name": "reputech",
+  "version": "1.0.0",
+  "license": "GNU",
+  "private": false,
+  "description": "RepuTech",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "tech",
+    "technology",
+	"reputation"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akshay-nair/RepuTech"
+  },
+  "engines": {
+    "node": "*",
+    "npm": "*"
+  },
+  "dependencies": {
+    "bcrypt-nodejs": "*",
+    "compression": "*",
+    "express-session": "*",
+    "ejs": "*",
+    "express": "*",
+    "pg": "*",
+	"body-parser": "*",
+	"request": "*",
+	"moment": "*"
+  },
+}

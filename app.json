@@ -1,0 +1,8 @@
+{
+  "name": "RepuTech",
+  "description": "A technology service sharing economy",
+  "repository": "https://github.com/akshay-nair/RepuTech",
+  "logo": "http://node-js-sample.herokuapp.com/assets/images/logo.png",
+  "keywords": ["technology", "service", "reputation"],
+  "image": "heroku/nodejs"
+}
