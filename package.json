@@ -31,5 +31,5 @@
 	"body-parser": "*",
 	"request": "*",
 	"moment": "*"
-  },
+  }
 }
