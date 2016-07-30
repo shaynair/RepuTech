@@ -23,7 +23,6 @@
     "npm": "3.x"
   },
   "dependencies": {
-    "bcrypt": "*",
     "compression": "*",
     "express-session": "*",
     "express-validator": "*",
@@ -31,14 +30,18 @@
     "csurf": "*",
     "ejs": "*",
     "express": "*",
-    "pg": "*",
+    "serve-favicon": "*",
 	"body-parser": "*",
+    
+    "bcrypt": "*",
+    "pg": "*",
+    
     "nodemailer": "*",
 	"moment": "*",
 	"socket.io": "*",
+    
     "memwatch": "*",
     "monitor": "*",
-    "serve-favicon": "*",
     
     "gulp": "*",
     "gulp-sourcemaps": "*",
@@ -48,7 +51,6 @@
     "gulp-uglify": "*",
     "gulp-imagemin": "*",
     "gulp-cache": "*",
-    "gulp-sass": "*",
     "gulp-cssnano": "*",
     "gulp-autoprefixer": "*",
     "del": "*"

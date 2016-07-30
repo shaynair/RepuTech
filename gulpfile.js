@@ -31,7 +31,8 @@ const paths = {
  
 // Cleans all gulp files
 gulp.task('clean', () => {
-  return del(['public']);
+  return del([paths.scripts[1], paths.images[1], 
+                paths.css[1], paths.icon[1]]);
 });
  
 // Minify and copy all JavaScript (except vendor scripts) 
@@ -69,7 +70,6 @@ gulp.task('css', ['clean'], () => {
   return gulp.src(paths.css[0])
     .pipe(changed(path.css[1], {extension: '.css'}))
     .pipe(sourcemaps.init())
-      .pipe(sass())
       .pipe(autoprefixer())
       .pipe(nano())
       .pipe(concat('style.css'))
