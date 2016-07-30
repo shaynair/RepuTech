@@ -158,8 +158,6 @@ function initialize() {
 }
 
 
-
-
 function delete_user(id) {
     
     $.ajax({

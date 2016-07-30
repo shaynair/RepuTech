@@ -12,7 +12,7 @@ var data = [
         "rating": 4,
         "followers": 23,
         "job": "Smartphone Technician",
-        "status": "Feeling tech-tastic",
+        "mood": "Feeling tech-tastic",
         "posts": [
             {
                 "author": "John Doe",
@@ -22,6 +22,15 @@ var data = [
                 "picture": "",
                 "contact_info": "111-111-1111",
                 "description": "If you're looking to get your smartphone repaired, look no further! I have been repairing smartphone for the past 5 years and I can guarantee that your smartphone will be fixed in less than 5 business days!"
+            },
+            {
+                "author": "Jane D",
+                "title": "Looking for someone to fix an iPhone 4",
+                "type": "Searching",
+                "rating": "4/5",
+                "picture": "",
+                "contact_info": "416-000-1234",
+                "description": "hi, im looking for someone who can fix my iPhone 4 and replace the screen for me. pls msg me if you can help!"
             }
         ],
         "wiki": [
@@ -51,7 +60,7 @@ var msgs = [
 
 function get_profile() {
     var url = 'profile';
-    /*$.ajax({
+    $.ajax({
         method: "GET",
         dataType: "json",
         url: url,
@@ -61,24 +70,95 @@ function get_profile() {
         error: function (err) {
             console.log(err);
         }
-    });*/
+    });
 
 }
 
 function get_messages() {
-    var url = 'messages';
-    /*$.ajax({
+    $.ajax({
         method: "GET",
         dataType: "json",
-        url: url,
+        url: '',
         success: function (data) {
             render_messages(data); 
         },
         error: function (err) {
             console.log(err);
         }
-    });*/
+    });
 }
+
+function get_general_info() {
+    $.ajax({
+        method: "GET",
+        dataType: "json",
+        url: '',
+        success: function (data) {
+            render_general_info(data); 
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    });
+}
+
+function get_settings_form() {
+    $.ajax({
+        method: "GET",
+        dataType: "json",
+        url: '',
+        success: function (data) {
+            render_settings_form(data); 
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    });
+}
+
+function get_posts() {
+    $.ajax({
+        method: "GET",
+        dataType: "json",
+        url: '',
+        success: function (data) {
+            render_posts(data); 
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    });
+}
+
+
+var GeneralInfo = React.createClass({
+    render: function() {
+        var userNodes = this.props.data.map(function(user) {
+            return (
+                <div>
+                <section id="profile-general">
+                    <h3 id="name">{user.firstname} {user.lastname}</h3>
+                    <p id="profile-status">Status: {user.mood}</p>
+                
+                    <h4>Reputation:</h4>
+                    <p>Rating: {user.rating}</p>
+                    <p>Followers: {user.followers}<button class="follow">Follow</button></p>
+                
+                    <h4>Information:</h4>
+                    <p>Specialize in: {user.job}</p>
+                    <p>Located in: {user.city}, {user.country}</p>
+                </section>
+                <section id="gallery"><h4>My Images:</h4></section>
+                </div>
+            );
+        });
+        return (
+            <div className="GeneralInfo">
+                {userNodes}
+            </div>
+        );
+    }
+});
 
 var ListingForm = React.createClass({
     
@@ -96,9 +176,7 @@ var ListingForm = React.createClass({
     
     render: function() {
         return (
-            <div>
-            <h3>Create Listing</h3>
-            <form method="post" id="listing-form">
+            <form method="post" id="listing-form" class="profile-form">
                 <p>Title:</p>
                 <input type="text" id="post-title"/>
                 <p>Post Type:</p>
@@ -118,9 +196,8 @@ var ListingForm = React.createClass({
                 </div>
                 <p>Description:</p>
                 <textarea id="post-description" rows="15"></textarea>
-                <button type="submit" form="listing-form" value="Submit">Submit</button>
+                <button type="submit" form="listing-form" value="Submit" id="listing-button">Submit</button>
             </form>
-            </div>
         );
     }
 });
@@ -130,8 +207,7 @@ var AccountInfo = React.createClass({
     render: function() {
         var userNodes = this.props.data.map(function(user) {
             return (
-                <form method="post" id="update-info">
-                    <h3>Update Account Info</h3>
+                <form method="post" id="update-info" class="profile-form">
                     <fieldset>
                         <legend>Personal Information:</legend>
                         <p>First name:</p>
@@ -162,7 +238,7 @@ var AccountInfo = React.createClass({
                         <p>Retype New Password (same as above): </p>
                         <input type="password" id="newpass-confirmation" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
                     </fieldset>
-                    <button type="submit" form="update-info" value="Update">Update</button>
+                    <button type="submit" form="update-info" value="Update" id="update-button">Update</button>
                 </form>
             );
         });
@@ -174,24 +250,52 @@ var AccountInfo = React.createClass({
     }
 });
 
+var Wiki = React.createClass({
+    render: function() {
+        var userNodes = this.props.data.map(function(user) {
+            for (var i = 0; i < user["wiki-posts"].length; i++) {
+                return (
+                    <section id="profile-wiki">
+                        <button id="wiki-new">New Wiki Post</button>
+                        <h3>{user["wiki-posts"][i].title}</h3>
+                        <p>{user["wiki-posts"][i].content}</p>
+                    </section>
+                );
+            }
+        });
+        return (
+            <div className="Wiki">
+                {userNodes}
+            </div>
+        );
+    }
+});
+
 var WikiNew = React.createClass({
     render: function() {
         return (
             <section id="profile-wiki-new">
-                <h3>New Wiki Post</h3>
-                <form data-reactroot="" method="post" id="wiki-form">
+                <form data-reactroot="" method="post" id="wiki-form" class="profile-form">
                     <p>Title:</p>
                     <input type="text" id="wiki-title"></input>
                     <p>Content:</p>
                     <textarea id="wiki-content" rows="15"></textarea>
-                    <button type="submit" form="wiki-form" value="Submit">Submit</button>
+                    <button type="submit" form="wiki-form" value="Submit" id="wiki-button">Submit</button>
                 </form>
             </section>
         );
     }
 });
 
-function render_settings_form() {
+
+function render_general_info(data) {
+    $('.profile-content').empty();
+    ReactDOM.render(<GeneralInfo data={data} />,
+                    document.getElementById('profile-content')
+    );
+}
+
+function render_settings_form(data) {
     $('.profile-content').empty();
     ReactDOM.render(<AccountInfo data={data} />,
                     document.getElementById('profile-content')
@@ -205,40 +309,11 @@ function render_listing_form() {
     );   
 }
 
-function render_general_info() {
-    $('.profile-content').empty();
-    $('.profile-content').append($('<section/>', {id: 'profile-general'}));
-    var user = data[0];
-    $('#profile-general').append($('<h3/>', {id: 'name', text: user.firstname + ' ' + user.lastname}));
-    $('#profile-general').append($('<p/>', {id: 'profile-status', text: 'Status: ' + user.status}));
-    $('#profile-general').append($('<h4/>', {text: 'Reputation:'}));
-    
-    if (user.rating === 1) {
-        $('#profile-general').append($("<p/>", {id: 'rating', html: "Rating: &#9733;&#9734;&#9734;&#9734;&#9734;"}));
-    } else if (user.rating === 2) {
-        $('#profile-general').append($("<p/>", {id: 'rating', html: "Rating: &#9733;&#9733;&#9734;&#9734;&#9734;"}));
-    } else if (user.rating === 3) {
-        $('#profile-general').append($("<p/>", {id: 'rating', html: "Rating: &#9733;&#9733;&#9733;&#9734;&#9734;"}));
-    } else if (user.rating === 4) {
-        $('#profile-general').append($("<p/>", {id: 'rating', html: "Rating: &#9733;&#9733;&#9733;&#9733;&#9734;"}));
-    } else if (user.rating === 5) {
-        $('#profile-general').append($("<p/>", {id: 'rating', html: "Rating: &#9733;&#9733;&#9733;&#9733;&#9733;"}));
-    }
-    
-    $('#profile-general').append($('<p/>', {id: 'followers', text: 'Followers: ' + user.followers}));
-    $('#followers').append($('<button/>', {id: 'follow', text: 'Follow'}));
-    $('#profile-general').append($('<h4/>', {text: 'Information:'}));
-    $('#profile-general').append($('<p/>', {text: 'Specialize in: ' + user.job}));
-    $('#profile-general').append($('<p/>', {text: 'Located in: ' + user.city + ', ' + user.country}));
-    $('#profile-general').append($('<section/>', {id: 'gallery'}));
-    $('#gallery').append($('<h4/>', {text: 'My images:'}));
-    
-}
 
-function render_messages() {
+function render_messages(msgs) {
+    
     $('.profile-content').empty();
     $('.profile-content').append($('<section/>', {id: 'messages'}));
-    $('.profile-content').append($('<h3/>', {text: 'My Messages'}));
     for (var i = 0; i < msgs.length; i ++) {
         $('.profile-content').append($('<section/>', {class: 'post', id: 'post-' + i}));
         for (var j = 0; j < msgs[i].length; j ++) {
@@ -248,9 +323,8 @@ function render_messages() {
     }
 }
 
-function render_posts() {
+function render_posts(data) {
     $('.profile-content').empty();
-    $('.profile-content').append($('<h3/>', {text: 'My Posts'}));
     var posts = data[0].posts;
     // Renders posts for the profile
     for (var i = 0; i < posts.length; i ++) {
@@ -275,12 +349,11 @@ function render_posts() {
 
 function render_wiki() {
     $('.profile-content').empty();
-    $('.profile-content').append($('<h3/>', {text: 'My Wiki Posts'}));
     var wiki = data[0].wiki;
     $('.profile-content').append($('<section/>', {id: 'profile-wiki'}));
     $('#profile-wiki').append($('<button/>', {id: 'wiki-new', text: 'New Wiki Post'}));
     for (var i = 0; i < wiki.length; i++) {
-        $('#profile-wiki').append($('<h4/>', {text: wiki[i].title}));
+        $('#profile-wiki').append($('<h3/>', {text: wiki[i].title}));
         $('#profile-wiki').append($('<p/>', {text: wiki[i].content}));
     }
     // Click to create new wiki form
@@ -301,7 +374,7 @@ function render_wiki_new() {
 
 var $old; // Holds previously clicked button
 $('#general').click(function() {
-    render_general_info();
+    get_general_info();
     if ($old != null) {
         $old.toggleClass('active');
     }
@@ -311,21 +384,22 @@ $('#general').click(function() {
 });
 
 $('#posts').click(function() {
-    render_posts();
+    get_posts();
     $old.toggleClass('active');
     $(this).toggleClass('active');
     $old = $(this);
 });
 
 $('#messages').click(function() {
-    render_messages();
+    
+    get_messages();
     $old.toggleClass('active');
     $(this).toggleClass('active');
     $old = $(this);
 });
 
 $('#settings').click(function() {
-    render_settings_form();
+    get_settings_form();
     $old.toggleClass('active');
     $(this).toggleClass('active');
     $old = $(this);
@@ -343,6 +417,24 @@ $('#wiki').click(function() {
     $old.toggleClass('active');
     $(this).toggleClass('active');
     $old = $(this);
+});
+
+$('.follow').click(function() {
+    // NOT SURE WHAT TO SEND SINCE WE DONT HAVE BOTH USERS IDs
+});
+
+$('.profile-form').on('submit', function(event) {
+    $.ajax({
+        method: "POST",
+        url: '',
+        data: $('form').serialize(),
+        success: function () {
+            // DO SOMETHING HERE!
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    });
 });
 
 // Profile loads General Info page by default
