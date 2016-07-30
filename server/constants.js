@@ -1,16 +1,20 @@
 // This file defines global constants for our app.
 
 // Postgres information
-const pg = {
+exports.DATABASE_INFO = {
     host: 'ec2-54-243-42-108.compute-1.amazonaws.com', 
     port: 5432,
     database: 'ddu88fjcr9a852',
     user: 'eprjxyhertbqxx',
-    password: 'j-nGiGLZKxuI6h7CBjyeEhi_QO'
+    password: 'j-nGiGLZKxuI6h7CBjyeEhi_QO',
+    ssl: true,
+    max: 20,
+    min: 4,
+    idleTimeoutMillis: 1000
 };
-exports.DATABASE = pg;
-exports.DATABASE_URL = "postgres://" + pg.user + ":" + pg.password + "@"
-			+ pg.host + ":" + pg.port + "/" + pg.database + "?ssl=true";
+
+//exports.DATABASE_URL = "postgres://" + pg.user + ":" + pg.password + "@"
+//			+ pg.host + ":" + pg.port + "/" + pg.database + "?ssl=true";
 			
 // SMTP email url
 exports.EMAIL = "reputech.team@gmail.com";

@@ -1,7 +1,7 @@
 // This file handles the main running of the server.
 
 // Do all requires
-const express = require('express')();
+const express = require('express');
 const compression = require('compression');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
@@ -10,10 +10,14 @@ const redis = require('connect-redis');
 const csrf = require('csurf')();
 const expressValidator = require('express-validator');
 const favicon = require('serve-favicon');
+const pg = require('pg');
+const Pool = require('pg-pool');
 
 // File requires
 const socket = require('./socket');
 const c = require('./constants');
+const routes = require('./routes');
+const auth = require('./auth');
 
 // Server config
 const app = express();
@@ -31,11 +35,13 @@ app.use(helmet({
         defaultSrc: ["'self'"],
         childSrc: ["'self'"],
         frameAncestors: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "https://code.jquery.com",
+                    "https://cdnjs.cloudflare.com"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://code.jquery.com"],
         imgSrc: ["'self'", 'data:'],
-        sandbox: ['allow-forms', 'allow-scripts'],
-        objectSrc: [] 
+        objectSrc: [],
+        sandbox: ["allow-forms", "allow-scripts", "allow-same-origin",
+                    "allow-top-navigation", "allow-modals"] 
       },
       reportOnly: false,
       setAllHeaders: false,
@@ -45,7 +51,7 @@ app.use(helmet({
 
 // Sessions
 const RedisStore = redis(session);
-app.use( session({
+app.use(session({
     secret: c.COOKIE_SECRET,
     name: 'session',
     resave: false, // Redis implements touch
@@ -55,7 +61,7 @@ app.use( session({
         secure: true,
         maxAge: 6*60*60*1000
     } // 6 hour cookie maximum
-});
+}));
 
 // CSRF protection for POST
 app.use(csrf);
@@ -67,23 +73,32 @@ app.use(express.static(__dirname + '/../public'));
 // Template files
 app.set('views', __dirname + '/../views');
 app.set('view engine', 'ejs');
-app.set('view cache', 'true');
+//app.set('view cache', 'true');
 
 // Enable body parsing
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(expressValidator());
 
+// Database connection
+const pool = new Pool(c.DATABASE_INFO);
 
-// Info to pass to any other modules
-const serverInfo = {
-}
-
-// Runs the server
-exports.run = () => {
-	const server = app.listen(app.get('port'), () => {
-		console.log('Node is running on port ', app.get('port'));
-	});
+// Exports for other files
+module.exports = {
+    // Runs server
+    run: () => {
+        routes.configure(app, module.exports);
+        auth.configure(app, module.exports);
+        
+        const server = app.listen(app.get('port'), () => {
+            console.log('Node is running on port', app.get('port'));
+        });
+        
+        socket.run(server, module.exports);
+    },
     
-    socket.run(server, serverInfo);
+    // Does a query to database (text, values, cb)
+    query: pool.query,
+    
+    
 }

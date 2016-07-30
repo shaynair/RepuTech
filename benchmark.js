@@ -1,7 +1,5 @@
 // Executes the Node.js server and benchmarks it.
 
-const memwatch = require('memwatch');
-
 const Monitor = require('monitor');
 // Set the probe to push changes every 10 seconds
 const processMonitor = new Monitor({
@@ -10,19 +8,6 @@ const processMonitor = new Monitor({
   initParams: {
     pollInterval: 10000
   }
-});
-
-// Memory leak detection
-memwatch.on('leak', (info) => {
-    console.log("Memory leak detected: grown " + info.growth + " on " 
-                + info.end + ": " + info.reason);
-});
-memwatch.on('stats', (stats) => {
-    if (stats.usage_trend > 0) {
-        // Using more and more memory
-        console.log("Potential leak: trend " + stats.usage_trend 
-                +  ", heap compactions: " + stats.heap_compactions);
-    }
 });
 
 // Attach the change listener

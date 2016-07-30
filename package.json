@@ -27,20 +27,23 @@
     "express-session": "*",
     "express-validator": "*",
     "connect-redis": "*",
-    "csurf": "*",
+    
     "ejs": "*",
     "express": "*",
     "serve-favicon": "*",
 	"body-parser": "*",
     
+    "csurf": "*",
+    "helmet": "*",
+    
     "bcrypt": "*",
     "pg": "*",
+    "pg-pool": "*",
     
     "nodemailer": "*",
 	"moment": "*",
 	"socket.io": "*",
     
-    "memwatch": "*",
     "monitor": "*",
     
     "gulp": "*",
@@ -50,9 +53,12 @@
     "gulp-babel": "*",
     "gulp-uglify": "*",
     "gulp-imagemin": "*",
-    "gulp-cache": "*",
     "gulp-cssnano": "*",
     "gulp-autoprefixer": "*",
-    "del": "*"
+    "del": "*",
+    "cross-spawn": "*",
+    "graceful-fs": "*",
+    "babel-preset-es2015": "*",
+    "babel-preset-react": "*"
   }
 }
