@@ -15,10 +15,11 @@
         <meta name="description" content="Reputable technology aid services">
 		
 		<!-- Assets, CSS, JS -->
-		<script defer src="../assets/scripts/jquery-3.0.0.min.js"></script>
         <link rel="stylesheet" href="../assets/css/style.css">
+        
+		<script defer src="../assets/scripts/jquery-3.0.0.min.js"></script>
         <script src="../assets/scripts/profile.js" defer></script>
-        <script src="../assets/scripts/forms.js" defer></script>
+        <script src="../assets/scripts/search.js" defer></script>
 
     </head>
     <body>
@@ -40,15 +41,15 @@
                     <p>Author name:</p>
                     <input type="text" id="name" value="John Doe"/>
                     <p>Urgency:</p>
-                    <input type="number" id="country" value="4"/>
+                    <input type="number" id="urgency" value="4"/>
                     <p>Reputation:</p>
                     <input type="number" id="reputation" value="4"/>
                     <p>Location:</p>
                     <input type="text" id="city" value="Toronto"/>
                     <p>Offering service:</p>
-                    <input type="checkbox" id="offer" checked/>
+                    <input type="checkbox" id="service" checked/>
                 </fieldset>
-                <button>Refine</button>
+                <button id='refine'>Refine</button>
             </section>
 
             <section class="profile-content">
