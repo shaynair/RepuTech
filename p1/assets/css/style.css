@@ -296,7 +296,7 @@ header h1 {
     overflow: scroll-y;
 }
 
-#profile-general h3 {
+#profile-content h3 {
     margin: 0;
     padding-bottom: 1rem;
     font-size: 2.5rem;
@@ -314,6 +314,10 @@ header h1 {
     background-color: #ededed;
     color: #7e7e7e;
     
+}
+
+#rating, #followers { 
+    color: green;
 }
 
 #profile-general p {
@@ -448,7 +452,7 @@ section#gallery ul li img {
     background: #000;
     border: none;
     margin: 3rem auto;
-    width: 33.333%;
+    width: 50%;
 }
 
 .ui-slider-horizontal {

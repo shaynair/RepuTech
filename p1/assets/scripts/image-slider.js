@@ -2,7 +2,11 @@
 
 function LoadImageSlider() {
     
-    // Pull from database
+    var pathname = window.location.pathname;
+    // Check if pathname is index.html or a user's profile
+    // Load the correct images
+    
+    // Placeholder images, pull user's images from database
     var images = [
         {
             "title": "Computer technician 2",
