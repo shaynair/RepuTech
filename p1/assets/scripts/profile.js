@@ -22,15 +22,6 @@ var data = [
                 "picture": "",
                 "contact_info": "111-111-1111",
                 "description": "If you're looking to get your smartphone repaired, look no further! I have been repairing smartphone for the past 5 years and I can guarantee that your smartphone will be fixed in less than 5 business days!"
-            },
-            {
-                "author": "Jane D",
-                "title": "Looking for someone to fix an iPhone 4",
-                "type": "Searching",
-                "rating": "4/5",
-                "picture": "",
-                "contact_info": "416-000-1234",
-                "description": "hi, im looking for someone who can fix my iPhone 4 and replace the screen for me. pls msg me if you can help!"
             }
         ],
         "wiki": [
@@ -130,36 +121,6 @@ function get_posts() {
     });
 }
 
-
-var GeneralInfo = React.createClass({
-    render: function() {
-        var userNodes = this.props.data.map(function(user) {
-            return (
-                <div>
-                <section id="profile-general">
-                    <h3 id="name">{user.firstname} {user.lastname}</h3>
-                    <p id="profile-status">Status: {user.mood}</p>
-                
-                    <h4>Reputation:</h4>
-                    <p>Rating: {user.rating}</p>
-                    <p>Followers: {user.followers}<button class="follow">Follow</button></p>
-                
-                    <h4>Information:</h4>
-                    <p>Specialize in: {user.job}</p>
-                    <p>Located in: {user.city}, {user.country}</p>
-                </section>
-                <section id="gallery"><h4>My Images:</h4></section>
-                </div>
-            );
-        });
-        return (
-            <div className="GeneralInfo">
-                {userNodes}
-            </div>
-        );
-    }
-});
-
 var ListingForm = React.createClass({
     
     getInitialState: function() {
@@ -176,6 +137,8 @@ var ListingForm = React.createClass({
     
     render: function() {
         return (
+			<div>
+            <h3>Create Listing</h3>
             <form method="post" id="listing-form" class="profile-form">
                 <p>Title:</p>
                 <input type="text" id="post-title"/>
@@ -198,6 +161,7 @@ var ListingForm = React.createClass({
                 <textarea id="post-description" rows="15"></textarea>
                 <button type="submit" form="listing-form" value="Submit" id="listing-button">Submit</button>
             </form>
+			</div>
         );
     }
 });
@@ -208,6 +172,7 @@ var AccountInfo = React.createClass({
         var userNodes = this.props.data.map(function(user) {
             return (
                 <form method="post" id="update-info" class="profile-form">
+					<h3>Update Account Info</h3>
                     <fieldset>
                         <legend>Personal Information:</legend>
                         <p>First name:</p>
@@ -250,31 +215,11 @@ var AccountInfo = React.createClass({
     }
 });
 
-var Wiki = React.createClass({
-    render: function() {
-        var userNodes = this.props.data.map(function(user) {
-            for (var i = 0; i < user["wiki-posts"].length; i++) {
-                return (
-                    <section id="profile-wiki">
-                        <button id="wiki-new">New Wiki Post</button>
-                        <h3>{user["wiki-posts"][i].title}</h3>
-                        <p>{user["wiki-posts"][i].content}</p>
-                    </section>
-                );
-            }
-        });
-        return (
-            <div className="Wiki">
-                {userNodes}
-            </div>
-        );
-    }
-});
-
 var WikiNew = React.createClass({
     render: function() {
         return (
             <section id="profile-wiki-new">
+				<h3>New Wiki Post</h3>
                 <form data-reactroot="" method="post" id="wiki-form" class="profile-form">
                     <p>Title:</p>
                     <input type="text" id="wiki-title"></input>
@@ -287,12 +232,34 @@ var WikiNew = React.createClass({
     }
 });
 
-
 function render_general_info(data) {
     $('.profile-content').empty();
-    ReactDOM.render(<GeneralInfo data={data} />,
-                    document.getElementById('profile-content')
-    );
+    $('.profile-content').append($('<section/>', {id: 'profile-general'}));
+    var user = data[0];
+    $('#profile-general').append($('<h3/>', {id: 'name', text: user.firstname + ' ' + user.lastname}));
+    $('#profile-general').append($('<p/>', {id: 'profile-status', text: 'Status: ' + user.status}));
+    $('#profile-general').append($('<h4/>', {text: 'Reputation:'}));
+    
+    if (user.rating === 1) {
+        $('#profile-general').append($("<p/>", {id: 'rating', html: "Rating: &#9733;&#9734;&#9734;&#9734;&#9734;"}));
+    } else if (user.rating === 2) {
+        $('#profile-general').append($("<p/>", {id: 'rating', html: "Rating: &#9733;&#9733;&#9734;&#9734;&#9734;"}));
+    } else if (user.rating === 3) {
+        $('#profile-general').append($("<p/>", {id: 'rating', html: "Rating: &#9733;&#9733;&#9733;&#9734;&#9734;"}));
+    } else if (user.rating === 4) {
+        $('#profile-general').append($("<p/>", {id: 'rating', html: "Rating: &#9733;&#9733;&#9733;&#9733;&#9734;"}));
+    } else if (user.rating === 5) {
+        $('#profile-general').append($("<p/>", {id: 'rating', html: "Rating: &#9733;&#9733;&#9733;&#9733;&#9733;"}));
+    }
+    
+    $('#profile-general').append($('<p/>', {id: 'followers', text: 'Followers: ' + user.followers}));
+    $('#followers').append($('<button/>', {id: 'follow', text: 'Follow'}));
+    $('#profile-general').append($('<h4/>', {text: 'Information:'}));
+    $('#profile-general').append($('<p/>', {text: 'Specialize in: ' + user.job}));
+    $('#profile-general').append($('<p/>', {text: 'Located in: ' + user.city + ', ' + user.country}));
+    $('#profile-general').append($('<section/>', {id: 'gallery'}));
+    $('#gallery').append($('<h4/>', {text: 'My images:'}));
+    
 }
 
 function render_settings_form(data) {
@@ -314,6 +281,7 @@ function render_messages(msgs) {
     
     $('.profile-content').empty();
     $('.profile-content').append($('<section/>', {id: 'messages'}));
+	$('.profile-content').append($('<h3/>', {text: 'My Messages'}));
     for (var i = 0; i < msgs.length; i ++) {
         $('.profile-content').append($('<section/>', {class: 'post', id: 'post-' + i}));
         for (var j = 0; j < msgs[i].length; j ++) {
@@ -325,6 +293,7 @@ function render_messages(msgs) {
 
 function render_posts(data) {
     $('.profile-content').empty();
+	$('.profile-content').append($('<h3/>', {text: 'My Posts'}));
     var posts = data[0].posts;
     // Renders posts for the profile
     for (var i = 0; i < posts.length; i ++) {
@@ -349,11 +318,12 @@ function render_posts(data) {
 
 function render_wiki() {
     $('.profile-content').empty();
+	$('.profile-content').append($('<h3/>', {text: 'My Wiki Posts'}));
     var wiki = data[0].wiki;
     $('.profile-content').append($('<section/>', {id: 'profile-wiki'}));
     $('#profile-wiki').append($('<button/>', {id: 'wiki-new', text: 'New Wiki Post'}));
     for (var i = 0; i < wiki.length; i++) {
-        $('#profile-wiki').append($('<h3/>', {text: wiki[i].title}));
+        $('#profile-wiki').append($('<h4/>', {text: wiki[i].title}));
         $('#profile-wiki').append($('<p/>', {text: wiki[i].content}));
     }
     // Click to create new wiki form
