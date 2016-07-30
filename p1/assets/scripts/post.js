@@ -74,6 +74,13 @@ var posts = [
     }
 ];
 
+var rating_stars = {
+    1 : "Rating: &#9733;&#9734;&#9734;&#9734;&#9734;",
+    2 : "Rating: &#9733;&#9733;&#9734;&#9734;&#9734;",
+    3 : "Rating: &#9733;&#9733;&#9733;&#9734;&#9734;",
+    4 : "Rating: &#9733;&#9733;&#9733;&#9733;&#9734;",
+    5 : "Rating: &#9733;&#9733;&#9733;&#9733;&#9733;"
+};
 
 function render_post_full() {
     $('.post-content').empty();
@@ -86,17 +93,7 @@ function render_post_full() {
     $('.post-full').append($('<p/>', {class: 'post-author', text: 'Author: ' + post.firstname + ' ' + post.lastname}));
     $('.post-author').append($('<button/>', {text: 'View Profile'}));
     
-    if (post.rating === 1) {
-        $('.post-full').append($("<p/>", {id: 'rating', html: "Rating: &#9733;&#9734;&#9734;&#9734;&#9734;"}));
-    } else if (post.rating === 2) {
-        $('.post-full').append($("<p/>", {id: 'rating', html: "Rating: &#9733;&#9733;&#9734;&#9734;&#9734;"}));
-    } else if (post.rating === 3) {
-        $('.post-full').append($("<p/>", {id: 'rating', html: "Rating: &#9733;&#9733;&#9733;&#9734;&#9734;"}));
-    } else if (post.rating === 4) {
-        $('.post-full').append($("<p/>", {id: 'rating', html: "Rating: &#9733;&#9733;&#9733;&#9733;&#9734;"}));
-    } else if (post.rating === 5) {
-        $('.post-full').append($("<p/>", {id: 'rating', html: "Rating: &#9733;&#9733;&#9733;&#9733;&#9733;"}));
-    }
+    $('.post-full').append($("<p/>", {id: 'rating', html: rating_stars[post.rating]}));
     
     $('.post-full').append($('<p/>', {text: post.type + ' service'}));
     $('.post-full').append($('<p/>', {text: 'Contact: ' + post.contact_info}));
@@ -119,8 +116,10 @@ function render_post_full() {
     
     for (var i = 0; i < post.reviews.length; i++) {
         $('.post-reviews').append($('<article/>', {class: 'post-review', id: 'post-review-' + i}));
-        $('#post-review-' + i).append($('<h4/>', {text: post.reviews[i].firstname + ' ' + post.reviews[i].lastname}));
-        $('#post-review-' + i).append($('<p/>', {text: post.reviews[i].rating}));
+        $('#post-review-' + i).append($('<h4/>', {text: 'By ' + post.reviews[i].firstname + ' ' + post.reviews[i].lastname}));
+        
+        $('#post-review-' + i).append($("<p/>", {id: 'rating', html: rating_stars[post.reviews[i].rating]}));
+        
         $('#post-review-' + i).append($('<p/>', {text: post.reviews[i].comment}));
     }
     $('.post-reviews').append($('<button/>', {text: 'Leave a Review'}));
@@ -134,7 +133,7 @@ function render_post_full() {
         $('#post-similar-' + i).append($('<a/>', {id:'post-link-' + i, href: post.similar_posts[i].link}));
         $('#post-link-' + i).append($('<h4/>', {text: post.similar_posts[i].title}));
         $('#post-similar-' + i).append($('<p/>', {text: post.similar_posts[i].firstname + ' ' + post.similar_posts[i].lastname}));
-        $('#post-similar-' + i).append($('<p/>', {text: post.similar_posts[i].rating}));
+        $('#post-similar-' + i).append($("<p/>", {id: 'rating', html: rating_stars[post.similar_posts[i].rating]}));
         $('#post-similar-' + i).append($('<p/>', {text: post.similar_posts[i].city + ', ' + post.similar_posts[i].country}));
     }
 }

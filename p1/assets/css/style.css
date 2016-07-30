@@ -347,6 +347,14 @@ header h1 {
     overflow: scroll-y;
 }
 
+.post-content {
+    background: white;
+}
+
+.post-content h3 {
+    margin-left: 2rem;
+}
+
 .post, .post-similar, .post-review, .post-comment {
     transition: border 0.5s, transform 0.5s;
 }
