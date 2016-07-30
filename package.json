@@ -6,7 +6,8 @@
   "description": "RepuTech",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "postinstall": "gulp default"
   },
   "keywords": [
     "tech",
@@ -18,18 +19,25 @@
     "url": "https://github.com/akshay-nair/RepuTech"
   },
   "engines": {
-    "node": "*",
-    "npm": "*"
+    "node": "6.x",
+    "npm": "3.x"
   },
   "dependencies": {
-    "bcrypt-nodejs": "*",
+    "bcrypt": "*",
     "compression": "*",
     "express-session": "*",
+    "express-validator": "*",
+    "connect-redis": "*",
+    "csurf": "*",
     "ejs": "*",
     "express": "*",
     "pg": "*",
 	"body-parser": "*",
-	"request": "*",
-	"moment": "*"
+    "nodemailer": "*",
+	"moment": "*",
+	"socket.io": "*",
+    "memwatch": "*",
+    "monitor": "*",
+    "serve-favicon": "*"
   }
 }
