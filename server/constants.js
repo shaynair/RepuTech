@@ -12,7 +12,7 @@ exports.DATABASE_INFO = {
     min: 4,
     idleTimeoutMillis: 1000
 };
-exports.SQL_INIT_PATH = "./Data/Structure.sql";
+exports.SQL_INIT_PATH = "./Data/Structure.sql"; // File containing SQL struct
 exports.SALT = 13; // Salt rounds for Bcrypt
 //exports.DATABASE_URL = "postgres://" + pg.user + ":" + pg.password + "@"
 //			+ pg.host + ":" + pg.port + "/" + pg.database + "?ssl=true";
@@ -31,3 +31,6 @@ exports.REDIS = {
     pass: 'csc309a4'
 };
 
+// Admin Info
+exports.ADMIN_LOGIN = "admin@reputech.com";
+exports.ADMIN_PASS = "admin";

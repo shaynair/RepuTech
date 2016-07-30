@@ -74,9 +74,9 @@ function remove_user(req,res){
 function ban_user(req,res){
      var u_id = req.query.u_id; 
 	 
-	 var sql_query = "UPDATE  users SET status = $1 WHERE u_id = $2";
+	 var sql_query = "UPDATE login SET banned = TRUE WHERE u_id = $1";
 	 pg.connect(connectpath, function(err, client, done) {
-          client.query(sql_query,['banned',u_id]);
+          client.query(sql_query,[u_id]);
      });
 }
 //-----------------------------------

@@ -1,8 +1,3 @@
-DROP DATABASE IF EXISTS reputech;
-CREATE DATABASE reputech;
-USE reputech;
-PSQL \c reputech;
-
 DROP TYPE IF EXISTS user_types;
 CREATE TYPE user_types AS ENUM('Normal', 'Facebook', 'Twitter', 'Google', 'GitHub', 'LinkedIn', 'BitBucket', 'Reddit', 'Dropbox');
 
@@ -20,7 +15,7 @@ CREATE TABLE login(
   creation_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   login_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   banned BOOLEAN NOT NULL DEFAULT FALSE,
-  ip_address VARCHAR(16) NOT NULL,
+  ip_address VARCHAR(16) DEFAULT NULL,
   sessionID VARCHAR(64) DEFAULT NULL,
   
   PRIMARY KEY (u_id),
