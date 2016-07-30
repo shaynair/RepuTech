@@ -1,0 +1,26 @@
+<%- include partials/head.ejs %>
+
+       <main>
+            <section class="sidebar flexbox flexbox-column">
+                <fieldset>
+                    <legend>Criteria</legend>
+                    <p>Posted By:</p>
+                    <input type="text" id="name" placeholder="Name"/>
+                    <p>Urgency:</p>
+                    <input type="number" id="urgency" placeholder="1-5"/>
+                    <p>Reputation:</p>
+                    <input type="number" id="reputation" placeholder="1-5"/>
+                    <p>Location:</p>
+                    <input type="text" id="city" placeholder="City"/>
+                    <input type="text" id="country" placeholder="Country"/>
+                    <p>Offering service:</p>
+                    <input type="checkbox" id="service" unchecked/>
+                </fieldset>
+                <button id='refine'>Refine</button>
+            </section>
+
+            <section class="profile-content">
+            </section>
+            
+        </main> 
+<%- include partials/footer.ejs %>

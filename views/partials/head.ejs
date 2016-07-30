@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<!-- Responsive Design Tags -->
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="ie=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+		
+		<!-- Copyright information. -->
+		<meta name="author" content="Akshay Nair, Seyed Hossein Fazeli, Anson Chen, Kevin Thich" />
+		<meta name="Copyright" content="Akshay Nair, Seyed Hossein Fazeli, Anson Chen, Kevin Thich" />
+		
+		<!-- Title of the page -->
+        <meta name="description" content="Reputable technology aid services">
+		<title>RepuTech<%= (title ? " - " + title : "") %></title>
+        
+		<!-- Assets, CSS, JS -->
+        <script defer src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+		<script defer src="/assets/scripts/all.min.js"></script>
+        <link rel="stylesheet" href="/assets/stylesheets/style.css">
+        
+        <% if (!title || title == "Profile") { %>
+            <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+        <% } %>
+        
+        <% if (title == "Profile") { %>
+            <script defer src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react.js"></script>
+            <script defer src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react-dom.js"></script>
+        <% } %>
+        
+        <!-- Icon -->
+        <link rel="apple-touch-icon" sizes="76x76" href="/assets/images/apple-touch-icon.png">
+        <link rel="icon" type="image/png" href="/assets/images/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="/assets/images/favicon-16x16.png" sizes="16x16">
+        <link rel="mask-icon" href="/assets/images/safari-pinned-tab.svg" color="#5bbad5">
+        <meta name="apple-mobile-web-app-title" content="RepuTech">
+        <meta name="application-name" content="RepuTech">
+        <meta name="theme-color" content="#ffffff">
+    </head>
+    <body>
+        <!--Navigation menu at top-->
+        <nav>
+            <a href="/" class="logo"> <!--Link to index of webpage-->
+                <img alt="Logo" src="/assets/images/logo.png" />
+            </a>
+			<section class="right">
+				<form id="search-form" method="post" action="/search" class="inline-form">
+					<section class="inline-form">
+						<input name="search" type="text" placeholder="Keywords...">
+					</section>
+					<button type="submit" form="search-form" class="search-button">Search</button>
+				</form>
+                <% if (!user) { %>
+                    <a href="/signup"><button>Sign Up</button></a>
+                    <a href="/login"><button>Sign In</button></a>
+                <% } else { %>
+                    <a href="/logout"><button>Logout</button></a>
+                <% } %>
+			</section>
+        </nav>

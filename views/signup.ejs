@@ -1,0 +1,53 @@
+<%- include partials/head.ejs %>
+		<!-- Main sign up -->
+		<main>
+			<section class="modal-box">
+				<h2 class="title">Sign Up</h2>
+				<form method="post" id="sign-up-form" action="profile.html">
+				
+				    <p id="email-err" class="error"></p>
+				    <input type="email" name="email" id="email" pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}" required placeholder="Email Address..."/>
+				  
+				    <p id="email2-err" class="error"></p>
+				    <input type="email" name="email2" id="email2" pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}" required placeholder="Confirm Email Address...">
+				  
+				    <p id="pass-err" class="error"></p>
+				    <input type="password" name="pass" id="pass" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" required placeholder="Password..."/>
+				  
+				    <p id="pass2-err" class="error"></p>
+				    <input type="password" name="pass2" id="pass2" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" required placeholder="Confirm Password..."/>
+				  
+				    <p id="name-err" class="error"></p>
+				    <input type="text" class="input-half" id="name" pattern="[a-zA-Z]+" required name="firstname" placeholder="First Name..."/>	  
+				  
+				    <p id="lastname-err" class="error"></p>
+				    <input type="text" class="input-half" id="lastname" pattern="[a-zA-Z]+" required name="firstname" placeholder="Last Name..."/>	  
+				  
+				    <select id="country" required name="country">
+						<option selected>Country</option>
+				    </select>
+				  
+				    <select id="state" required name="state" >
+					  <option selected >State/Province</option>
+				    </select>
+				  
+				    <p id="city-err" class="error"></p>
+				    <input type="text" id="city" required pattern="[a-zA-Z]{2,}" name="city" placeholder="City"/>
+				  
+				    <p id="phone-err" class="error"></p>
+				    <input type="number" id="phone" required name="phone" pattern="[0-9]{10,12}" placeholder="Phone Number..."/>	  
+				  
+				    <button id="submit" type="submit" form="sign-up-form" value="Sign Up">Sign Up</button>    
+				</form>
+                
+				<a href="/login-facebook"><button>Sign Up with Facebook</button></a>
+                <a href="/login-twitter"><button>Sign Up with Twitter</button></a>
+                <a href="/login-google"><button>Sign Up with Google+</button></a>
+                <a href="/login-linkedin"><button>Sign Up with LinkedIn</button></a>
+                <a href="/login-reddit"><button>Sign Up with Reddit</button></a>
+                <a href="/login-dropbox"><button>Sign Up with Dropbox</button></a>
+                <a href="/login-bitbucket"><button>Sign Up with BitBucket</button></a>
+                <a href="/login-github"><button>Sign Up with GitHub</button></a>
+			</section>
+		</main>
+<%- include partials/footer.ejs %>

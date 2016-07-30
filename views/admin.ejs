@@ -1,0 +1,29 @@
+<%- include partials/head.ejs %>
+		<main>
+			<section class="modal-box" id="stats">
+				<h2 class="title">Statistics</h2>
+				<section class="admin-stats">
+				</section>
+			</section>
+            
+			<section class="modal-box" id="users">
+				<h2 class="title">Users</h2>
+				<form id="search-user" method="post">
+					<section class="inline-form">
+						<input name="search" type="text" placeholder="Keywords...">
+					</section>
+					<button type="submit" form="search-user">Search</button>
+				</form>
+				<section class="admin-users">
+				</section>
+				<a href="/admin-signup" class="self"><button>Add New User</button></a>
+			</section>
+            
+			<section class="modal-box" id="reports">
+				<h2 class="title">Reports</h2>
+				<section class="admin-reports">
+					
+				</section>
+			</section>
+		</main>
+<%- include partials/footer.ejs %>

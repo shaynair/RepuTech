@@ -1,0 +1,21 @@
+<%- include partials/head.ejs %>
+		<!-- Main login form -->
+		<main>
+			<section class="modal-box">
+				<h2 class="title">Log In</h2>
+				<form method="post" id="login-form" action="/login-local">
+					<input type="text" name="email" id="email" placeholder="Email Address..."/>
+					<input type="password" name="pass" id="pass" placeholder="Password..."/>
+					<button type="submit" form="login-form" value="Log In">Log In</button>
+				</form>
+				<a href="/login-facebook"><button>Log In with Facebook</button></a>
+                <a href="/login-twitter"><button>Log In with Twitter</button></a>
+                <a href="/login-google"><button>Log In with Google+</button></a>
+                <a href="/login-linkedin"><button>Log In with LinkedIn</button></a>
+                <a href="/login-reddit"><button>Log In with Reddit</button></a>
+                <a href="/login-dropbox"><button>Log In with Dropbox</button></a>
+                <a href="/login-bitbucket"><button>Log In with BitBucket</button></a>
+                <a href="/login-github"><button>Log In with GitHub</button></a>
+			</section>
+		</main>
+<%- include partials/footer.ejs %>
