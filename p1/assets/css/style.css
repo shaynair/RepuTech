@@ -298,11 +298,22 @@ header h1 {
 
 #profile-general h3 {
     margin: 0;
-    padding: 2rem;
+    padding-bottom: 1rem;
     font-size: 2.5rem;
     font-weight: lighter;
     color: white;
+    padding: 2rem;
     background: #1976D2;
+}
+
+#profile-general #profile-status {
+    background: grey;
+    margin: 0;
+    padding: 1rem 2rem;
+    font-style: italic;
+    background-color: #ededed;
+    color: #7e7e7e;
+    
 }
 
 #profile-general p {
