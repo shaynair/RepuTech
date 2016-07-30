@@ -30,14 +30,14 @@ const paths = {
 // Cleans all gulp files
 gulp.task('clean', () => {
   return del([paths.scripts[1], paths.images[1], 
-                paths.css[1], paths.icon[1]]);
+                paths.css[1]]);
 });
  
 // Minify and copy all JavaScript (except vendor scripts) 
-gulp.task('scripts', ['clean'], () => {
+gulp.task('scripts', () => {
   return gulp.src(paths.scripts[0], {extension: '.js'})
     .pipe(sourcemaps.init())
-      .pipe(changed(paths.scripts[1]))
+      .pipe(changed(paths.scripts[0]))
       .pipe(babel({
         presets: ['es2015', 'react']
       }))
@@ -48,32 +48,37 @@ gulp.task('scripts', ['clean'], () => {
 });
  
 // Copy all static images 
-gulp.task('images', ['clean'], () => {
+gulp.task('images', () => {
   return gulp.src(paths.images[0])
-    .pipe(changed(paths.images[1]))
+    .pipe(changed(paths.images[0]))
     .pipe(imagemin())
     .pipe(gulp.dest(paths.images[1]));
 });
 
 // Copy icon
-gulp.task('icon', ['clean'], () => {
+gulp.task('icon', () => {
   return gulp.src(paths.icon[0], {extension: '.ico'})
-    .pipe(changed(paths.icon[1]))
+    .pipe(changed(paths.icon[0]))
     .pipe(gulp.dest(paths.icon[1]));
 });
 
 // Pre-process CSS
-gulp.task('css', ['clean'], () => {
-  return gulp.src(paths.css[0])
-    .pipe(changed(paths.css[1], {extension: '.css'}))
+gulp.task('css', () => {
+  return gulp.src(paths.css[0], {extension: '.css'})
+    .pipe(changed(paths.css[0]))
     .pipe(autoprefixer())
     .pipe(nano())
     .pipe(concat('style.css'))
     .pipe(gulp.dest(paths.css[1]))
 })
- 
-gulp.on('stop', () => { process.exit(0); });
+
+gulp.task('watch', () => {
+    for (let s in paths) {
+        gulp.watch(paths[s][0], [s]);
+    }
+});
+
 gulp.on('err', () => { process.exit(1); });
  
 // The default task (run on server start)
-gulp.task('default', Object.keys(paths));
+gulp.task('default', Object.keys(paths).concat('watch'));

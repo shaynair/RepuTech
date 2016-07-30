@@ -1,10 +1,3 @@
-function initialize() {
-    	
-	$(".error").hide();
-	populateCountries();
-	$("#submit").on("click", validateEvent);
-}
-
 function validateEvent(e) {
 	var valid = true;
 	$("input").each(function(index, elem) {
@@ -18,8 +11,7 @@ function validateEvent(e) {
 		
 	if (!valid) {
 		e.preventDefault();
-	}
-	if (valid) {
+	} else {
    	  submitForm();
 	}  
 }
@@ -130,5 +122,3 @@ function submitForm(){
 		       alert("error");
          }}); 
 }
-
-$(document).ready(initialize);

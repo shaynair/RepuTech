@@ -1,7 +1,7 @@
 // Should pull this info from the database
-var data = [
+var data = 
     {
-        "img": "../assets/images/avatar.png",
+        "img": "/assets/images/avatar.png",
         "firstname": "John",
         "lastname": "Doe",
         "country": "Canada",
@@ -35,8 +35,7 @@ var data = [
                 "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam molestie sagittis porttitor. Pellentesque ipsum est, scelerisque ultricies vulputate a, dapibus sit amet dolor. Curabitur euismod libero sit amet quam consequat, vitae tempor augue gravida. Praesent sit amet libero sed neque bibendum imperdiet vel quis ligula. Proin interdum porta interdum. Quisque vitae facilisis ex, ac ornare enim. Suspendisse accumsan tellus nec ex auctor tincidunt. Pellentesque placerat dapibus turpis, ac consequat ex sodales vitae. Etiam auctor maximus auctor. Pellentesque gravida, leo nec faucibus posuere, magna metus placerat ex, sed bibendum nibh urna at lectus. Duis nunc mauris, molestie et dui non, auctor dictum urna. Aliquam arcu lacus, faucibus sit amet vestibulum aliquam, tincidunt eget ex. Morbi et sem id ante consequat aliquet. Nulla nibh arcu, aliquet in ultricies lacinia, bibendum a nisl. Pellentesque a finibus neque."
             }
         ]
-    }
-];
+    };
 
 var msgs = [
     [
@@ -122,116 +121,10 @@ function get_posts() {
     });
 }
 
-var ListingForm = React.createClass({
-    
-    getInitialState: function() {
-        return {
-            selectedOption: "Searching"
-        };
-    },
-    
-    handleOptionChange: function (changeEvent) {
-        this.setState({
-            selectedOption: changeEvent.target.value
-        });
-    },
-    
-    render: function() {
-        return (
-			<div>
-            <h3>Create Listing</h3>
-            <form method="post" id="listing-form" class="profile-form">
-                <p>Title:</p>
-                <input type="text" id="post-title"/>
-                <p>Post Type:</p>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name='post-type' value="Searching" checked={this.state.selectedOption === 'Searching'}
-                        onChange={this.handleOptionChange}/>
-                        Searching for Service
-                    </label>
-                </div>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name='post-type' value="Offering" checked={this.state.selectedOption === 'Offering'}
-                        onChange={this.handleOptionChange}/>
-                        Offering Service
-                    </label>
-                </div>
-                <p>Description:</p>
-                <textarea id="post-description" rows="15"></textarea>
-                <button type="submit" form="listing-form" value="Submit" id="listing-button">Submit</button>
-            </form>
-			</div>
-        );
-    }
-});
-
-
-var AccountInfo = React.createClass({
-    render: function() {
-        var userNodes = this.props.data.map(function(user) {
-            return (
-                <form method="post" id="update-info" class="profile-form">
-					<h3>Update Account Info</h3>
-                    <fieldset>
-                        <legend>Personal Information:</legend>
-                        <p>First name:</p>
-                        <input type="text" id="firstname" defaultValue={user.firstname} pattern="[a-zA-Z]+" title="This field can only consist of letters."/>
-                        <p>Last name:</p>
-                        <input type="text" id="lastname" defaultValue={user.lastname} pattern="[a-zA-Z]+" title="This field can only consist of letters."/>
-                        <p>Country:</p>
-                        <select id="country" required name="country">
-				            <option selected>{user.country}</option>
-				        </select>
-				        <p>Province/State:</p>
-				        <select id="state" required name="state">
-                            <option selected>{user.prov_state}</option>
-				        </select>
-                        <p>City:</p>
-                        <input type="text" id="city" defaultValue={user.city} pattern="[a-zA-Z]{2,}" title="This field can only consist of letters."/>
-                        <p>Phone Number:</p>
-                        <input type="text" id="phonenum" defaultValue={user.phonenum} pattern="[0-9]{10,12}" title="This field can only consist of numbers."/>
-                    </fieldset>
-                    <fieldset>
-                        <legend>Account Information:</legend>
-                        <p>Email:</p>
-                        <input type="text" id="email" defaultValue={user.email} pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}" title="E-mail address must be valid."/>
-                        <p>Current Password (must be entered to make any changes): </p>
-                        <input type="password" id="currentpass"/>
-                        <p>New Password:</p>
-                        <input type="password" id="newpass" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
-                        <p>Retype New Password (same as above): </p>
-                        <input type="password" id="newpass-confirmation" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
-                    </fieldset>
-                    <button type="submit" form="update-info" value="Update" id="update-button">Update</button>
-                </form>
-            );
-        });
-        return (
-            <div className="AccountInfo">
-                {userNodes}
-            </div>
-        );
-    }
-});
-
-var WikiNew = React.createClass({
-    render: function() {
-        return (
-            <section id="profile-wiki-new">
-				<h3>New Wiki Post</h3>
-                <form data-reactroot="" method="post" id="wiki-form" class="profile-form">
-                    <p>Title:</p>
-                    <input type="text" id="wiki-title"></input>
-                    <p>Content:</p>
-                    <textarea id="wiki-content" rows="15"></textarea>
-                    <button type="submit" form="wiki-form" value="Submit" id="wiki-button">Submit</button>
-                </form>
-            </section>
-        );
-    }
-});
+// React classes to be filled in later
+var ListingForm;
+var AccountInfo;
+var WikiNew;
 
 var rating_stars = {
     1 : "Rating: &#9733;&#9734;&#9734;&#9734;&#9734;",
@@ -247,7 +140,7 @@ function render_general_info() {
 //function render_general_info(data) {
     $('.profile-content').empty();
     $('.profile-content').append($('<section/>', {id: 'profile-general'}));
-    var user = data[0];
+    var user = data;
     $('#profile-general').append($('<h3/>', {id: 'name', text: user.firstname + ' ' + user.lastname}));
     $('#profile-general').append($('<p/>', {id: 'profile-status', text: 'Status: ' + user.status}));
     $('#profile-general').append($('<h4/>', {text: 'Reputation:'}));
@@ -261,6 +154,12 @@ function render_general_info() {
     $('#profile-general').append($('<p/>', {text: 'Located in: ' + user.city + ', ' + user.country}));
     $('#profile-general').append($('<section/>', {id: 'gallery'}));
     $('#gallery').append($('<h4/>', {text: 'My images:'}));
+    
+    if (data.img != "") {
+        $('.profile-pic').append($('<img>', {alt: "avatar", src: data.img}));
+    } else {
+        $('.profile-pic').append($('<img>', {alt: "avatar", src: "/assets/images/avatar.png"}));
+    }
     
 }
 
@@ -297,7 +196,7 @@ function render_posts() {
 //function render_posts(data) {
     $('.profile-content').empty();
 	$('.profile-content').append($('<h3/>', {text: 'My Posts'}));
-    var posts = data[0].posts;
+    var posts = data.posts;
     // Renders posts for the profile
     for (var i = 0; i < posts.length; i ++) {
         $('.profile-content').append($('<article/>', {class: 'post', id: 'post-' + i}));
@@ -322,7 +221,7 @@ function render_posts() {
 function render_wiki() {
     $('.profile-content').empty();
 	$('.profile-content').append($('<h3/>', {text: 'My Wiki Posts'}));
-    var wiki = data[0].wiki;
+    var wiki = data.wiki;
     $('.profile-content').append($('<section/>', {id: 'profile-wiki'}));
     $('#profile-wiki').append($('<button/>', {id: 'wiki-new', text: 'New Wiki Post'}));
     for (var i = 0; i < wiki.length; i++) {
@@ -342,89 +241,189 @@ function render_wiki_new() {
     ); 
 }
 
-
-// Click functions for each menu item on profile
-
-// NOTE: use get_general_info(); instead of render_general_info();
-// after server is set up (same for all the other calls)
-
-var $old; // Holds previously clicked button
-$('#general').click(function() {
-    //get_general_info();
-    render_general_info();
-    if ($old != null) {
-        $old.toggleClass('active');
-    }
-    $(this).toggleClass('active');
-    $old = $(this);
-    LoadImageSlider();
-});
-
-$('#posts').click(function() {
-    //get_posts();
-    render_posts();
-    $old.toggleClass('active');
-    $(this).toggleClass('active');
-    $old = $(this);
-});
-
-$('#messages').click(function() {
-    //get_messages();
-    render_messages();
-    $old.toggleClass('active');
-    $(this).toggleClass('active');
-    $old = $(this);
-});
-
-$('#settings').click(function() {
-    //get_settings_form();
-    render_settings_form();
-    $old.toggleClass('active');
-    $(this).toggleClass('active');
-    $old = $(this);
-});
-
-$('#create-listing').click(function() {
-    render_listing_form();
-    $old.toggleClass('active');
-    $(this).toggleClass('active');
-    $old = $(this);
-});
-
-$('#wiki').click(function() {
-    render_wiki();
-    $old.toggleClass('active');
-    $(this).toggleClass('active');
-    $old = $(this);
-});
-
-$('.follow').click(function() {
-    // NOT SURE WHAT TO SEND SINCE WE DONT HAVE BOTH USERS IDs
-});
-
-$('.profile-form').on('submit', function(event) {
-    $.ajax({
-        method: "POST",
-        url: '',
-        data: $('form').serialize(),
-        success: function () {
-            // DO SOMETHING HERE!
-        },
-        error: function (err) {
-            console.log(err);
-        }
-    });
-});
-
 // Profile loads General Info page by default
 $(document).ready(function() {
-    
-    // Check if user has a profile pic, else use default avatar
-    if (data[0].img != "") {
-        $('.profile-pic').append($('<img>', {alt: "avatar", src: data[0].img}));
-    } else {
-        $('.profile-pic').append($('<img>', {alt: "avatar", src: "/assets/images/avatar.png"}));
-    }
-    
+
+    // Click functions for each menu item on profile
+
+    // NOTE: use get_general_info(); instead of render_general_info();
+    // after server is set up (same for all the other calls)
+
+    var $old; // Holds previously clicked button
+    $('#general').click(function() {
+        //get_general_info();
+        render_general_info();
+        if ($old != null) {
+            $old.toggleClass('active');
+        }
+        $(this).toggleClass('active');
+        $old = $(this);
+    });
+
+    $('#posts').click(function() {
+        //get_posts();
+        render_posts();
+        $old.toggleClass('active');
+        $(this).toggleClass('active');
+        $old = $(this);
+    });
+
+    $('#messages').click(function() {
+        //get_messages();
+        render_messages();
+        $old.toggleClass('active');
+        $(this).toggleClass('active');
+        $old = $(this);
+    });
+
+    $('#settings').click(function() {
+        //get_settings_form();
+        render_settings_form();
+        $old.toggleClass('active');
+        $(this).toggleClass('active');
+        $old = $(this);
+    });
+
+    $('#create-listing').click(function() {
+        render_listing_form();
+        $old.toggleClass('active');
+        $(this).toggleClass('active');
+        $old = $(this);
+    });
+
+    $('#wiki').click(function() {
+        render_wiki();
+        $old.toggleClass('active');
+        $(this).toggleClass('active');
+        $old = $(this);
+    });
+
+    $('.follow').click(function() {
+        // NOT SURE WHAT TO SEND SINCE WE DONT HAVE BOTH USERS IDs
+    });
+
+    $('.profile-form').on('submit', function(event) {
+        $.ajax({
+            method: "POST",
+            url: '',
+            data: $('form').serialize(),
+            success: function () {
+                // DO SOMETHING HERE!
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    });
     $('#general').click();
+    
+    ListingForm = React.createClass({
+        
+        getInitialState: function() {
+            return {
+                selectedOption: "Searching"
+            };
+        },
+        
+        handleOptionChange: function (changeEvent) {
+            this.setState({
+                selectedOption: changeEvent.target.value
+            });
+        },
+        
+        render: function() {
+            return (
+                <div>
+                <h3>Create Listing</h3>
+                <form method="post" id="listing-form" class="profile-form">
+                    <p>Title:</p>
+                    <input type="text" id="post-title"/>
+                    <p>Post Type:</p>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name='post-type' value="Searching" checked={this.state.selectedOption === 'Searching'}
+                            onChange={this.handleOptionChange}/>
+                            Searching for Service
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name='post-type' value="Offering" checked={this.state.selectedOption === 'Offering'}
+                            onChange={this.handleOptionChange}/>
+                            Offering Service
+                        </label>
+                    </div>
+                    <p>Description:</p>
+                    <textarea id="post-description" rows="15"></textarea>
+                    <button type="submit" form="listing-form" value="Submit" id="listing-button">Submit</button>
+                </form>
+                </div>
+            );
+        }
+    });
+    
+    AccountInfo = React.createClass({
+        render: function() {
+            var userNodes = this.props.data.map(function(user) {
+                return (
+                    <form method="post" id="update-info" class="profile-form">
+                        <h3>Update Account Info</h3>
+                        <fieldset>
+                            <legend>Personal Information:</legend>
+                            <p>First name:</p>
+                            <input type="text" id="firstname" defaultValue={user.firstname} pattern="[a-zA-Z]+" title="This field can only consist of letters."/>
+                            <p>Last name:</p>
+                            <input type="text" id="lastname" defaultValue={user.lastname} pattern="[a-zA-Z]+" title="This field can only consist of letters."/>
+                            <p>Country:</p>
+                            <select id="country" required name="country">
+                                <option selected>{user.country}</option>
+                            </select>
+                            <p>Province/State:</p>
+                            <select id="state" required name="state">
+                                <option selected>{user.prov_state}</option>
+                            </select>
+                            <p>City:</p>
+                            <input type="text" id="city" defaultValue={user.city} pattern="[a-zA-Z]{2,}" title="This field can only consist of letters."/>
+                            <p>Phone Number:</p>
+                            <input type="text" id="phonenum" defaultValue={user.phonenum} pattern="[0-9]{10,12}" title="This field can only consist of numbers."/>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Account Information:</legend>
+                            <p>Email:</p>
+                            <input type="text" id="email" defaultValue={user.email} pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}" title="E-mail address must be valid."/>
+                            <p>Current Password (must be entered to make any changes): </p>
+                            <input type="password" id="currentpass"/>
+                            <p>New Password:</p>
+                            <input type="password" id="newpass" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
+                            <p>Retype New Password (same as above): </p>
+                            <input type="password" id="newpass-confirmation" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
+                        </fieldset>
+                        <button type="submit" form="update-info" value="Update" id="update-button">Update</button>
+                    </form>
+                );
+            });
+            return (
+                <div className="AccountInfo">
+                    {userNodes}
+                </div>
+            );
+        }
+    });
+    
+    WikiNew = React.createClass({
+        render: function() {
+            return (
+                <section id="profile-wiki-new">
+                    <h3>New Wiki Post</h3>
+                    <form data-reactroot="" method="post" id="wiki-form" class="profile-form">
+                        <p>Title:</p>
+                        <input type="text" id="wiki-title"></input>
+                        <p>Content:</p>
+                        <textarea id="wiki-content" rows="15"></textarea>
+                        <button type="submit" form="wiki-form" value="Submit" id="wiki-button">Submit</button>
+                    </form>
+                </section>
+            );
+        }
+    });
 });

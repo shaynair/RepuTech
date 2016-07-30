@@ -138,5 +138,3 @@ function render_post_full() {
     }
 }
 
-
-$(document).ready(render_post_full);

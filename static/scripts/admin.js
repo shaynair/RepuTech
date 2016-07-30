@@ -211,6 +211,3 @@ function dismiss(id) {
     
 }
 
-$(document).ready(initialize);
-
-

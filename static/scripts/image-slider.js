@@ -1,17 +1,17 @@
 // Dynamic image slider, slightly modified from W7 Lab 6: jQuery+ UI
 
-function loadImageSlider() {
+function loadImageSlider(images, title = "RepuTech") {
     // Load the correct images
     
-    // Placeholder images, pull user's images from database
-    let images = ["computer-2.jpg",
-        "computer-3.jpg",
-        "smartphone-1.jpg",
-        "computer-1.jpg",
-        "mac-1.jpg"
-    ];
-    let title = "RepuTech";
-
+    if (!Array.isArray(images)) {
+        // Placeholder images, pull user's images from database
+        images = ["/assets/images/computer-2.jpg",
+            "/assets/images/computer-3.jpg",
+            "/assets/images/smartphone-1.jpg",
+            "/assets/images/computer-1.jpg",
+            "/assets/images/mac-1.jpg"
+        ];
+    }
     let $slider = $('<ul/>', {
         id: 'slider'
     });
@@ -27,7 +27,7 @@ function loadImageSlider() {
         });
         
         let $img = $('<img/>', {
-            src: "/assets/images/" + item,
+            src: item,
             alt: title
         });
         
@@ -39,7 +39,6 @@ function loadImageSlider() {
     
     // Append the slider <ul> to <section id="gallery">
     $("section#gallery").append($slider);
-    
     
     // Since we want the first image to be bigger than the next two, we'll need to apply double the width.
     // Use the :first-child selector.
@@ -118,7 +117,4 @@ function loadImageSlider() {
     });
     
     $("section#gallery").append($controller);
-    
 }
-
-$(document).ready(loadImageSlider);
