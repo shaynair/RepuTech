@@ -12,7 +12,7 @@ var data = [
         "rating": 4,
         "followers": 23,
         "job": "Smartphone Technician",
-        "mood": "Feeling tech-tastic",
+        "status": "Feeling tech-tastic",
         "posts": [
             {
                 "author": "John Doe",
@@ -232,7 +232,10 @@ var WikiNew = React.createClass({
     }
 });
 
-function render_general_info(data) {
+// NOTE: use second function call after server is set up
+
+function render_general_info() {
+//function render_general_info(data) {
     $('.profile-content').empty();
     $('.profile-content').append($('<section/>', {id: 'profile-general'}));
     var user = data[0];
@@ -262,7 +265,8 @@ function render_general_info(data) {
     
 }
 
-function render_settings_form(data) {
+function render_settings_form() {
+//function render_settings_form(data) {
     $('.profile-content').empty();
     ReactDOM.render(<AccountInfo data={data} />,
                     document.getElementById('profile-content')
@@ -276,9 +280,8 @@ function render_listing_form() {
     );   
 }
 
-
-function render_messages(msgs) {
-    
+function render_messages() {
+//function render_messages(msgs) {
     $('.profile-content').empty();
     $('.profile-content').append($('<section/>', {id: 'messages'}));
 	$('.profile-content').append($('<h3/>', {text: 'My Messages'}));
@@ -291,7 +294,8 @@ function render_messages(msgs) {
     }
 }
 
-function render_posts(data) {
+function render_posts() {
+//function render_posts(data) {
     $('.profile-content').empty();
 	$('.profile-content').append($('<h3/>', {text: 'My Posts'}));
     var posts = data[0].posts;
@@ -342,9 +346,13 @@ function render_wiki_new() {
 
 // Click functions for each menu item on profile
 
+// NOTE: use get_general_info(); instead of render_general_info();
+// after server is set up (same for all the other calls)
+
 var $old; // Holds previously clicked button
 $('#general').click(function() {
-    get_general_info();
+    //get_general_info();
+    render_general_info();
     if ($old != null) {
         $old.toggleClass('active');
     }
@@ -354,22 +362,24 @@ $('#general').click(function() {
 });
 
 $('#posts').click(function() {
-    get_posts();
+    //get_posts();
+    render_posts();
     $old.toggleClass('active');
     $(this).toggleClass('active');
     $old = $(this);
 });
 
 $('#messages').click(function() {
-    
-    get_messages();
+    //get_messages();
+    render_messages();
     $old.toggleClass('active');
     $(this).toggleClass('active');
     $old = $(this);
 });
 
 $('#settings').click(function() {
-    get_settings_form();
+    //get_settings_form();
+    render_settings_form();
     $old.toggleClass('active');
     $(this).toggleClass('active');
     $old = $(this);
