@@ -25,6 +25,9 @@
 				  
 				    <select id="country" required name="country">
 						<option selected>Country</option>
+                        <% for (let c of Object.keys(countries).sort()) { %>
+                            <option value="<%= countries[c] %>"><%= c %></option>
+                        <% } %>
 				    </select>
 				  
 				    <select id="state" required name="state" >
@@ -37,6 +40,7 @@
 				    <p id="phone-err" class="error"></p>
 				    <input type="number" id="phone" required name="phone" pattern="[0-9]{10,12}" placeholder="Phone Number..."/>	  
 				  
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 				    <button id="submit" type="submit" form="sign-up-form" value="Sign Up">Sign Up</button>    
 				</form>
                 

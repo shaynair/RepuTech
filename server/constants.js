@@ -12,7 +12,8 @@ exports.DATABASE_INFO = {
     min: 4,
     idleTimeoutMillis: 1000
 };
-
+exports.SQL_INIT_PATH = "./Data/Structure.sql";
+exports.SALT = 13; // Salt rounds for Bcrypt
 //exports.DATABASE_URL = "postgres://" + pg.user + ":" + pg.password + "@"
 //			+ pg.host + ":" + pg.port + "/" + pg.database + "?ssl=true";
 			
@@ -29,3 +30,4 @@ exports.REDIS = {
     port: 14141,
     pass: 'csc309a4'
 };
+

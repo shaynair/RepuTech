@@ -1,7 +1,6 @@
 function validateEvent(e) {
 	var valid = true;
 	$("input").each(function(index, elem) {
-	     alert($(elem).attr("id"));
 		if($(elem).attr("id") != "search"){ 
 		  if ( !validate($(elem)) ){
 			valid = false;
@@ -26,6 +25,7 @@ function validate($elem) {
 	setBorderColor($elem, "#ccc");
 	$err.hide();
 	
+    // Use regex to make custom error messages
 	var r = new RegExp($elem.attr("pattern"));
 	if (!r.test($elem.val())) {
 		var prompt = null;
@@ -42,6 +42,7 @@ function validate($elem) {
 		setBorderColor($elem, "red");
 		return false;
 	}
+    // Handle confirmation fields
 	if (($elem.attr("id") == "email" || $elem.attr("id") == "pass")
 			&& ($elem.val() != $("#" + $elem.attr("id") + "2").val())) {
 				
@@ -57,68 +58,49 @@ function setBorderColor($elem, color){
 	$elem.css("border", "1px solid " + color);
 }
 
-function populateCountries(){
-     $.ajax({
-	     type:"GET",
-	     dataType: "json",
-		 url:"http://127.0.0.1:8080/get_countries",
-		 success: function(res){
-		             $.each(res,function(index,item){
-					      var option = $('<option>');
-						  option.attr('value',item.name);
-						  option.html(item.name);
-					      $('#country').append(option);
-					 });					 
-		          },
-		  error: function(){
-			 	     alert("error!!");								                              	   	          
-                 }}); 
-}
-
 function populateStates(){
     $.ajax({
 	     type:"GET",
 	     dataType: "json",
-		 url:"http://127.0.0.1:8080/get_provinces?country="+$('#country').val(),
-		 success: function(res){
+		 url:"/api/get_states",
+         data: {country: $('#country').val()},
+		 success: (res) => {
 		             $('#state').empty();
 					 
-                     if( res.length == 0 ) 					 
+                     if( res.length == 0 ) {			 
                           $('#state').append('<option selected disabled>State/Province</option>');					 
-						  
-		             $.each(res,function(index,item){
-					      var option = $('<option>');
-						  option.attr('value',item.state);
-						  option.html(item.state);
-					      $('#state').append(option);
-					 });					
+                     }
+                     for (let s in Object.keys(res).sort()) {
+					      let option = $('<option>');
+						  option.attr('value', res[s]);
+						  option.html(s);
+					      $('#state').append(option);				
+                     }
 		          },
-		  error: function(){
-			 	     alert("error!!");								                              	   	          
-                 }}); 
+		  error: (err) => {
+			 	     console.log(err);								                              	   	          
+                 }
+    }); 
 }
 
 
 function submitForm(){
-    $("#busy_sec").css("visibility","visible"); 
     $.ajax({
-	     type:"GET",
+	     type:"POST",
 	     dataType: "json",
-		 url:"http://127.0.0.1:8080/store_info?email="+$('#email').val()+"&pass="+$('#pass').val()+"&name="+$('#name').val()+
-		                              "&lastname="+$('#lastname').val()+"&country="+$('#country').val()+"&state="+$('#state').val()
-									  +"&city="+$('#city').val()+"&phone="+$('#phone').val(),
+		 url: "signup-form",
+         data: $("#sign-up-form").serialize(),
 		 success: function(res){
-		             $("#busy_sec").css("visibility","hidden"); 
-		             if (res.status === "exists"){
-					    setBorderColor($("#email"), "red");
-			            $("#email-err").text("This Email Address is Already Used. Please Use Another Email Address.").fadeIn();
-					 }else{
-					    $("main").empty();    
-						$("main").append("<h3>Verification Email Has Been Send to The Email Address You Used to Sign up. Please Verify Your Email As Soon As possible in Order to Activate Your Account.</h3>");
-						
-					 }
-		          },
-		 error: function(){
-		       alert("error");
-         }}); 
+		    if (res.status === "exists"){
+			    setBorderColor($("#email"), "red");
+			    $("#email-err").text("This Email Address is Already Used. Please Use Another Email Address.").fadeIn();
+			} else {
+                $("main").empty();    
+				$("main").append($("<h3>").text());	
+            }
+		 },
+		 error: function(err){
+		    console.log(err);
+         }
+    }); 
 }

@@ -4,7 +4,7 @@ USE reputech;
 PSQL \c reputech;
 
 DROP TYPE IF EXISTS user_types;
-CREATE TYPE user_types AS ENUM('Normal', 'Facebook', 'Twitter', 'Google', 'GitHub');
+CREATE TYPE user_types AS ENUM('Normal', 'Facebook', 'Twitter', 'Google', 'GitHub', 'LinkedIn', 'BitBucket', 'Reddit', 'Dropbox');
 
 DROP TYPE IF EXISTS privilege_types;
 CREATE TYPE privilege_types AS ENUM('Inactivated', 'Normal', 'Admin');
@@ -21,9 +21,12 @@ CREATE TABLE login(
   login_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   banned BOOLEAN NOT NULL DEFAULT FALSE,
   ip_address VARCHAR(16) NOT NULL,
+  sessionID VARCHAR(64) DEFAULT NULL,
   
   PRIMARY KEY (u_id),
-  UNIQUE (email)
+  UNIQUE (email),
+  INDEX(ip_address),
+  INDEX(sessionID)
 );
 
 DROP TABLE IF EXISTS auth CASCADE;
@@ -62,13 +65,13 @@ CREATE TABLE users(
   firstname VARCHAR(50) NOT NULL,
   lastname VARCHAR(50) NOT NULL,
   phone BIGINT UNSIGNED NOT NULL,
-  region INTEGER,
+  region_id INTEGER,
   city VARCHAR(50) NOT NULL,
   status VARCHAR(50) NOT NULL DEFAULT '',
   
   PRIMARY KEY (u_id), 
   FOREIGN KEY (u_id) REFERENCES login(u_id) ON DELETE CASCADE,
-  FOREIGN KEY (region) REFERENCES address_region(region_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  FOREIGN KEY (region_id) REFERENCES address_region(region_id) ON DELETE SET NULL ON UPDATE CASCADE,
   INDEX (firstname, lastname)
 );
 

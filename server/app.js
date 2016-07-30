@@ -18,6 +18,7 @@ const socket = require('./socket');
 const c = require('./constants');
 const routes = require('./routes');
 const auth = require('./auth');
+const queries = require('./queries');
 
 // Server config
 const app = express();
@@ -51,12 +52,13 @@ app.use(helmet({
 
 // Sessions
 const RedisStore = redis(session);
+const sessionStore = new RedisStore(c.REDIS);
 app.use(session({
     secret: c.COOKIE_SECRET,
     name: 'session',
     resave: false, // Redis implements touch
     saveUninitialized: false,
-    store: new RedisStore(c.REDIS),
+    store: sessionStore,
     cookie: {
         secure: true,
         maxAge: 6*60*60*1000
@@ -82,6 +84,7 @@ app.use(expressValidator());
 
 // Database connection
 const pool = new Pool(c.DATABASE_INFO);
+const db = queries(pool, sessionStore);
 
 // Exports for other files
 module.exports = {
@@ -100,5 +103,6 @@ module.exports = {
     // Does a query to database (text, values, cb)
     query: pool.query,
     
-    
+    // Formatted queries
+    "db": db
 }

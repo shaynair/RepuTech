@@ -7,7 +7,6 @@ $(document).ready(() => {
         loadImageSlider();
     } else if (last == 'signup') {
         $(".error").hide();
-        populateCountries();
         $("#submit").on("click", validateEvent);
     }
 
@@ -42,12 +41,20 @@ $(document).ready(() => {
     });
 
     $(".login-form").on("submit", function(event) {
+        $(".error").fadeOut().text("");
+        
         $.ajax({
             method: "POST",
-            url: '',
-            data: $('.login-form').serialize(),
+            url: '/login-form',
+            data: $('#login-form').serialize(),
             success: function (data) {
-                window.location.href("profile.html");
+                if (!data.status || data.status == "Bad") {
+                    $("#err").fadeIn().text("Unknown email or incorrect password.");
+                } else if (data.status == "OK"){
+                    window.location.href = "/profile";
+                } else {
+                    $("#err").fadeIn().text("This account is " + data.status + ".");
+                }
             },
             error: function (err) {
                 console.log(err);

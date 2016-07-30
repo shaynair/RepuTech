@@ -1,33 +1,8 @@
 
-
-var express = require('express');
-var promise = require('bluebird'); 
-var bodyParser = require('body-parser');
 var pg = require('pg');
-//var app = express();
-
-var options = {
-    promiseLib: promise 
-};
-
-var pgc = require('pg-promise')(options);
 var db = pgc(c.DATABASE);
-var app = new express();
 
 var connectpath = c.DATABASE_URL;
-
-app.get('/get_countries',function(req,res){
-       console.log("countries");
-       db.any("select * from countries order by  name ASC")
-	   .then(function(data){
-	      res.writeHead(200,{'Content-Type':'text/plain','Access-Control-Allow-Origin':'*'});
-          res.end(JSON.stringify(data));
-		  pgc.end(); 
-	   })
-	   .catch(function(error){
-	      console.log("ERROR====>>>",error);
-       })
-})
 
 app.get('/get_provinces',function(req,res){
 
@@ -71,10 +46,49 @@ app.get('/store_info',function(req,res){
        })
    
 })
-		  
-app.listen(8080,function(){
-      console.log("server is listening.....");
-})	 
+
+//-----------------------------------------------------------------------------
+app.get('/delete_user',function(req,res){ 
+       remove_user(req,res);
+});
+
+app.get('/ban_user',function(req,res){ 
+       ban_user(req,res);
+});
+
+app.get('/add_report',function(req,res){ 
+       add_report(req,res);
+});
+
+
+//-------------------------------------------------------------------------------------------------------
+function remove_user(req,res){
+     var u_id = req.query.u_id; 
+	 
+	 var sql_query = "DELETE FROM login WHERE u_id = $1";
+	 pg.connect(connectpath, function(err, client, done) {
+          client.query(sql_query,[u_id]);
+     });
+}
+//-----------------------------------
+function ban_user(req,res){
+     var u_id = req.query.u_id; 
+	 
+	 var sql_query = "UPDATE  users SET status = $1 WHERE u_id = $2";
+	 pg.connect(connectpath, function(err, client, done) {
+          client.query(sql_query,['banned',u_id]);
+     });
+}
+//-----------------------------------
+function add_report(req,res){
+     var reported = req.query.reported; 
+	 var reporter = req.query.reporter; 
+	 var p_id = req.query.p_id; 
+	 var sql_query = "INSERT INTO reports(reported,reporter,post) VALUES($1,$2,$3)";
+	 pg.connect(connectpath, function(err, client, done) {
+          client.query(sql_query,[reported,reporter,p_id]);
+     });
+}
 
 
 function storeInfo(req,res){

@@ -3,9 +3,13 @@
 		<main>
 			<section class="modal-box">
 				<h2 class="title">Log In</h2>
-				<form method="post" id="login-form" action="/login-local">
+				<form method="post" id="login-form">
+                    <p id="err" class="error"></p>
 					<input type="text" name="email" id="email" placeholder="Email Address..."/>
+                    
 					<input type="password" name="pass" id="pass" placeholder="Password..."/>
+                    
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 					<button type="submit" form="login-form" value="Log In">Log In</button>
 				</form>
 				<a href="/login-facebook"><button>Log In with Facebook</button></a>
