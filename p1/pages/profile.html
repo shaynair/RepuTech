@@ -20,15 +20,14 @@
         
         <script defer src="../assets/scripts/jquery-3.0.0.min.js"></script>
         <script type="text/javascript" src="../assets/jquery-ui/scripts/jquery-ui.min.js" defer></script>
-        <script src="../assets/scripts/profile.js" defer></script>
-        <script src="../assets/scripts/script.js" defer></script>
+        <script src="../assets/scripts/image-slider.js" defer></script>
         
         <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react-dom.js"></script>
     
         <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
         <!-- The above is a JS compiler "Babel" for JSX -> JS. https://babeljs.io/ -->
-        <script type="text/babel" src="../assets/scripts/profile-forms.js" defer></script>
+        <script type="text/babel" src="../assets/scripts/profile.js" defer></script>
         
     </head>
     <body>
@@ -48,21 +47,20 @@
 			</section>
         </nav>
         
-       <main>
+        <main>
             <section class="sidebar flexbox flexbox-column">
                 
-                <section class="profile-pic">
-                    <img alt="Avatar" src="../assets/images/avatar.png">
-                </section>
+                <!--Placeholder for profile picture-->
+                <section class="profile-pic"></section>
                 <!--<section class="profile-buttons">
                     <button>Follow</button>
                 </section>-->
 				<section class="profile-menu">
                     <button id='general'>General Info</button>
-                    <button id='posts'>Posts</button>
-                    <button id='messages'>Messages</button>
+                    <button id='messages'>My Messages</button>
+                    <button id='posts'>My Posts</button>
                     <button id='create-listing'>Create Listing</button>
-                    <button id='wiki'>Wiki Posts</button>
+                    <button id='wiki'>My Wiki Posts</button>
                     <button id='settings'>Update Account Info</button>
                 </section>
 				<!--<section class="profile-wiki">
@@ -72,8 +70,8 @@
                 </section>-->
             </section>
 
-            <section class="profile-content" id="profile-content">
-            </section>
+            <!--Placeholder for profile content-->
+            <section class="profile-content" id="profile-content"></section>
             
         </main> 
 		
@@ -85,12 +83,13 @@
 			<p>
                 Icons from <a href="http://www.flaticon.com">Flaticon</a>
             </p>
+            <p>
+                Image slider modified from <a href="https://github.com/CSC309summer2016/w7-lab-adv-s">W7 Lab 6: jQuery+ UI</a>
+            </p>
 			<p>
 				&copy; Akshay Nair, Seyed Hossein Fazeli, Anson Chen, Kevin Thich | Made for <a href="http://www.cdf.toronto.edu/~csc309h/summer">CSC309, Summer 2016</a>.
 			</p>
         </footer>
         
-
-
     </body>
 </html>

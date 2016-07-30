@@ -215,13 +215,12 @@ nav button, nav input {
 header {
     width: 100%;
     height: 500px;
-    top: 12em; /* header */
+    top: 12em; /* header space */
     /* Background picture darker to read text easier */ 
     background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
 		url('../images/banner-small.jpg') no-repeat center fixed;
     background-size: cover;  /* Cover the whole area */ 
     z-index: -1;
-	
     position: relative;
 }
 
@@ -286,36 +285,50 @@ header h1 {
     clear: both;
 }
 
-#listing-form {
-    margin-left: 2em;
+#listing-form, #wiki-form {
+    margin-left: 2rem;
 }
 
 #profile-wiki {
     padding: 2em;
     background-color: white;
-    text-align: center;
+    /*text-align: center;*/
     overflow: scroll-y;
 }
 
-#profile-general h3 {
+#profile-content h3 {
     margin: 0;
-    padding: 0.5em;
-    font-size: 2.5em;
+    padding-bottom: 1rem;
+    font-size: 2.5rem;
     font-weight: lighter;
     color: white;
+    padding: 2rem;
     background: #1976D2;
 }
 
-#profile-general p {
-    margin-bottom: 0.5em;
-    padding-left: 1.5em;
+#profile-general #profile-status {
+    background: grey;
+    margin: 0;
+    padding: 1rem 2rem;
+    font-style: italic;
+    background-color: #ededed;
+    color: #7e7e7e;
+    
 }
 
-#gallery h3 {
+#rating, #followers { 
+    color: green;
+}
+
+#profile-general p {
+    margin-left: 2rem;
+}
+
+.profile-content h4 {
     color: #1976D2;
-    font-size: 2em;
+    font-size: 2rem;
     font-weight: 500;
-    margin-left: 0.5em;
+    margin: 2rem;
 }
 
 .profile-status, .post-review {
@@ -439,7 +452,7 @@ section#gallery ul li img {
     background: #000;
     border: none;
     margin: 3rem auto;
-    width: 33.333%;
+    width: 50%;
 }
 
 .ui-slider-horizontal {

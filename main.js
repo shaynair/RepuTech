@@ -83,7 +83,7 @@ app.get('/store_info',function(req,res){
 })
 		  
 app.listen(8080,function(){
-      console.log("server is listening.....");
+      console.log("listening on port 8080");
 })	 
 
 

@@ -1,8 +1,13 @@
+// Dynamic image slider, slightly modified from W7 Lab 6: jQuery+ UI
+
 function LoadImageSlider() {
-    // Dynamic image slider
-     
+    
+    var pathname = window.location.pathname;
+    // Check if pathname is index.html or a user's profile
+    // Load the correct images
+    
+    // Placeholder images, pull user's images from database
     var images = [
-        
         {
             "title": "Computer technician 2",
             "url": "../assets/images/computer-2.jpg"
@@ -59,10 +64,10 @@ function LoadImageSlider() {
     
     $("section#gallery ul li:first-child").css({ "width": "500px" });
     
-    
     // jQuery UI to create slider
     
-    var step_size = 25;
+    // Step size changes depending on how many images to display
+    var step_size = 50 - images.length * 5;
     var last_index = -1;
     
     var $controller = $( "<div/>", {
@@ -94,12 +99,10 @@ function LoadImageSlider() {
                     width: 500
                 }, { duration: 200, queue: true });
                 
-                
                 // We animate the rest differently based on direction.
                 if (direction == "-" ) {
                     // Move all items to the right of the showcase
                     $showcase.nextAll().each(function(index) {
-                        
                         var amount = "250";
                         if ( index === 0 ) amount = 500;
                         
@@ -111,7 +114,6 @@ function LoadImageSlider() {
                 } else {
                     // Move all items to the left of the showcase
                     $("section#gallery ul li:lt("+$showcase.index()+")").each(function(index) {
-                        
                         var offset = "250";
                         if ( index === 0 ) var offset = 500;
                         
@@ -123,7 +125,6 @@ function LoadImageSlider() {
                         }, { duration: 200, queue: true });
                     });
                 }
-                
             }
             
             animateItems();
