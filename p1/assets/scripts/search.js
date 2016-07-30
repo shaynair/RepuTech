@@ -43,15 +43,13 @@ function render_posts() {
     }
 }
 
+// Get value from input fields
 $('#refine').click(function() {
-    var name = $('#name').value;
-    console.log(name);
-    var urgency = $('#urgency').value;
-    console.log(urgency);
-    var reputation = $('#reputation').value;
-    console.log(reputation);
-    var city = $('#city').value;
-    console.log(city);
+    var name = $('#name').val();
+    var urgency = $('#urgency').val();
+    var reputation = $('#reputation').val();
+    var city = $('#city').val();
+    var country = $('#country').val();
     var service; 
     if ($('#service').is(':checked')) {
         // Is offering service
@@ -60,5 +58,8 @@ $('#refine').click(function() {
         // Is requesting service
         service = "Requesting";
     }
+    
+    // Send above information to back-end and search through all posts to return matching ones
+    
     render_posts();
 });
