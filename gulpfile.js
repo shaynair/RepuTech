@@ -21,10 +21,10 @@ const autoprefixer = require('gulp-autoprefixer');
 const del = require('del');
  
 const paths = {
-  scripts: ['assets/scripts/*.js', 'public/assets/scripts'],
-  images: ['assets/images/*', 'public/assets/images'],
-  css: ['assets/stylesheets/*.css', 'public/assets/stylesheets'],
-  icon: ['assets/*.ico', 'public']
+  scripts: ['static/scripts/*.js', 'public/assets/scripts'],
+  images: ['static/images/*', 'public/assets/images'],
+  css: ['static/stylesheets/*.css', 'public/assets/stylesheets'],
+  icon: ['static/*.ico', 'public']
 };
  
 // Cleans all gulp files
