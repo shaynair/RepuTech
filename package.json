@@ -38,6 +38,19 @@
 	"socket.io": "*",
     "memwatch": "*",
     "monitor": "*",
-    "serve-favicon": "*"
+    "serve-favicon": "*",
+    
+    "gulp": "*",
+    "gulp-sourcemaps": "*",
+    "gulp-changed": "*",
+    "gulp-concat": "*",
+    "gulp-babel": "*",
+    "gulp-uglify": "*",
+    "gulp-imagemin": "*",
+    "gulp-cache": "*",
+    "gulp-sass": "*",
+    "gulp-cssnano": "*",
+    "gulp-autoprefixer": "*",
+    "del": "*"
   }
 }
