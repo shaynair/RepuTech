@@ -29,8 +29,21 @@ module.exports = function(pool, sessionStore) {
         initializeDatabase: function() {
             console.log("Re-populating database...");
             
-            this.simpleQuery(fs.readFileSync(c.SQL_INIT_PATH).toString(), []);
-            this.register(c.ADMIN_LOGIN, 'Normal', c.ADMIN_PASS, 'Admin');
+            // Destroy sessions first
+            this.query("SELECT sessionID FROM login WHERE sessionID IS NOT NULL", [], (data) => {
+                
+                for (let d of data.rows) {
+                    sessionStore.destroy(d.sessionID, (err) => {
+                        this.logError(err);
+                    });
+                }
+                console.log("Executing queries...");
+                this.query(fs.readFileSync(c.SQL_INIT_PATH).toString(), [], () => {
+                    this.register(c.ADMIN_LOGIN, 'Normal', c.ADMIN_PASS, 'Admin', () => {
+                        console.log("Finished executing queries.");
+                    });
+                });
+            });
         },
         
         // Returns an associative array of countries to IDs
