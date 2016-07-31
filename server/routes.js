@@ -9,7 +9,7 @@ const PAGES = {
     '/signup': {name: 'signup', logged_out: true, title: 'Sign Up'},
     '/login': {name: 'login', logged_out: true, title: 'Log In'},
     '/admin-signup': {name: 'signup', logged_in: true, needs_admin: true, title: 'Add New User'},
-    '/profile': {name: 'profile', logged_in: true, title: 'Profile'}
+    '/profile': {name: 'profile', title: 'Profile'}
 }
 
 module.exports = {

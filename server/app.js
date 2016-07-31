@@ -87,6 +87,9 @@ app.use(expressValidator({
         },
         isPassword: (value) => {
             return /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}/.test(value);
+        },
+        isText: (value) => {
+            return /[a-zA-Z ]/g.test(value);
         }
     }
 }));

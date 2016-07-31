@@ -93,7 +93,18 @@ const CALLS = {
             req.checkQuery('token', 'Invalid').notEmpty();
         },
         perform: (req, main, cb) => {
-            main.db.resetPassEnd(req.body.token, (user) => cb(null));
+            main.db.resetPassEnd(req.query.token, (user) => cb(null));
+        }
+    },
+    
+    'confirm':  {
+        logged_out: true,
+        validate: (req) => {
+            req.checkQuery('id', 'Invalid').notEmpty();
+            req.checkQuery('id', 'Invalid').isNumeric();
+        },
+        perform: (req, main, cb) => {
+            main.db.activateUser(req.query.id, (user) => cb(null));
         }
     },
     
@@ -166,42 +177,183 @@ const CALLS = {
             req.checkBody('city', 'Max length of 50').isLength({max: 50});
             req.checkBody('phone', 'Numbers only').isNumeric();
             req.checkBody('phone', 'Length between 10 and 12').len(10, 12);
+            req.checkBody('job', 'Letters only').optional().isText();
             
             req.assert('email2', 'Do not match').equals(req.body.email);
             req.assert('pass2', 'Do not match').equals(req.body.pass);
         },
         perform: (req, main, cb) => {
-            
-            email, user_type, password = null, privilege = 'Normal', cb
             main.db.register(req.body.email, 'Normal', req.body.pass, 'Normal', (user) => {
                 let ret = {};
                 if (!user) {
                     ret.status = "Exists";
+                    cb(ret);
                 } else if (user == -1) {
                     ret.status = "Bad";
+                    cb(ret);
                 } else {
                     ret.status = "OK";
-                    user.info = {
-                        "firstname": req.body.firstname,
-                        "lastname": req.body.lastname,
-                        "phone": req.body.phone,
-                        "city": req.body.city,
-                        "status": '',
-                        "region": req.body.state,
-                        "country": req.body.country
-                    };
-                    req.session.user = user;
-                    req.session.save();
+                    main.db.editUser(user.id, req.body.firstname, req.body.lastname, 
+                            req.body.phone, req.body.state, req.body.city, req.body.job, 
+                            req.ip, req.sessionID, (user) => {
+
+                        mail.send(req.body.email, 
+                            "RepuTech Registration", // subject
+                            "You or someone using your e-mail has requested a registration. "
+                            + "Go to this link: " + c.SITE_URL + "/confirm?id=" + user.id
+                            + " to activate it.", (res, err) => {
+                                
+                            if (err) {
+                                logError(res);
+                            }
+                        });
+                    });
                 }
                 
-                main.db.editUser(user.id, req.body.firstname, req.body.lastname, 
-                        req.body.phone, req.body.state, req.body.city, req.ip, req.sessionID, (user) => {
-
-                    cb(ret);
-                });
             });
         }
     },
+    
+    'get-wiki':  {
+        api: true,
+        validate: (req) => {
+            req.checkQuery('id', 'Required field').notEmpty();
+            req.checkQuery('id', 'Must be a number').isNumeric();
+        },
+        perform: (req, main, cb) => {
+            main.db.getWikiData(req.query.id, cb);
+        }
+    },
+    
+    
+    'get-messages':  {
+        logged_in: true,
+        api: true,
+        validate: (req) => {
+            req.checkQuery('id', 'Required field').notEmpty();
+            req.checkQuery('id', 'Must be a number').isNumeric();
+            req.assert('id', 'Do not match').equals(req.session.user.id);
+        },
+        perform: (req, main, cb) => {
+            main.db.getMessageData(req.query.id, cb);
+        }
+    },
+    
+    'get-images':  {
+        logged_in: true,
+        api: true,
+        validate: (req) => {
+            req.checkQuery('id', 'Required field').notEmpty();
+            req.checkQuery('id', 'Must be a number').isNumeric();
+            req.assert('id', 'Do not match').equals(req.session.user.id);
+        },
+        perform: (req, main, cb) => {
+            main.db.getImageData(req.query.id, cb);
+        }
+    },
+    
+    
+    'follow':  {
+        logged_in: true,
+        api: true,
+        validate: (req) => {
+            req.checkQuery('id', 'Required field').notEmpty();
+            req.checkQuery('id', 'Must be a number').isNumeric();
+            if (req.query.id && req.session.user.id == req.query.id) {
+                req.assert('id', 'Do not match').equals("");
+            }
+        },
+        perform: (req, main, cb) => {
+            main.db.tryFollow(req.session.user.id, req.query.id, (ret) => cb({status: ret}));
+        }
+    },
+    
+    
+    'add-wiki':  {
+        post: true,
+        logged_in: true,
+        api: true,
+        validate: (req) => {
+            req.checkBody('title', 'Required field').notEmpty();
+            req.checkBody('content', 'Required field').notEmpty();
+           
+            req.sanitize('title');
+            req.sanitize('content');
+        },
+        perform: (req, main, cb) => {
+            main.db.addWiki(req.session.user.id, req.body.title, req.body.content, (ret) => cb({status: ret}));
+        }
+    },
+    
+    'set-image':  {
+        logged_in: true,
+        api: true,
+        validate: (req) => {
+            req.checkBody('url', 'Required field').notEmpty();
+           
+            req.sanitize('url');
+        },
+        perform: (req, main, cb) => {
+            main.db.setImage(req.session.user.id, req.body.url, (ret) => cb({status: ret}));
+        }
+    },
+    
+    'delete-image':  {
+        logged_in: true,
+        api: true,
+        validate: (req) => {
+            req.checkBody('url', 'Required field').notEmpty();
+           
+            req.sanitize('url');
+        },
+        perform: (req, main, cb) => {
+            main.db.deleteImage(req.session.user.id, req.body.url, (ret) => cb({status: ret}));
+        }
+    },
+    
+    'change-settings': {
+        post: true,
+        logged_in: true,
+        api: true,
+        validate: (req) => {
+            req.checkBody('id', 'Required field').notEmpty();
+            req.checkBody('id', 'Must be a number').isNumeric();
+            
+            req.checkBody('firstname', 'Required field').notEmpty();
+            req.checkBody('lastname', 'Required field').notEmpty();
+            req.checkBody('country', 'Required field').notEmpty();
+            req.checkBody('phone', 'Required field').notEmpty();
+            
+            req.checkBody('firstname', 'Letters only').isAlpha();
+            req.checkBody('lastname', 'Letters only').isAlpha();
+            req.checkBody('firstname', 'Max length of 50').isLength({max: 50});
+            req.checkBody('lastname', 'Max length of 50').isLength({max: 50});
+            req.checkBody('city', 'Letters only').isAlpha();
+            req.checkBody('city', 'Max length of 50').isLength({max: 50});
+            req.checkBody('phone', 'Numbers only').isNumeric();
+            req.checkBody('phone', 'Length between 10 and 12').len(10, 12);
+            req.checkBody('job', 'Letters only').optional().isText();
+            req.checkBody('status', 'Letters only').optional().isText();
+            
+            req.checkBody('currentpass', 'Must be a password').optional().isPassword();
+            req.checkBody('newpass', 'Must be a password').optional().isPassword();
+            
+            req.assert('newpass2', 'Do not match').equals(req.body.newpass2);
+            
+            if (req.body.id && req.session.user.id != req.body.id && !req.session.user.is_admin) {
+                req.assert('id', 'Do not match').equals("");
+            }
+            // Only non-third party can change passwords
+            if (req.body.currentpass && req.session.user.user_type != "Normal") {
+                req.assert('id', 'Do not match').equals("");
+            }
+        },
+        perform: (req, main, cb) => {
+            main.db.addWiki(req.body.id, req.body.firstname, req.body.lastname,
+                            req.body.phone, req.body.city, req.body.job, req.body.status,
+                            req.body.newpass, req.body.currentpass, (ret) => cb({status: ret}));
+        }
+    }
 }
 
 module.exports = {

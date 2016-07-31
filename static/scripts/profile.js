@@ -1,105 +1,30 @@
 // Should pull this info from the database
-var data = 
-    {
-        "img": "/assets/images/avatar.png",
-        "firstname": "John",
-        "lastname": "Doe",
-        "country": "Canada",
-		"prov_state": "Ontario",
-        "city": "Toronto",
-        "phonenum": "1234567890",
-        "email": "john.doe@email.com",
-        "rating": 4,
-        "followers": 23,
-        "job": "Smartphone Technician",
-        "status": "Feeling tech-tastic",
-        "posts": [
-            {
-                "firstname": "John",
-                "lastname": "Doe",
-                "title": "Looking to get your smartphone repaired?!",
-                "type": "Offering",
-                "rating": 4,
-                "img": "",
-                "contact_info": "111-111-1111",
-                "description": "If you're looking to get your smartphone repaired, look no further! I have been repairing smartphone for the past 5 years and I can guarantee that your smartphone will be fixed in less than 5 business days!"
-            }
-        ],
-        "wiki": [
-            {
-                "title": "Lorem Ipsum",
-                "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam molestie sagittis porttitor. Pellentesque ipsum est, scelerisque ultricies vulputate a, dapibus sit amet dolor. Curabitur euismod libero sit amet quam consequat, vitae tempor augue gravida. Praesent sit amet libero sed neque bibendum imperdiet vel quis ligula. Proin interdum porta interdum. Quisque vitae facilisis ex, ac ornare enim. Suspendisse accumsan tellus nec ex auctor tincidunt. Pellentesque placerat dapibus turpis, ac consequat ex sodales vitae. Etiam auctor maximus auctor. Pellentesque gravida, leo nec faucibus posuere, magna metus placerat ex, sed bibendum nibh urna at lectus. Duis nunc mauris, molestie et dui non, auctor dictum urna. Aliquam arcu lacus, faucibus sit amet vestibulum aliquam, tincidunt eget ex. Morbi et sem id ante consequat aliquet. Nulla nibh arcu, aliquet in ultricies lacinia, bibendum a nisl. Pellentesque a finibus neque."
-            },
-            {
-                "title": "Lorem Ipsum 2",
-                "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam molestie sagittis porttitor. Pellentesque ipsum est, scelerisque ultricies vulputate a, dapibus sit amet dolor. Curabitur euismod libero sit amet quam consequat, vitae tempor augue gravida. Praesent sit amet libero sed neque bibendum imperdiet vel quis ligula. Proin interdum porta interdum. Quisque vitae facilisis ex, ac ornare enim. Suspendisse accumsan tellus nec ex auctor tincidunt. Pellentesque placerat dapibus turpis, ac consequat ex sodales vitae. Etiam auctor maximus auctor. Pellentesque gravida, leo nec faucibus posuere, magna metus placerat ex, sed bibendum nibh urna at lectus. Duis nunc mauris, molestie et dui non, auctor dictum urna. Aliquam arcu lacus, faucibus sit amet vestibulum aliquam, tincidunt eget ex. Morbi et sem id ante consequat aliquet. Nulla nibh arcu, aliquet in ultricies lacinia, bibendum a nisl. Pellentesque a finibus neque."
-            }
-        ]
-    };
+var posts = [];
+var wiki = [];
+var msgs = [];
+var imgs = [];
+var pGot = false;
+var wGot = false;
+var mGot = false;
+var iGot = false;
+var $selected = null;
 
-var msgs = [
-    [
-        ["John Doe", "Hi there!"],
-        ["Jane D", "Hello, can you help fix my phone before Friday?"],
-        ["John Doe", "I sure can!"]
-    ],
-    [
-        ["A A", "Hello"],
-        ["John Doe", "Hi, what can I help you with?"]
-    ]
-];
-
-function get_profile() {
-    var url = 'profile';
-    $.ajax({
-        method: "GET",
-        dataType: "json",
-        url: url,
-        success: function (data) {
-            render_profile(data); 
-        },
-        error: function (err) {
-            console.log(err);
-        }
-    });
-
-}
 
 function get_messages() {
+    if (mGot) {
+        render_messages(); 
+        return;
+    }
+    
     $.ajax({
         method: "GET",
         dataType: "json",
-        url: '',
+        url: '/api/get-messages',
+        data: {id: user.id},
         success: function (data) {
-            render_messages(data); 
-        },
-        error: function (err) {
-            console.log(err);
-        }
-    });
-}
-
-function get_general_info() {
-    $.ajax({
-        method: "GET",
-        dataType: "json",
-        url: '',
-        success: function (data) {
-            render_general_info(data); 
-        },
-        error: function (err) {
-            console.log(err);
-        }
-    });
-}
-
-function get_settings_form() {
-    $.ajax({
-        method: "GET",
-        dataType: "json",
-        url: '',
-        success: function (data) {
-            render_settings_form(data); 
+            msgs = data;
+            mGot = true;
+            render_messages(); 
         },
         error: function (err) {
             console.log(err);
@@ -108,12 +33,64 @@ function get_settings_form() {
 }
 
 function get_posts() {
+    if (pGot) {
+        render_posts(); 
+        return;
+    }
+    
     $.ajax({
         method: "GET",
         dataType: "json",
-        url: '',
+        url: '/api/get-posts',
+        data: {id: user.id},
         success: function (data) {
-            render_posts(data); 
+            posts = data;
+            pGot = true;
+            render_posts(); 
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    });
+}
+
+function get_wiki() {
+    if (wGot) {
+        render_wiki(); 
+        return;
+    }
+    
+    $.ajax({
+        method: "GET",
+        dataType: "json",
+        url: '/api/get-wiki',
+        data: {id: user.id},
+        success: function (data) {
+            wiki = data;
+            wGot = true;
+            render_wiki(); 
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    });
+}
+
+function get_images() {
+    if (iGot) {
+        render_images(); 
+        return;
+    }
+    
+    $.ajax({
+        method: "GET",
+        dataType: "json",
+        url: '/api/get-images',
+        data: {id: user.id},
+        success: function (data) {
+            imgs = data;
+            iGot = true;
+            render_images();
         },
         error: function (err) {
             console.log(err);
@@ -137,10 +114,8 @@ var rating_stars = {
 // NOTE: use second function call after server is set up
 
 function render_general_info() {
-//function render_general_info(data) {
     $('.profile-content').empty();
     $('.profile-content').append($('<section/>', {id: 'profile-general'}));
-    var user = data;
     $('#profile-general').append($('<h3/>', {id: 'name', text: user.firstname + ' ' + user.lastname}));
     $('#profile-general').append($('<p/>', {id: 'profile-status', text: 'Status: ' + user.status}));
     $('#profile-general').append($('<h4/>', {text: 'Reputation:'}));
@@ -148,18 +123,10 @@ function render_general_info() {
     $('#profile-general').append($("<p/>", {id: 'rating', html: rating_stars[user.rating]}));
     
     $('#profile-general').append($('<p/>', {id: 'followers', text: 'Followers: ' + user.followers}));
-    $('#followers').append($('<button/>', {id: 'follow', text: 'Follow'}));
+    $('#followers').append($('<p/>', {id: 'followers-err', 'class': 'error', text: ''}));
     $('#profile-general').append($('<h4/>', {text: 'Information:'}));
     $('#profile-general').append($('<p/>', {text: 'Specialize in: ' + user.job}));
-    $('#profile-general').append($('<p/>', {text: 'Located in: ' + user.city + ', ' + user.country}));
-    $('#profile-general').append($('<section/>', {id: 'gallery'}));
-    $('#gallery').append($('<h4/>', {text: 'My images:'}));
-    
-    if (data.img != "") {
-        $('.profile-pic').append($('<img>', {alt: "avatar", src: data.img}));
-    } else {
-        $('.profile-pic').append($('<img>', {alt: "avatar", src: "/assets/images/avatar.png"}));
-    }
+    $('#profile-general').append($('<p/>', {text: 'Located in: ' + user.city + ', ' + user.state + ', ' + user.country}));
     
 }
 
@@ -169,6 +136,40 @@ function render_settings_form() {
     ReactDOM.render(<AccountInfo data={data} />,
                     document.getElementById('profile-content')
     );
+    
+    if (user.user_type != "Normal") {
+        $("#passinfo").hide();
+    }
+    
+    $('#update-info').on('submit', function(event) {
+        let info = $('#update-info').serialize();
+        info.id = user.id;
+        
+        $("#update-err").fadeOut().text("");
+        
+        event.preventDefault();
+        $.ajax({
+            method: "POST",
+            url: '/api/change-settings',
+            data: info,
+            success: function () {
+                if (data.status) {
+                    user.firstname = $("#firstname").text();
+                    user.lastname = $("#lastname").text();
+                    user.status = $("#status").text();
+                    user.job = $("#job").text();
+                    user.city = $("#city").text();
+                    user.phone = $("#phone").text();
+                    render_general_info();
+                } else {
+                    $("#update-err").fadeIn().text("An error occurred or the passwords are incorrect.");
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    });
 }
 
 function render_listing_form() {
@@ -192,11 +193,85 @@ function render_messages() {
     }
 }
 
+function render_images() {
+//function render_messages(msgs) {
+    $('.profile-content').empty();
+    $('.profile-content').append($('<section/>', {id: 'images'}));
+	$('.profile-content').append($('<h3/>', {text: 'My Images'}));
+    for (var i = 0; i < imgs.length; i ++) {
+        $('.profile-content').append($('<img/>', {src: 'assets/images/avatar/' + imgs[i], alt: 'Image'}));
+        
+    }
+    $("#images").append($("<p/>", {"class": "error", "id": "image-err"}));
+    $('#images').append($('<button/>', {id: "select-img", text: "Select"}));
+    $('#images').append($('<button/>', {id: "delete-img", text: "Delete"}));
+    $('#images').append($('<button/>', {id: "add-new-img", text: "Add New"}));
+    
+    $('#images img').on("click", function(event) {
+        if ($selected != null) {
+            $selected.toggleClass('active');
+        }
+        $(this).addClass("active");
+        $selected = $(this);
+    });
+    $("#delete-img").on("click", function(event) {
+        if ($selected == null) {
+            $("#image-err").text("Please select an image.").fadeIn();
+        } else {
+            $("#image-err").text("").fadeOut();
+            let srcImg = $selected.attr("src").substr(21);
+            $.ajax({
+                method: "GET",
+                url: '/api/delete-image',
+                data: {url: srcImg}, // Strip first path
+                success: function () {
+                    if (data.status) {
+                        if (user.img == $selected.attr("src")) {
+                            user.img = '';
+                            $("#pic").attr("src", '/assets/images/avatar.png');
+                        }
+                        $selected.remove();
+                        $selected = null;
+                    } else {
+                        $("#image-err").fadeIn().text("An error occurred");
+                    }
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
+    });
+    $("#select-img").on("click", function(event) {
+        if ($selected == null) {
+            $("#image-err").text("Please select an image.").fadeIn();
+        } else {
+            $("#image-err").text("").fadeOut();
+            let srcImg = $selected.attr("src").substr(21);
+            $.ajax({
+                method: "GET",
+                url: '/api/set-image',
+                data: {url: srcImg}, // Strip first path
+                success: function () {
+                    if (data.status) {
+                        user.img = $selected.attr("src");
+                        $("#pic").attr("src", $selected.attr("src"));
+                    } else {
+                        $("#image-err").fadeIn().text("An error occurred");
+                    }
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
+    });
+}
+
 function render_posts() {
 //function render_posts(data) {
     $('.profile-content').empty();
 	$('.profile-content').append($('<h3/>', {text: 'My Posts'}));
-    var posts = data.posts;
     // Renders posts for the profile
     for (var i = 0; i < posts.length; i ++) {
         $('.profile-content').append($('<article/>', {class: 'post', id: 'post-' + i}));
@@ -221,7 +296,6 @@ function render_posts() {
 function render_wiki() {
     $('.profile-content').empty();
 	$('.profile-content').append($('<h3/>', {text: 'My Wiki Posts'}));
-    var wiki = data.wiki;
     $('.profile-content').append($('<section/>', {id: 'profile-wiki'}));
     $('#profile-wiki').append($('<button/>', {id: 'wiki-new', text: 'New Wiki Post'}));
     for (var i = 0; i < wiki.length; i++) {
@@ -239,6 +313,27 @@ function render_wiki_new() {
     ReactDOM.render(<WikiNew/>,
                     document.getElementById('profile-content')
     ); 
+    
+    $('#wiki-form').on('submit', function(event) {
+        event.preventDefault();
+        $("#wiki-err").text("").fadeOut();
+        $.ajax({
+            method: "POST",
+            url: '/api/add-wiki',
+            data: $('#wiki-form').serialize(),
+            success: function (data) {
+                if (data.status) {
+                    wiki.push({title: $("#wiki-title").text(), content: $("#wiki-content").text()});
+                    render_wiki();
+                } else {
+                    $("#wiki-err").text("An error occurred.").fadeIn();
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    });
 }
 
 // Profile loads General Info page by default
@@ -246,12 +341,8 @@ $(document).ready(function() {
 
     // Click functions for each menu item on profile
 
-    // NOTE: use get_general_info(); instead of render_general_info();
-    // after server is set up (same for all the other calls)
-
     var $old; // Holds previously clicked button
     $('#general').click(function() {
-        //get_general_info();
         render_general_info();
         if ($old != null) {
             $old.toggleClass('active');
@@ -261,23 +352,20 @@ $(document).ready(function() {
     });
 
     $('#posts').click(function() {
-        //get_posts();
-        render_posts();
+        get_posts();
         $old.toggleClass('active');
         $(this).toggleClass('active');
         $old = $(this);
     });
 
     $('#messages').click(function() {
-        //get_messages();
-        render_messages();
+        get_messages();
         $old.toggleClass('active');
         $(this).toggleClass('active');
         $old = $(this);
     });
 
     $('#settings').click(function() {
-        //get_settings_form();
         render_settings_form();
         $old.toggleClass('active');
         $(this).toggleClass('active');
@@ -292,29 +380,38 @@ $(document).ready(function() {
     });
 
     $('#wiki').click(function() {
-        render_wiki();
+        get_wiki();
         $old.toggleClass('active');
         $(this).toggleClass('active');
         $old = $(this);
     });
-
-    $('.follow').click(function() {
-        // NOT SURE WHAT TO SEND SINCE WE DONT HAVE BOTH USERS IDs
+    $('#images').click(function() {
+        get_images();
+        $old.toggleClass('active');
+        $(this).toggleClass('active');
+        $old = $(this);
     });
-
-    $('.profile-form').on('submit', function(event) {
+    $('#follow').click(function() {
+        $("#followers-err").text("").fadeOut();
         $.ajax({
-            method: "POST",
-            url: '',
-            data: $('form').serialize(),
-            success: function () {
-                // DO SOMETHING HERE!
+            method: "GET",
+            dataType: "json",
+            url: '/api/follow',
+            data: {id: user.id},
+            success: function (data) {
+                if (data.status) {
+                    user.followers++;
+                    $("#followers").text('Followers: ' + user.followers);
+                } else {
+                    $("#followers-err").fadeIn().text("You've already followed them.");
+                }
             },
             error: function (err) {
                 console.log(err);
             }
         });
     });
+    
     $('#general').click();
     
     ListingForm = React.createClass({
@@ -355,6 +452,7 @@ $(document).ready(function() {
                     </div>
                     <p>Description:</p>
                     <textarea id="post-description" rows="15"></textarea>
+                    <input type="hidden" name="_csrf" value={csrf}></input>
                     <button type="submit" form="listing-form" value="Submit" id="listing-button">Submit</button>
                 </form>
                 </div>
@@ -371,33 +469,29 @@ $(document).ready(function() {
                         <fieldset>
                             <legend>Personal Information:</legend>
                             <p>First name:</p>
-                            <input type="text" id="firstname" defaultValue={user.firstname} pattern="[a-zA-Z]+" title="This field can only consist of letters."/>
+                            <input type="text" name="firstname" id="firstname" required defaultValue={user.firstname} pattern="[a-zA-Z]{1,50}" title="This field can only consist of letters."/>
                             <p>Last name:</p>
-                            <input type="text" id="lastname" defaultValue={user.lastname} pattern="[a-zA-Z]+" title="This field can only consist of letters."/>
-                            <p>Country:</p>
-                            <select id="country" required name="country">
-                                <option selected>{user.country}</option>
-                            </select>
-                            <p>Province/State:</p>
-                            <select id="state" required name="state">
-                                <option selected>{user.prov_state}</option>
-                            </select>
+                            <input type="text" name="lastname" id="lastname" required defaultValue={user.lastname} pattern="[a-zA-Z]{1,50}" title="This field can only consist of letters."/>
                             <p>City:</p>
-                            <input type="text" id="city" defaultValue={user.city} pattern="[a-zA-Z]{2,}" title="This field can only consist of letters."/>
+                            <input type="text" id="city" name="city" required defaultValue={user.city} pattern="[a-zA-Z]{2,50}" title="This field can only consist of letters."/>
                             <p>Phone Number:</p>
-                            <input type="text" id="phonenum" defaultValue={user.phonenum} pattern="[0-9]{10,12}" title="This field can only consist of numbers."/>
+                            <input type="text" id="phone" name="phone" required defaultValue={user.phone} pattern="[0-9]{10,12}" title="This field can only consist of numbers."/>
+                            <p>Speciality:</p>
+                            <input type="text" id="job" name="job" defaultValue={user.job} maxlength="50" pattern="[a-zA-Z ]+" title="This field can only consist of letters."/>
+                            <p>Status:</p>
+                            <input type="text" id="status" name="status" defaultValue={user.status} maxlength="50" pattern="[a-zA-Z ]+" title="This field can only consist of letters."/>
                         </fieldset>
-                        <fieldset>
+                        <fieldset id="passinfo">
                             <legend>Account Information:</legend>
-                            <p>Email:</p>
-                            <input type="text" id="email" defaultValue={user.email} pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}" title="E-mail address must be valid."/>
                             <p>Current Password (must be entered to make any changes): </p>
-                            <input type="password" id="currentpass"/>
+                            <input type="password" name="currentpass" id="currentpass"/>
                             <p>New Password:</p>
-                            <input type="password" id="newpass" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
+                            <input type="password" name="newpass" id="newpass" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
                             <p>Retype New Password (same as above): </p>
-                            <input type="password" id="newpass-confirmation" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
+                            <input type="password" name="newpass2" id="newpass-confirmation" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
                         </fieldset>
+                        <input type="hidden" name="_csrf" value={csrf}></input>
+                        <p class="error" id="update-err"></p>
                         <button type="submit" form="update-info" value="Update" id="update-button">Update</button>
                     </form>
                 );
@@ -416,10 +510,12 @@ $(document).ready(function() {
                 <section id="profile-wiki-new">
                     <h3>New Wiki Post</h3>
                     <form data-reactroot="" method="post" id="wiki-form" class="profile-form">
+                        <p id="wiki-err" class="error"></p>
                         <p>Title:</p>
-                        <input type="text" id="wiki-title"></input>
+                        <input required type="text" name="title" id="wiki-title"></input>
                         <p>Content:</p>
-                        <textarea id="wiki-content" rows="15"></textarea>
+                        <textarea required name="content" form="wiki-form" id="wiki-content" rows="15"></textarea>
+                        <input type="hidden" name="_csrf" value={csrf}></input>
                         <button type="submit" form="wiki-form" value="Submit" id="wiki-button">Submit</button>
                     </form>
                 </section>

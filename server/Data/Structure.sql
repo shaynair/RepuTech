@@ -1,10 +1,10 @@
-DROP TYPE IF EXISTS user_types;
+DROP TYPE IF EXISTS user_types CASCADE;
 CREATE TYPE user_types AS ENUM('Normal', 'Facebook', 'Twitter', 'Google', 'GitHub', 'LinkedIn', 'BitBucket', 'Reddit', 'Dropbox');
 
-DROP TYPE IF EXISTS privilege_types;
+DROP TYPE IF EXISTS privilege_types CASCADE;
 CREATE TYPE privilege_types AS ENUM('Inactivated', 'Normal', 'Admin');
 
-DROP TYPE IF EXISTS privacy_types;
+DROP TYPE IF EXISTS privacy_types CASCADE;
 CREATE TYPE privacy_types AS ENUM('All', 'Registered', 'High', 'Medium');
 
 DROP TABLE IF EXISTS login CASCADE;
@@ -69,6 +69,7 @@ CREATE TABLE users(
   region_id INTEGER,
   city VARCHAR(50) NOT NULL,
   status VARCHAR(50) NOT NULL DEFAULT '',
+  job VARCHAR(50) NOT NULL DEFAULT '',
   
   PRIMARY KEY (u_id), 
   FOREIGN KEY (u_id) REFERENCES login(u_id) ON DELETE CASCADE,
@@ -82,14 +83,14 @@ CREATE INDEX name ON users(firstname, lastname);
 DROP TABLE IF EXISTS user_images CASCADE;
 CREATE TABLE user_images(
   img_url CHAR(16) NOT NULL,
-  user_id INTEGER NOT NULL,
+  u_id INTEGER NOT NULL,
   is_active BOOLEAN NOT NULL DEFAULT FALSE,
   
   PRIMARY KEY (img_url), 
-  FOREIGN KEY (user_id) REFERENCES users(u_id) ON DELETE CASCADE
+  FOREIGN KEY (u_id) REFERENCES users(u_id) ON DELETE CASCADE
 );
 
-CREATE INDEX active ON user_images(user_id, is_active);
+CREATE INDEX active ON user_images(u_id, is_active);
 
 DROP TABLE IF EXISTS followers CASCADE;
 CREATE TABLE followers(
@@ -98,7 +99,9 @@ CREATE TABLE followers(
   
   PRIMARY KEY (followed,follower),
   FOREIGN KEY (followed) REFERENCES users(u_id) ON DELETE CASCADE,
-  FOREIGN KEY (follower) REFERENCES users(u_id) ON DELETE CASCADE
+  FOREIGN KEY (follower) REFERENCES users(u_id) ON DELETE CASCADE,
+   
+  CHECK (followed != follower)
 );
 
 DROP TABLE IF EXISTS posts CASCADE;
@@ -165,7 +168,9 @@ CREATE TABLE messages (
    
    PRIMARY KEY (m_id),
    FOREIGN KEY (receiver) REFERENCES users(u_id) ON DELETE CASCADE,  
-   FOREIGN KEY (sender) REFERENCES users(u_id) ON DELETE CASCADE
+   FOREIGN KEY (sender) REFERENCES users(u_id) ON DELETE CASCADE,
+   
+   CHECK (receiver != sender)
 );
 
 DROP TABLE IF EXISTS likes CASCADE;
@@ -182,6 +187,7 @@ DROP TABLE IF EXISTS wiki CASCADE;
 CREATE TABLE wiki (
   w_id SERIAL NOT NULL,
   poster INTEGER NOT NULL,
+  title TEXT NOT NULL,
   content TEXT NOT NULL,
   post_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   
@@ -199,7 +205,9 @@ CREATE TABLE reports (
   PRIMARY KEY (reported, reporter),
   FOREIGN KEY (reported) REFERENCES users(u_id) ON DELETE CASCADE,
   FOREIGN KEY (reporter) REFERENCES users(u_id) ON DELETE CASCADE,
-  FOREIGN KEY (post) REFERENCES posts(p_id) ON DELETE CASCADE
+  FOREIGN KEY (post) REFERENCES posts(p_id) ON DELETE CASCADE,
+   
+  CHECK (reported != reporter)
 );
 
 DROP TABLE IF EXISTS ip_bans CASCADE;

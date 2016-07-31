@@ -2,24 +2,36 @@
         <main>
             <section class="sidebar flexbox flexbox-column">
                 
-                <section class="profile-pic"></section>
-                <!--
-                
-                <section class="profile-buttons">
-                    <button>Follow</button>
-                </section>-->
+                <section class="profile-pic">
+                    <img id="pic" alt="avatar" src="<%= (profile.img ? profile.img : "/assets/images/avatar.png")%>" />
+                </section>
 				<section class="profile-menu">
                     <button id='general'>General Info</button>
-                    <button id='messages'>My Messages</button>
-                    <button id='posts'>My Posts</button>
-                    <button id='create-listing'>Create Listing</button>
-                    <button id='wiki'>My Wiki Posts</button>
-                    <button id='settings'>Update Account Info</button>
+                    <button id='posts'>Posts</button>
+                    <button id='wiki'>Wiki Posts</button>
+                    
+                    <% if (user != null && user.id == profile.id) { %>
+                        <button id='messages'>My Messages</button>
+                        <button id='images'>My Images</button>
+                        <button id='create-listing'>Create Listing</button>
+                    <% } else { %>
+                        <button id="follow">Follow</button>
+                        <button id="message">Message</button>
+                    <% } %>
+                    
+                    <% if (user != null && (user.is_admin || user.id == profile.id)) { %>
+                        <button id='settings'>Update Account Info</button>
+                    <% } %>
                 </section>
             </section>
 
             <!--Placeholder for profile content-->
             <section class="profile-content" id="profile-content"></section>
             
+            <script type='text/javascript'>
+              var myuser = <%-JSON.stringify(user)%>
+              var user = <%-JSON.stringify(profile)%>
+              var csrf = <%= csrfToken %>
+            </script>
         </main> 
 <%- include partials/footer.ejs %>
