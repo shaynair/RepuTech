@@ -27,6 +27,7 @@
     "express-session": "*",
     "express-validator": "*",
     "connect-redis": "*",
+    "node-gpw": "*",
     
     "ejs": "*",
     "express": "*",

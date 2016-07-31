@@ -2,10 +2,41 @@
 
 
 const c = require("./constants");
+const mailer = require("./mail");
+
+// Helpers
+function setAttempts(req) {
+    req.session.attempts = req.session.attempts || 0;
+    req.session.attempts++;
+    req.session.attemptTime = Math.floor(new Date() / 1000);
+    req.session.save();
+}
+
+function hasAttempts(req) {
+    if (req.session.attemptTime && req.session.attemptTime >= 
+             (Math.floor(new Date() / 1000) - 30)) {
+                // Within 30 seconds
+        if (req.session.attempts >= 5) {
+            return true;
+        }
+    } else if (req.session.attempts) {
+        delete req.session.attempts;
+        delete req.session.attemptTime;
+        req.session.save();
+    }
+    return false;
+}
+
+function logError(err) {
+    if (err) {
+        console.log(err);
+    }
+}
 
 const CALLS = {
     'get-states': {
         post: false, 
+        api: true,
         validate: (req) => {
             req.checkBody('country', 'Invalid').len(2, 2);
         },
@@ -14,30 +45,75 @@ const CALLS = {
         }
     },
     
-    'login-form':  {
+    'reset-pass':  {
         post: true,
         logged_out: true,
+        api: true,
         validate: (req) => {
-            req.checkBody('email', 'Invalid').notEmpty();
-            req.checkBody('pass', 'Invalid').notEmpty();
-            
-            req.checkBody('email', 'Invalid').isEmail();
-            req.checkBody('email', 'Invalid').isRegularEmail();
-            req.checkBody('pass', 'Invalid').isPassword();
+            req.checkBody('email', 'Required field').notEmpty();
+            req.checkBody('email', 'Must be an email').isEmail();
+            req.checkBody('email', 'Must be an email').isRegularEmail();
         },
         perform: (req, main, cb) => {
             // If they've used it too much
-            if (req.session.attemptTime && req.session.attemptTime >= 
-                            (Math.floor(new Date() / 1000) - 30)) {
-                // Within 30 seconds
-                if (req.session.attempts >= 5) {
-                    cb({status: "Attempts"});
-                    return;
+            if (hasAttempts(req)) {
+                cb({status: "Attempts"});
+                return;
+            }
+            
+            main.db.resetPassStart(req.body.email, (user) => {
+                let ret = {};
+                if (user) {
+                    ret.status = "OK";
+                    
+                    mail.send(req.body.email, 
+                        "RepuTech Password Reset", // subject
+                        "You or someone using your e-mail has requested a password reset. "
+                        + "Go to this link: " + c.SITE_URL + "/reset?token=" + user 
+                        + " to reset it. It is valid for 24 hours. Your new password will be "
+                        + token + " after you click on it.", (res, err) => {
+                            
+                        if (err) {
+                            logError(res);
+                        }
+                    });
+                } else {
+                    ret.status = "Bad";
                 }
-            } else if (req.session.attempts) {
-                delete req.session.attempts;
-                delete req.session.attemptTime;
-                req.session.save();
+                setAttempts(req);
+                ret.attempts = req.session.attempts;
+                cb(ret);
+            });
+        }
+    },
+    
+    'reset':  {
+        logged_out: true,
+        validate: (req) => {
+            req.checkQuery('token', 'Invalid').notEmpty();
+        },
+        perform: (req, main, cb) => {
+            main.db.resetPassEnd(req.body.token, (user) => cb(null));
+        }
+    },
+    
+    'login-form':  {
+        post: true,
+        logged_out: true,
+        api: true,
+        validate: (req) => {
+            req.checkBody('email', 'Required field').notEmpty();
+            req.checkBody('pass', 'Required field').notEmpty();
+            
+            req.checkBody('email', 'Must be an email').isEmail();
+            req.checkBody('email', 'Must be an email').isRegularEmail();
+            req.checkBody('pass', 'Must match the format').isPassword();
+        },
+        perform: (req, main, cb) => {
+            // If they've used it too much
+            if (hasAttempts(req)) {
+                cb({status: "Attempts"});
+                return;
             }
             
             main.db.logIn(req.body.email, req.body.pass, req.ip, 
@@ -45,10 +121,7 @@ const CALLS = {
                 let ret = {};
                 if (!user) {
                     ret.status = "Bad";
-                    req.session.attempts = req.session.attempts || 0;
-                    req.session.attempts++;
-                    req.session.attemptTime = Math.floor(new Date() / 1000);
-                    req.session.save();
+                    setAttempts(req);
                 } else if (user == 1) {
                     ret.status = "Banned";
                 } else if (user == 2) {
@@ -60,6 +133,72 @@ const CALLS = {
                 }
                 ret.attempts = req.session.attempts;
                 cb(ret);
+            });
+        }
+    },
+    
+    'signup-form':  {
+        post: true,
+        logged_out: true,
+        api: true,
+        validate: (req) => {
+            req.checkBody('email', 'Required field').notEmpty();
+            req.checkBody('pass', 'Required field').notEmpty();
+            req.checkBody('firstname', 'Required field').notEmpty();
+            req.checkBody('lastname', 'Required field').notEmpty();
+            req.checkBody('country', 'Required field').notEmpty();
+            req.checkBody('state', 'Required field').notEmpty();
+            req.checkBody('city', 'Required field').notEmpty();
+            req.checkBody('phone', 'Required field').notEmpty();
+            
+            req.checkBody('email', 'Must be an email').isEmail();
+            req.checkBody('email', 'Must be valid email').isRegularEmail();
+            req.checkBody('email', 'Max length of 100').isLength({max: 100});
+            req.checkBody('pass', 'Must match format').isPassword();
+            req.checkBody('firstname', 'Letters only').isAlpha();
+            req.checkBody('lastname', 'Letters only').isAlpha();
+            req.checkBody('firstname', 'Max length of 50').isLength({max: 50});
+            req.checkBody('lastname', 'Max length of 50').isLength({max: 50});
+            req.checkBody('country', 'Letters only').isAlpha();
+            req.checkBody('country', 'Invalid').len(2, 2);
+            req.checkBody('state', 'Numbers only').isNumeric();
+            req.checkBody('city', 'Letters only').isAlpha();
+            req.checkBody('city', 'Max length of 50').isLength({max: 50});
+            req.checkBody('phone', 'Numbers only').isNumeric();
+            req.checkBody('phone', 'Length between 10 and 12').len(10, 12);
+            
+            req.assert('email2', 'Do not match').equals(req.body.email);
+            req.assert('pass2', 'Do not match').equals(req.body.pass);
+        },
+        perform: (req, main, cb) => {
+            
+            email, user_type, password = null, privilege = 'Normal', cb
+            main.db.register(req.body.email, 'Normal', req.body.pass, 'Normal', (user) => {
+                let ret = {};
+                if (!user) {
+                    ret.status = "Exists";
+                } else if (user == -1) {
+                    ret.status = "Bad";
+                } else {
+                    ret.status = "OK";
+                    user.info = {
+                        "firstname": req.body.firstname,
+                        "lastname": req.body.lastname,
+                        "phone": req.body.phone,
+                        "city": req.body.city,
+                        "status": '',
+                        "region": req.body.state,
+                        "country": req.body.country
+                    };
+                    req.session.user = user;
+                    req.session.save();
+                }
+                
+                main.db.editUser(user.id, req.body.firstname, req.body.lastname, 
+                        req.body.phone, req.body.state, req.body.city, req.ip, req.sessionID, (user) => {
+
+                    cb(ret);
+                });
             });
         }
     },
@@ -88,24 +227,25 @@ module.exports = {
                 if (req.validationErrors()) {
                     ret.error = "Invalid parameters";
                 } else {
-                    CALLS[r].perform(req, main, (r) => res.send(JSON.stringify(r)));
+                    CALLS[r].perform(req, main, (r) => {
+                        if (r) {
+                            res.send(JSON.stringify(r));
+                        } else {
+                            res.redirect("/");
+                        }
+                    });
                     return;
                 }
             }
             res.send(JSON.stringify(ret));
         };
+        // Configure routes
         for (let r in CALLS) {
             if (CALLS[r].post) {
-                app.post('/api/' + r, (req, res) => f(req, res, r));
+                app.post('/' + (CALLS[r].api ? 'api/' : '') + r, (req, res) => f(req, res, r));
             } else {
-                app.get('/api/' + r, (req, res) => f(req, res, r));
+                app.get('/' + (CALLS[r].api ? 'api/' : '') + r, (req, res) => f(req, res, r));
             }
         }
-    },
-    
-    logError: (err) => {
-        if (err) {
-            console.log(err);
-        }
-    },
+    }
 }

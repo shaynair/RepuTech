@@ -11,6 +11,7 @@
                     
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 					<button type="submit" form="login-form" value="Log In">Log In</button>
+                    <button id="reset-pass" value="Reset Password">Reset Password</button>
 				</form>
                 <% for (let o in oauth) { %>
                     <a href="/<%= oauth[o].URL %>"><button>Log In with <%= o %></button></a>

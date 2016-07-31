@@ -1,5 +1,8 @@
 // This file defines global constants for our app.
 
+// General info
+exports.SITE_URL = 'https://reputech.herokuapp.com';
+
 // Postgres information
 exports.DATABASE_INFO = {
     host: 'ec2-54-243-42-108.compute-1.amazonaws.com', 

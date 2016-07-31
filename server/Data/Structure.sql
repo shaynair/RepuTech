@@ -31,9 +31,14 @@ CREATE TABLE auth(
   password CHAR(64) NOT NULL,
   privilege privilege_types NOT NULL, 
   
+  reset_token VARCHAR(64) DEFAULT NULL,
+  reset_time TIMESTAMP DEFAULT NULL,
+  
   PRIMARY KEY (u_id), 
   FOREIGN KEY (u_id) REFERENCES login(u_id) ON DELETE CASCADE
 );
+
+CREATE INDEX reset ON auth(reset_token) WHERE reset_token IS NOT NULL;
 
 DROP TABLE IF EXISTS address_country CASCADE;
 CREATE TABLE address_country (

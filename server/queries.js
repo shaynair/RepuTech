@@ -3,6 +3,7 @@
 const bcrypt = require('bcrypt');
 const fs = require('graceful-fs');
 const c = require("./constants");
+const gpw = require("node-gpw")
 
 module.exports = function(pool, sessionStore) {
     return {
@@ -136,7 +137,7 @@ module.exports = function(pool, sessionStore) {
             this.query("UPDATE users SET status  = $1 WHERE u_id = $2", [status, u_id], cb);
         },
         
-        editUser: function(u_id, firstname, lastname, phone, region_id, city, cb) {
+        editUser: function(u_id, firstname, lastname, phone, region_id, city, ipaddr, sID, cb) {
             // Check if exists
             this.query("SELECT u_id FROM users WHERE u_id = $1", [u_id], (users) => {
 
@@ -149,9 +150,59 @@ module.exports = function(pool, sessionStore) {
                                 + "phone, region_id, city) VALUES ($1, $2, $3, $4, $5, $6)", 
                                 [u_id, firstname, lastname, phone, region_id, city]);
                 }
+                
+                this.simpleQuery("UPDATE login SET ip_address = $1, sessionID = $2 WHERE u_id = $3", [ipaddr, sID, u_id]);
                 if (cb) {
                     cb();
                 }
+            });
+        },
+        
+        // Returns token on success
+        resetPassStart: function(email, cb) {
+            let token = gpw(6).toUpperCase() + gpw(6).toLowerCase() + Math.floor(Math.random() * 10); // GPW + number
+            this.query("UPDATE auth LEFT JOIN login USING (u_id) "
+                    + "SET reset_token = $1, reset_time = NOW() WHERE email = $2", [token, email], (users) => {
+                if (!users || users.rows.length == 0 
+                        || users.rows[0].privilege == "Inactivated" || users.rows[0].user_type != "Normal") { // NOT FOUND
+                    if (cb) {
+                        cb(null);
+                    }
+                    return;
+                }
+                cb(token);
+            });
+        },
+        
+        resetPassEnd: function(token, cb) {
+            this.query("SELECT * FROM auth WHERE reset_token = $1", [token], (users) => {
+                if (!users || users.rows.length == 0 ) { // NOT FOUND
+                    if (cb) {
+                        cb(null);
+                    }
+                    return;
+                }
+                let u = users.rows[0];
+                if (Math.round(((new Date()) - u.reset_time)) / (24 * 60 * 60  * 1000) < 1)  {
+                    // Less than one day has passed
+                    this.simpleQuery("UPDATE auth SET reset_time = NULL, reset_token = NULL, "
+                                    + "password = $1 WHERE u_id = $2", 
+                                [bcrypt.hashSync(token, c.SALT), u.u_id]);
+                                
+                    cb(token);
+                } else {
+                    this.simpleQuery("UPDATE auth SET reset_time = NULL, reset_token = NULL "
+                                    + "WHERE reset_token = $1", 
+                                [token]);
+                    cb(null);
+                }
+                
+                // Release session if online
+                this.query("SELECT sessionID FROM login WHERE u_id = $1", [u.u_id], (users) => {
+                    if (users && users.rows.length != 0) { // EXISTS
+                        destroySession(users.rows[0].sessionID);
+                    }
+                });
             });
         },
         

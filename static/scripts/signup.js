@@ -88,15 +88,17 @@ function submitForm(){
     $.ajax({
 	     type:"POST",
 	     dataType: "json",
-		 url: "signup-form",
+		 url: "/api/signup-form",
          data: $("#sign-up-form").serialize(),
 		 success: function(res){
-		    if (res.status === "exists"){
+		    if (res.status === "Exists"){
 			    setBorderColor($("#email"), "red");
-			    $("#email-err").text("This Email Address is Already Used. Please Use Another Email Address.").fadeIn();
-			} else {
-                $("main").empty();    
-				$("main").append($("<h3>").text());	
+			    $("#email-err").text("This Email Address is already used. Please use another Email Address.").fadeIn();
+            } else if (res.status === "Bad"){
+			    setBorderColor($("#email"), "red");
+			    $("#email-err").text("An unknown error occurred.").fadeIn();
+			} else if (res.status == "OK") {
+                window.location.href = "/profile";
             }
 		 },
 		 error: function(err){
