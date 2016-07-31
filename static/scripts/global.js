@@ -10,24 +10,8 @@ $(document).ready(() => {
         $("#submit").on("click", validateEvent);
         $("#country").on("change", populateStates);
     }
-
-    $(".search-form").on("submit", (event) => {
-        $.ajax({
-            method: "POST",
-            url: '',
-            dataType: "json",
-            data: $('.search-form').serialize(),
-            success: (data) => {
-                window.location.href("search.html");
-                render_search_data(data);
-            },
-            error: (err) => {
-                console.log(err);
-            }
-        });
-    });
     
-    $(".search-user").on("submit", (event) => {
+    $("#search-user").on("submit", (event) => {
         $.ajax({
             method: "POST",
             url: '',

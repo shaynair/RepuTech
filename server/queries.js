@@ -3,7 +3,8 @@
 const bcrypt = require('bcrypt');
 const fs = require('graceful-fs');
 const c = require("./constants");
-const gpw = require("node-gpw")
+const gpw = require("node-gpw");
+const async = require("async");
 
 module.exports = function(pool, sessionStore) {
     return {
@@ -26,7 +27,7 @@ module.exports = function(pool, sessionStore) {
         },
         
         // Initializes and repopulates a database.
-        initializeDatabase: function() {
+        initializeDatabase: function(cb) {
             console.log("Re-populating database...");
             
             // Destroy sessions first
@@ -41,6 +42,9 @@ module.exports = function(pool, sessionStore) {
                 this.query(fs.readFileSync(c.SQL_INIT_PATH).toString(), [], () => {
                     this.register(c.ADMIN_LOGIN, 'Normal', c.ADMIN_PASS, 'Admin', () => {
                         console.log("Finished executing queries.");
+                        if (cb) {
+                            cb();
+                        }
                     });
                 });
             });
@@ -147,6 +151,12 @@ module.exports = function(pool, sessionStore) {
             this.query("UPDATE auth SET privilege = 'Normal' WHERE "
                     + "u_id = $1 AND privilege = 'Inactivated'", [u_id], cb);
         },
+        // Bans a user
+        banUser: function(u_id, origin, cb) {
+            this.query("UPDATE login SET banned = TRUE WHERE "
+                    + "u_id = $1 AND u_id != $2", [u_id, origin], cb);
+        },
+        
         
         editUser: function(u_id, firstname, lastname, phone, region_id, city, job, ipaddr, sID, cb) {
             // Check if exists
@@ -169,10 +179,21 @@ module.exports = function(pool, sessionStore) {
             });
         },
         
-        setImage: function(u_id, url, cb) {
-            this.query("UPDATE user_images SET is_active = TRUE WHERE u_id = $1 AND img_url = $2", [u_id, url], (users) => {
+        addImage: function(u_id, url, cb) {
+            this.query("INSERT INTO user_images (u_id, img_url) VALUES ($1, $2)", [u_id, url], (images) => {
 
-                if (users && users.rows.length != 0) { // EXISTS
+                if (images && images.rows.length != 0) { // EXISTS
+                    cb(true);
+                } else {
+                    cb(false);
+                }
+            });
+        },
+        
+        setImage: function(u_id, url, cb) {
+            this.query("UPDATE user_images SET is_active = TRUE WHERE u_id = $1 AND img_url = $2", [u_id, url], (images) => {
+
+                if (images && images.rows.length != 0) { // EXISTS
                     this.simpleQuery("UPDATE user_images SET is_active = FALSE WHERE u_id = $1 AND img_url != $2", 
                             [u_id, url]);
                             
@@ -184,8 +205,8 @@ module.exports = function(pool, sessionStore) {
         },
         
         deleteImage: function(u_id, url, cb) {
-            this.query("DELETE FROM user_images WHERE u_id = $1 AND img_url = $2", [u_id, url], (users) => {
-                if (users && users.rows.length != 0) { // EXISTS
+            this.query("DELETE FROM user_images WHERE u_id = $1 AND img_url = $2", [u_id, url], (images) => {
+                if (images && images.rows.length != 0) { // EXISTS
                     cb(true);
                 } else {
                     cb(false);
@@ -367,7 +388,9 @@ module.exports = function(pool, sessionStore) {
                         "country": u.country,
                         "job": u.job,
                         "followers": 0,
-                        "rating": 0
+                        "rating": 0,
+                        "img": "",
+                        "images": []
                     };
                     
                     this.query("SELECT COUNT(follower) AS c FROM followers WHERE followed = $1", [u_id], (users) => {
@@ -383,10 +406,18 @@ module.exports = function(pool, sessionStore) {
                                     return prev + row.rating; 
                                 }, 0);
                                 info.rating /= users.rows.length;
+                                info.rating = Math.round(info.rating);
                             }
-                            this.query("SELECT img_url FROM user_images WHERE u_id = $1 AND is_active = TRUE", [u_id], (users) => {
+                            // Get images
+                            this.query("SELECT img_url FROM user_images WHERE u_id = $1", [u_id], (users) => {
                                 if (users && users.rows.length > 0) {
-                                    info.img = users.rows[0].img_url;
+                                    for (let row of users.rows) {
+                                        if (row.is_active) {
+                                            info.img = row.img_url;
+                                        } else {
+                                            info.images.push(row.img_url);
+                                        }
+                                    }
                                 }
                                 cb(info);
                             });
@@ -402,34 +433,60 @@ module.exports = function(pool, sessionStore) {
         getWikiData: function(u_id, cb) {
             // Try to get detailed data
             
-            this.query("SELECT title, content FROM wiki WHERE poster = $1 ORDER BY post_time DESC", [u_id], (users) => {
+            this.query("SELECT title, content FROM wiki WHERE poster = $1 ORDER BY post_time DESC", [u_id], (wikis) => {
                        
                 let info = [];
-                if (users && users.rows.length > 0) {
-                    info = users.rows;
+                if (wikis && wikis.rows.length > 0) {
+                    info = wikis.rows;
                 }
                  cb(info);
             });
         },
         
+
+        
         getMessageData: function(u_id, cb) {
             // Try to get detailed data
             
-            this.query("SELECT * FROM wiki WHERE sender = $1 OR receiver = $2 ORDER BY message_time DESC", [u_id, u_id], (users) => {
-                let info = [];
-                if (users && users.rows.length > 0) {
-                    info = users.rows.map(row => [row.sender, row.content]);
+            this.query("SELECT * FROM messages WHERE sender = $1 OR receiver = $2 ORDER BY message_time DESC", [u_id, u_id], (msgs) => {
+                let tasks = {}; // Build the user names
+                if (msgs && msgs.rows.length > 0) {
+                    for (let row of msgs.rows) {
+                        let other = row.sender;
+                        if (other == u_id) {
+                            other = row.receiver;
+                        }
+                        if (!(other in tasks)) {
+                            tasks[other] = (ret) => {
+                                this.getUserName(other, (name) => ret(null, {id: other, "name": name}));
+                            };
+                        }
+                    }
                 }
-                cb(info);
+                
+                // Execute all tasks then return
+                async.parallel(tasks, (err, results) => {
+                    let ret = {};
+                    // Build conversation threads
+                    for (let user in results) {
+                        ret[user.id] = {name: user, messages: []};
+                        for (let row of msgs.rows) {
+                            if (row.sender == user.id || row.receiver == user.id) {
+                                ret[user.id].messages.push({sender: row.sender, content: row.content});
+                            }
+                        }
+                    }
+                    cb(ret);
+                });
             });
         },
         
         getImageData: function(u_id, cb) {
             // Try to get detailed data
-            this.query("SELECT * FROM user_images WHERE u_id = $1", [u_id, u_id], (users) => {
+            this.query("SELECT * FROM user_images WHERE u_id = $1", [u_id, u_id], (images) => {
                 let info = [];
-                if (users && users.rows.length > 0) {
-                    info = users.rows.map(row => row.img_url);
+                if (images && images.rows.length > 0) {
+                    info = images.rows.map(row => row.img_url);
                 }
                 cb(info);
             });
@@ -446,11 +503,51 @@ module.exports = function(pool, sessionStore) {
                 }
             });
         },
+        // Return true on success
+        tryLike: function(p_id, u_id, cb) {
+            this.query("SELECT * FROM likes WHERE post = $1 AND liker = $2", [p_id, u_id], (users) => {
+                if (users && users.rows.length > 0) {
+                    cb(false);
+                } else {
+                    this.simpleQuery("INSERT INTO likes (post, liker) VALUES($1, $2)", [p_id, u_id]);
+                    cb(true);
+                }
+            });
+        },
         
         // Return true on success
         addWiki: function(u_id, title, content, cb) {
-            this.query("INSERT INTO wiki (poster, title, content) VALUES ($1, $2, $3)", [u_id, title, content], (users) => {
-                if (users && users.rows.length > 0) {
+            this.query("INSERT INTO wiki (poster, title, content) VALUES ($1, $2, $3)", [u_id, title, content], (wikis) => {
+                if (wikis && wikis.rows.length > 0) {
+                    cb(true);
+                } else {
+                    cb(false);
+                }
+            });
+        },
+        
+        // Return true on success
+        addPost: function(u_id, title, content, privacy, urgency, is_offer, cb) {
+            if (is_offer) {
+                urgency = 0;
+            } else if (!urgency) {
+                urgency = 1;
+            }
+            this.query("INSERT INTO posts (poster, title, content, urgency, privacy) VALUES ($1, $2, $3, $4, $5)", [u_id, title, content, urgency, privacy], (posts) => {
+                if (posts && posts.rows.length > 0) {
+                    cb(true);
+                } else {
+                    cb(false);
+                }
+            });
+        },
+        
+
+        
+        // Return true on success
+        addMessage: function(u_id, to, content, cb) {
+            this.query("INSERT INTO messages (receiver, sender, content) VALUES ($1, $2, $3)", [to, u_id, content], (msgs) => {
+                if (msgs && msgs.rows.length > 0) {
                     cb(true);
                 } else {
                     cb(false);
@@ -507,6 +604,7 @@ module.exports = function(pool, sessionStore) {
                 let u = users.rows[0]; // UNIQUE KEY
                 
                 u.is_admin = false;
+                u.activated = true;
                 
                 // Check for privilege type
                 this.query("SELECT * FROM auth WHERE u_id = $1", [u_id], (users) => {
@@ -518,6 +616,280 @@ module.exports = function(pool, sessionStore) {
                     this.getUserData(u_id, (info) => {
                         u.info = info;
                         cb(u);
+                    });
+                });
+            });
+        },
+        
+        // Returns a user string if u_id are right, otherwise null
+        getUserName: function(u_id, cb) {
+            
+            // Get user from database
+            this.query("SELECT firstname, lastname FROM users WHERE u_id = $1", [u_id], (users) => {
+
+                if (!users || users.rows.length != 1) { // NOT FOUND
+                    cb("");
+                    return;
+                }
+                
+                let u = users.rows[0]; // UNIQUE KEY
+                
+                cb(u.firstname + " " + u.lastname);
+            });
+        },
+        
+        
+        // Get posts by a query
+        searchPosts: function(user, query, cb) {
+            query = query.toLowerCase();
+            this.query("SELECT p_id FROM posts WHERE content LIKE $1 OR title LIKE $1 ORDER BY post_time DESC", 
+                            ["%" + query + "%", "%" + query + "%"], (posts) => {
+
+                let ret = [];
+                if (!posts || posts.rows.length != 1) { // NOT FOUND
+                    cb(ret);
+                    return;
+                }
+                
+                let tasks = []; // Build the posts
+                for (let row of posts.rows) {
+                    tasks.push((ret) => {
+                        this.getPost(row.p_id, (post) => ret(null, post));
+                    });
+                }
+                
+                // Execute all tasks then return
+                async.parallel(tasks, (err, results) => {
+                    cb(results
+                        .map(p => [p, this.computeScore(user, query, p)]) // Associate each post with a score
+                        .filter(p => p[1] > 5) // Filter out any scores too low
+                        .sort((a, b) => a[1] - b[1]) // Sort by the score
+                        .map(p => p[0])); // Take out the score
+                });
+            });
+        },
+        
+        similarPosts: function(post, cb) {
+            if (post == null) {
+                cb([]);
+                return;
+            }
+            query = query.toLowerCase();
+            this.query("SELECT p_id FROM posts WHERE p_id != $1 ORDER BY post_time DESC", [post.id], (posts) => {
+
+                let ret = [];
+                if (!posts || posts.rows.length != 1) { // NOT FOUND
+                    cb(ret);
+                    return;
+                }
+                
+                let tasks = []; // Build the posts
+                for (let row of posts.rows) {
+                    tasks.push((ret) => {
+                        this.getPost(row.p_id, (post) => ret(null, post));
+                    });
+                }
+                
+                // Execute all tasks then return
+                async.parallel(tasks, (err, results) => {
+                    cb(results
+                        .map(p => [p, this.relativeScore(post, p)]) // Associate each post with a score
+                        .filter(p => p[1] > 5) // Filter out any scores too low
+                        .sort((a, b) => a[1] - b[1]) // Sort by the score
+                        .map(p => p[0]) // Take out the score
+                        .slice(0, 5)); // Top 5
+                });
+            });
+        },
+        
+        // Returns the relative score based on the query and user
+        computeScore: function(user, query, post) {
+            let ret = 0;
+            if(user) {
+                if (user.id == post.poster) {
+                    return ret; // Do not show these
+                }
+                if (user.country == post.country) {
+                    ret += 5;
+                }
+                if (user.region == post.region) {
+                    ret += 10;
+                }
+                if (user.city == post.city) {
+                    ret += 20;
+                }
+                if (post.privacy == "High" && user.rating < 4) {
+                    return 0;
+                }
+                if (post.privacy == "Medium" && user.rating < 2) {
+                    return 0;
+                }
+            } else if (post.privacy != "All") {
+                return ret;
+            }
+            ret += post.title.toLowerCase().count(query) * 3; // Title is more important
+            ret += post.content.toLowerCase().count(query);
+            ret += post.rating * 2;
+            ret += post.likes / 10;
+            ret += post.urgency * 2;
+            
+            return ret;
+        },
+        
+        // Returns the relative score based on two posts
+        relativeScore: function(a, b) {
+            let ret = 0;
+            if (a.poster == b.poster) {
+                ret += 10; // This will also trigger same location
+            }
+            if (a.country == b.country) {
+                ret += 5;
+            }
+            if (a.region == b.region) {
+                ret += 10;
+            }
+            if (a.city == b.city) {
+                ret += 20;
+            }
+            // Less difference in rating/urgency means better
+            ret += (5 - Math.abs(a.rating - b.rating)) * 2;
+            ret += (5 - Math.abs(a.urgency - b.urgency)) * 2;
+            
+            return ret;
+        },
+        
+        // Get all posts by a user
+        getPosts: function(u_id, cb) {
+            this.query("SELECT p_id FROM posts WHERE poster = $1", [u_id], (posts) => {
+
+                let ret = [];
+                if (!posts || posts.rows.length != 1) { // NOT FOUND
+                    cb(ret);
+                    return;
+                }
+                
+                let tasks = []; // Build the posts
+                for (let row of posts.rows) {
+                    tasks.push((ret) => {
+                        this.getPost(row.p_id, (post) => ret(null, post));
+                    });
+                }
+                
+                // Execute all tasks then return
+                async.parallel(tasks, (err, results) => {
+                    cb(results);
+                });
+            });
+        },
+        
+        // Return a post object, or null if nonexistent
+        getPost: function(p_id, cb) {
+            this.query("SELECT * FROM posts WHERE p_id = $1", [p_id], (posts) => {
+
+                if (!posts || posts.rows.length != 1) { // NOT FOUND
+                    cb(null);
+                    return;
+                }
+                
+                let p = posts.rows[0];
+                let post = {
+                    id: p.p_id,
+                    poster: p.poster,
+                    title: p.title,
+                    content: p.content,
+                    urgency: p.urgency,
+                    privacy: p.privacy,
+                    likes: 0,
+                    rating: 0,
+                    comments: [],
+                    reviews: []
+                };
+                
+                this.getUser(p.poster, (user) => {
+                    if (!user) {
+                        cb(null); // Impossible
+                        return;
+                    }
+                    
+                    post.user = user;
+                    
+                    post.country = user.info.country;
+                    post.city = user.info.city;
+                    post.region = user.info.region;
+                    post.firstname = user.info.firstname;
+                    post.lastname = user.info.lastname;
+                    post.phone = user.info.phone;
+                    post.email = user.email;
+                    post.images = user.info.images;
+                    
+                    // get rating
+                    this.query("SELECT reviewer, content, rating FROM reviews r WHERE r.post = $1 ORDER BY review_time DESC", [p_id], (posts) => {
+                        let tasks = {}; // Build the user names
+                        if (posts && posts.rows.length > 0) {
+                            // Average rating
+                            post.rating = posts.rows.reduce((prev, row) => {
+                                return prev + row.rating; 
+                            }, 0);
+                            post.rating /= posts.rows.length;
+                            post.rating = Math.round(post.rating);
+                            
+                            
+                            for (let row of posts.rows) {
+                                if (!(row.reviewer in tasks)) {
+                                    tasks[row.reviewer] = (ret) => {
+                                        this.getUserName(row.reviewer, (name) => ret(null, name));
+                                    };
+                                }
+                            }
+                            
+                        }
+                        // Execute all tasks then return
+                        async.parallel(tasks, (err, results) => {
+                            if (posts && posts.rows.length > 0) {
+                                for (let row of posts.rows) {
+                                    post.reviews.push({name: results[row.reviewer], id: row.reviewer, rating: row.rating, content: row.content});
+                                }
+                            }
+                            
+                            this.query("SELECT user FROM likes WHERE post = $1", [p_id], (posts) => {
+                                if (posts && posts.rows.length > 0) {
+                                    post.likes = posts.rows.length;
+                                }
+                                    
+                                this.query("SELECT c_id, reply_to, commenter, content FROM comments WHERE post = $1 ORDER BY comment_time DESC", [p_id], (posts) => {
+                                    tasks = {};
+                                    if (posts && posts.rows.length > 0) {
+                                        for (let row of posts.rows) {
+                                            if (!(row.commenter in tasks)) {
+                                                tasks[row.commenter] = (ret) => {
+                                                    this.getUserName(row.commenter, (name) => ret(null, name));
+                                                };
+                                            }
+                                        }
+                                    }
+                                    // Execute all tasks then return
+                                    async.parallel(tasks, (err, results) => {
+                                       for (let c of posts.rows) {
+                                           let comment = {id: c.c_id, user: c.commenter, name: results[c.commenter], content: c.content, comments: []};
+                                           if (c.reply_to == null) {
+                                               post.comments.push(comment);
+                                           } else {
+                                               let parent = post.comments.find(p => p.id == c.reply_to);
+                                               if (parent) {
+                                                   parent.comments.push(comment);
+                                               } else {
+                                                   // Insert empty
+                                                   post.comments.push({id: c.reply_to, user: false, name: false, content: false, comments: [c]});
+                                               }
+                                           }
+                                       }
+                                       // Filter out any empty comments
+                                       post.comments = post.comments.filter(c => c.user);
+                                       cb(post);
+                                    });
+                                });
+                            });
+                        });
                     });
                 });
             });

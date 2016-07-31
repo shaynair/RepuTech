@@ -24,9 +24,7 @@
   },
   "dependencies": {
     "compression": "*",
-    "express-session": "*",
     "express-validator": "*",
-    "connect-redis": "*",
     "node-gpw": "*",
     
     "ejs": "*",
@@ -34,6 +32,7 @@
     "serve-favicon": "*",
 	"body-parser": "*",
     "cookie-parser": "*",
+    "formidable": "*",
     
     "csurf": "*",
     "helmet": "*",
@@ -44,7 +43,13 @@
     
     "nodemailer": "*",
 	"moment": "*",
-	"socket.io": "*",
+    "async": "*",
+    
+    "express-session": "*",
+    "connect-redis": "*",
+    
+    "graceful-fs": "*",
+    "sharp": "*",
     
     "passport": "*",
     "passport-facebook": "*",
@@ -66,7 +71,6 @@
     "gulp-autoprefixer": "*",
     "del": "*",
     "cross-spawn": "*",
-    "graceful-fs": "*",
     "babel-preset-es2015": "*",
     "babel-preset-react": "*"
   }

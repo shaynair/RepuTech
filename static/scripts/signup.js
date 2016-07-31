@@ -97,8 +97,12 @@ function submitForm(){
             } else if (res.status === "Bad"){
 			    setBorderColor($("#email"), "red");
 			    $("#email-err").text("An unknown error occurred.").fadeIn();
+			} else if (res.status == "Done") {
+                $("#sign-up-form").hide();
+                $("#status-text").text("Account registered.").fadeIn();
 			} else if (res.status == "OK") {
-                window.location.href = "/profile";
+                $("#sign-up-form").hide();
+                $("#status-text").text("Please check your e-mail for activation.").fadeIn();
             }
 		 },
 		 error: function(err){

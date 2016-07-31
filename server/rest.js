@@ -3,6 +3,9 @@
 
 const c = require("./constants");
 const mailer = require("./mail");
+const formidable = require("formidable");
+const fs = require("graceful-fs");
+const sharp = require("sharp");
 
 // Helpers
 function setAttempts(req) {
@@ -102,6 +105,7 @@ const CALLS = {
         validate: (req) => {
             req.checkQuery('id', 'Invalid').notEmpty();
             req.checkQuery('id', 'Invalid').isNumeric();
+            req.sanitize('id').toInt();
         },
         perform: (req, main, cb) => {
             main.db.activateUser(req.query.id, (user) => cb(null));
@@ -197,16 +201,23 @@ const CALLS = {
                             req.body.phone, req.body.state, req.body.city, req.body.job, 
                             req.ip, req.sessionID, (user) => {
 
-                        mail.send(req.body.email, 
-                            "RepuTech Registration", // subject
-                            "You or someone using your e-mail has requested a registration. "
-                            + "Go to this link: " + c.SITE_URL + "/confirm?id=" + user.id
-                            + " to activate it.", (res, err) => {
+                        if (req.session.user && req.session.user.is_admin) {
+                            ret.status = "Done"; // No need for verification
+                            main.db.activateUser(user.id, (user) => cb(ret));
+                        } else {
+                            mail.send(req.body.email, 
+                                "RepuTech Registration", // subject
+                                "You or someone using your e-mail has requested a registration. "
+                                + "Go to this link: " + c.SITE_URL + "/confirm?id=" + user.id
+                                + " to activate it.", (res, err) => {
+                                    
+                                if (err) {
+                                    logError(res);
+                                }
                                 
-                            if (err) {
-                                logError(res);
-                            }
-                        });
+                                cb(ret);
+                            });
+                        }
                     });
                 }
                 
@@ -219,9 +230,24 @@ const CALLS = {
         validate: (req) => {
             req.checkQuery('id', 'Required field').notEmpty();
             req.checkQuery('id', 'Must be a number').isNumeric();
+            req.sanitize('id').toInt();
         },
         perform: (req, main, cb) => {
             main.db.getWikiData(req.query.id, cb);
+        }
+    },
+    
+    'get-similar':  {
+        api: true,
+        validate: (req) => {
+            req.checkQuery('id', 'Required field').notEmpty();
+            req.checkQuery('id', 'Must be a number').isNumeric();
+            req.sanitize('id').toInt();
+        },
+        perform: (req, main, cb) => {
+            main.db.getPost(req.query.id, (post) => {
+                main.db.getSimilarPosts(post, cb);
+            });
         }
     },
     
@@ -229,26 +255,38 @@ const CALLS = {
     'get-messages':  {
         logged_in: true,
         api: true,
+        validate: (req) => {},
+        perform: (req, main, cb) => {
+            main.db.getMessageData(req.session.user.id, cb);
+        }
+    },
+    
+    'add-message':  {
+        logged_in: true,
+        api: true,
+        post: true,
         validate: (req) => {
-            req.checkQuery('id', 'Required field').notEmpty();
-            req.checkQuery('id', 'Must be a number').isNumeric();
-            req.assert('id', 'Do not match').equals(req.session.user.id);
+            req.checkBody('reply', 'Required field').notEmpty();
+            req.checkBody('to', 'Required field').notEmpty();
+            req.checkBody('to', 'Must be a number').isNumeric();
+            req.sanitize('to').toInt();
+            req.sanitize('reply');
+            
+            if (req.body.to && req.session.user.id == req.body.to) {
+                req.assert('id', 'Do not match').equals("");
+            }
         },
         perform: (req, main, cb) => {
-            main.db.getMessageData(req.query.id, cb);
+            main.db.addMessage(req.session.user.id, req.body.to, req.body.reply, (ret) => cb({status: ret}));
         }
     },
     
     'get-images':  {
         logged_in: true,
         api: true,
-        validate: (req) => {
-            req.checkQuery('id', 'Required field').notEmpty();
-            req.checkQuery('id', 'Must be a number').isNumeric();
-            req.assert('id', 'Do not match').equals(req.session.user.id);
-        },
+        validate: (req) => {},
         perform: (req, main, cb) => {
-            main.db.getImageData(req.query.id, cb);
+            main.db.getImageData(req.session.user.id, cb);
         }
     },
     
@@ -259,6 +297,7 @@ const CALLS = {
         validate: (req) => {
             req.checkQuery('id', 'Required field').notEmpty();
             req.checkQuery('id', 'Must be a number').isNumeric();
+            req.sanitize('id').toInt();
             if (req.query.id && req.session.user.id == req.query.id) {
                 req.assert('id', 'Do not match').equals("");
             }
@@ -268,6 +307,43 @@ const CALLS = {
         }
     },
     
+    'like':  {
+        logged_in: true,
+        api: true,
+        validate: (req) => {
+            req.checkQuery('id', 'Required field').notEmpty();
+            req.checkQuery('id', 'Must be a number').isNumeric();
+            req.sanitize('id').toInt();
+            
+        },
+        perform: (req, main, cb) => {
+            main.db.tryLike(req.query.id, req.session.user.id, (ret) => cb({status: ret}));
+        }
+    },
+    
+    'search-posts':  {
+        api: true,
+        validate: (req) => {
+            req.checkQuery('query', 'Required field').notEmpty();
+           
+            req.sanitize('query');
+        },
+        perform: (req, main, cb) => {
+            main.db.searchPosts(req.session.user, req.query.query, cb);
+        }
+    },
+    
+    'get-posts':  {
+        api: true,
+        validate: (req) => {
+            req.checkQuery('id', 'Required field').notEmpty();
+            req.checkQuery('id', 'Must be a number').isNumeric();
+            req.sanitize('id').toInt();
+        },
+        perform: (req, main, cb) => {
+            main.db.getPosts(req.query.id, cb);
+        }
+    },
     
     'add-wiki':  {
         post: true,
@@ -282,6 +358,61 @@ const CALLS = {
         },
         perform: (req, main, cb) => {
             main.db.addWiki(req.session.user.id, req.body.title, req.body.content, (ret) => cb({status: ret}));
+        }
+    },
+    
+    'add-post':  {
+        post: true,
+        logged_in: true,
+        api: true,
+        validate: (req) => {
+            req.checkBody('title', 'Required field').notEmpty();
+            req.checkBody('content', 'Required field').notEmpty();
+            req.checkBody('privacy', 'Required field').notEmpty();
+           
+            req.sanitize('title');
+            req.sanitize('content');
+            req.sanitize('privacy');
+            req.sanitize('posttype').toBoolean();
+        },
+        perform: (req, main, cb) => {
+            main.db.addPost(req.session.user.id, req.body.title, req.body.content, req.body.privacy, req.body.urgency, req.body.posttype, (ret) => cb({status: ret}));
+        }
+    },
+    
+    // Image upload
+    'new-image':  {
+        logged_in: true,
+        api: true,
+        post: true,
+        validate: (req) => {},
+        perform: (req, main, cb) => {
+            let form = new formidable.IncomingForm();
+            form.parse(req, (err, fields, files) => {
+                logError(err);
+                
+                // Only images are allowed
+                if (files.file.type != 'image/png' && files.file.type != 'image/jpeg'){
+                    cb(null);
+                    return;
+                }
+                
+                // `file` is the name of the <input> field of type `file`
+                let old_path = files.file.path,
+                    file_size = files.file.size,
+                    file_ext = files.file.name.split('.').pop(),
+                    index = old_path.lastIndexOf('/') + 1,
+                    file_name = old_path.substr(index),
+                    new_path = path.join(process.env.PWD, '/static/assets/images/avatar/', file_name + '.' + file_ext);
+                    
+                console.log("Got file to " + old_path);
+                
+                sharp(old_path).resize(100, 100).toFile(new_path, function(err) {
+                    logError(err);
+                    // Success
+                    main.db.addImage(req.session.user.id, file_name + '.' + file_ext, (ret) => cb(null));
+                });
+            });
         }
     },
     
@@ -318,6 +449,7 @@ const CALLS = {
         validate: (req) => {
             req.checkBody('id', 'Required field').notEmpty();
             req.checkBody('id', 'Must be a number').isNumeric();
+            req.sanitize('id').toInt();
             
             req.checkBody('firstname', 'Required field').notEmpty();
             req.checkBody('lastname', 'Required field').notEmpty();

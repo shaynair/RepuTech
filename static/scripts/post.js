@@ -1,140 +1,145 @@
-// Should pull this info from the database
-var posts = [
-    {
-        "firstname": "John",
-        "lastname": "Doe",
-        "country": "Canada",
-        "city": "Toronto",
-        "title": "Looking to get your smartphone repaired?!",
-        "type": "Offering",
-        "rating": 4,
-        "img": "../assets/images/repairing.jpg",
-        "contact_info": "111-111-1111",
-        "description": "If you're looking to get your smartphone repaired, look no further! I have been repairing smartphone for the past 5 years and I can guarantee that your smartphone will be fixed in less than 5 business days!",
-        "replies": [
-            {
-                "firstname": "A",
-                "lastname": "A",
-                "comment": "How much do you charge to replace the screen on an iPhone 6?"
-            },
-            {
-                "firstname": "John",
-                "lastname": "Doe",
-                "comment": "Name your price ;)"
-            },
-            {
-                "firstname": "James",
-                "lastname": "A",
-                "comment": "Can you fix a water damaged phone?"
-            }
-        ],
-        "reviews": [
-            {
-                "firstname": "Jane",
-                "lastname": "D",
-                "rating": 5,
-                "comment": "He fixed my iPhone 6 and then he also upgraded it to iPhone 7 free of charge!! Best tech support ever!!!"
-            }
-        ],
-        "similar_posts": [
-            {
-                "link": "post.html",
-                "title": "Want a tune-up for your device?",
-                "firstname": "A",
-                "lastname": "A",
-                "rating": 5,
-                "country": "Canada",
-                "city": "Vancouver",
-            },
-            {
-                "link": "post.html",
-                "title": "Fixing desktop computers.",
-                "firstname": "James",
-                "lastname": "A",
-                "rating": 3,
-                "country": "Canada",
-                "city": "Ottawa",
-            }
-        ]
-    },
-    {
-        "firstname": "Jane",
-        "lastname": "D",
-        "country": "Canada",
-        "city": "Toronto",
-        "title": "Looking for someone to fix an iPhone 4",
-        "type": "Request",
-        "rating": 4,
-        "img": "",
-        "contact_info": "416-000-1234",
-        "description": "hi, im looking for someone who can fix my iPhone 4 and replace the screen for me. pls msg me if you can help!",
-        "replies": [],
-        "reviews": [],
-        "similar_posts": []
-    }
-];
+let similar = [];
 
-var rating_stars = {
-    1 : "Rating: &#9733;&#9734;&#9734;&#9734;&#9734;",
-    2 : "Rating: &#9733;&#9733;&#9734;&#9734;&#9734;",
-    3 : "Rating: &#9733;&#9733;&#9733;&#9734;&#9734;",
-    4 : "Rating: &#9733;&#9733;&#9733;&#9733;&#9734;",
-    5 : "Rating: &#9733;&#9733;&#9733;&#9733;&#9733;"
-};
+function get_similars() {
+    $.ajax({
+        method: "GET",
+        dataType: "json",
+        url: '/api/get-similar',
+        data: {id: post.id},
+        success: function (data) {
+            similar = data;
+            render_similar(); 
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    });
+}
+
+function render_similar() {
+    for (var i = 0; i < similar.length; i++) {
+        $('.post-similars').append($('<article/>', {class: 'post-similar', id: 'post-similar-' + i}));
+        $('#post-similar-' + i).append($('<a/>', {id:'post-link-' + i, href: '/post?id=' + similar[i].id}));
+        $('#post-link-' + i).append($('<h4/>', {text: similar[i].title}));
+        $('#post-similar-' + i).append($('<p/>', {text: similar[i].firstname + ' ' + similar[i].lastname}));
+        $('#post-similar-' + i).append($("<p/>", {id: 'rating', html: rating_stars[similar[i].rating]}));
+        $('#post-similar-' + i).append($('<p/>', {text: similar[i].city + ', ' + similar[i].country}));
+    }
+}
+
+function render_review(r) {
+    $('.post-reviews').append($('<article/>', {class: 'post-review', id: 'post-review-' + r.id}));
+    $('#post-review-' + r.id).append($('<h4/>', {text: 'By ' + r.name}));
+        
+    $('#post-review-' + r.id).append($("<p/>", {id: 'rating', html: rating_stars[r.rating]}));
+        
+    $('#post-review-' + r.id).append($('<p/>', {text: r.content}));
+}
+
+function render_comment(c) {
+    $('.post-comments').append($('<article/>', {class: 'post-comment', id: 'post-comment-' + c.id}));
+    $('#post-comment-' + c.id).append($('<h4/>', {text: c.name}));
+    $('#post-comment-' + c.id).append($('<p/>', {text: c.content}));
+        
+    for (let r of c.comments) {
+        $('#post-comment-' + c.id).append($('<article/>', {class: 'post-comment', id: 'post-comment-replies-' + c.id}));
+        $('#post-comment-replies-' + c.id).append($('<h4/>', {text: r.name}));
+        $('#post-comment-replies-' + c.id).append($('<p/>', {text: r.content}));
+    }
+    if (user) {
+        $('#post-comment-' + c.id).append($('<textarea/>', {id: 'reply-' + c.id + '-text'}));
+        $('#post-comment-' + c.id).append($('<button/>', {class: 'comment-reply', id: 'reply-' + c.id, text: 'Reply'}));
+    }
+}
 
 function render_post_full() {
     $('.post-content').empty();
     $('.post-content').append($('<section/>', {class: 'post-full'}));
     
     // Post info
-    var post = posts[0];
-    $('.post-full').append($('<img/>', {class: 'post-img', src: post.img, alt: 'Repair service'}));
+    $('.post-full').append($('<section/>', {id: "gallery"}));
+    
+    loadImageSlider(post.images);
+    
     $('.post-full').append($('<h2/>', {text: post.title}));
     $('.post-full').append($('<p/>', {class: 'post-author', text: 'Author: ' + post.firstname + ' ' + post.lastname}));
-    $('.post-author').append($('<button/>', {text: 'View Profile'}));
+    $('.post-author').append($('<a/>', {href: '/profile?id=' + post.poster}).append($('<button/>', {text: 'View Profile'})));
     
-    $('.post-full').append($("<p/>", {id: 'rating', html: rating_stars[post.rating]}));
+    $('.post-full').append($('<p/>', {class: 'post_type', id: 'type'}));
+    if (post.urgency != 0) {
+        $('#type').text("Searching for service");
+        $('.post-full').append($('<p/>', {class: 'post_type', text: "Urgency: " + rating_stars[posts[i].urgency]}));
+    } else {
+        $('#type').text("Offering service");
+        $('.post-full').append($("<p/>", {class: 'post_type', html: rating_stars[posts[i].rating]}));
+    }
+        
+    $('.post-full').append($('<p/>', {text: 'Contact: ' + post.phone + ' | ' + post.email}));
+    $('.post-full').append($('<p/>', {text: 'Location: ' + posts[i].country + ", " + posts[i].region + ", " + posts[i].city}));
+    $('.post-full').append($('<p/>', {text: post.content}));
     
-    $('.post-full').append($('<p/>', {text: post.type + ' service'}));
-    $('.post-full').append($('<p/>', {text: 'Contact: ' + post.contact_info}));
-    $('.post-full').append($('<p/>', {text: post.description}));
-    
+    $('.post-full').append($('<p/>', {id: 'likes', text: "Likes: " + post.likes}));
+    if (user) {
+        $('.post-full').append($('<p/>', {class: 'error', id: 'like-err'}));
+        $('.post-full').append($('<button/>', {id: 'like', text: 'Like'}));
+    }
     // Comments
     $('.post-content').append($('<section/>', {class: 'post-comments'}));
     $('.post-comments').append($('<h3/>', {text: 'Comments'}));
     
-    for (var i = 0; i < post.replies.length; i++) {
-        $('.post-comments').append($('<article/>', {class: 'post-comment', id: 'post-comment-' + i}));
-        $('#post-comment-' + i).append($('<h4/>', {text: post.replies[i].firstname + ' ' + post.replies[i].lastname}));
-        $('#post-comment-' + i).append($('<p/>', {text: post.replies[i].comment}));
+    for (let c of post.comments) {
+        render_comment(c);
     }
-    $('.post-comments').append($('<button/>', {text: 'Reply'}));
+    if (user) {
+        $('.post-comments').append($('<p/>', {class: 'error', id: 'comment-err'}));
+        $('.post-comments').append($('<textarea/>', {id: 'reply-text'}));
+        $('.post-comments').append($('<button/>', {class: 'comment-reply', id: 'reply', text: 'Reply'}));
+    }
     
     // Reviews
     $('.post-content').append($('<section/>', {class: 'post-reviews'}));
     $('.post-reviews').append($('<h3/>', {text: 'Reviews'}));
     
-    for (var i = 0; i < post.reviews.length; i++) {
-        $('.post-reviews').append($('<article/>', {class: 'post-review', id: 'post-review-' + i}));
-        $('#post-review-' + i).append($('<h4/>', {text: 'By ' + post.reviews[i].firstname + ' ' + post.reviews[i].lastname}));
-        
-        $('#post-review-' + i).append($("<p/>", {id: 'rating', html: rating_stars[post.reviews[i].rating]}));
-        
-        $('#post-review-' + i).append($('<p/>', {text: post.reviews[i].comment}));
+    for (let r of post.reviews) {
+        render_review(r);
     }
-    $('.post-reviews').append($('<button/>', {text: 'Leave a Review'}));
-    
+    if (user) {
+        $('.post-reviews').append($('<p/>', {class: 'error', id: 'review-err'}));
+        $('.post-reviews').append($('<input/>', {id: 'review-rate', type: 'number'}));
+        $('.post-reviews').append($('<textarea/>', {id: 'review-text'}));
+        $('.post-reviews').append($('<button/>', {id: 'review', text: 'Leave a Review'}));
+    }
     // Similar posts
     $('.post-content').append($('<section/>', {class: 'post-similars'}));
     $('.post-similars').append($('<h3/>', {text: 'Similar Posts'}));
-    
-    for (var i = 0; i < post.similar_posts.length; i++) {
-        $('.post-similars').append($('<article/>', {class: 'post-similar', id: 'post-similar-' + i}));
-        $('#post-similar-' + i).append($('<a/>', {id:'post-link-' + i, href: post.similar_posts[i].link}));
-        $('#post-link-' + i).append($('<h4/>', {text: post.similar_posts[i].title}));
-        $('#post-similar-' + i).append($('<p/>', {text: post.similar_posts[i].firstname + ' ' + post.similar_posts[i].lastname}));
-        $('#post-similar-' + i).append($("<p/>", {id: 'rating', html: rating_stars[post.similar_posts[i].rating]}));
-        $('#post-similar-' + i).append($('<p/>', {text: post.similar_posts[i].city + ', ' + post.similar_posts[i].country}));
-    }
+    render_similar();
 }
 
+
+$(document).ready(() => {
+    render_post_full();
+    
+    $('#like').click(function() {
+        $("#like-err").text("").fadeOut();
+        $.ajax({
+            method: "GET",
+            dataType: "json",
+            url: '/api/like',
+            data: {id: post.id},
+            success: function (data) {
+                if (data.status) {
+                    post.likes++;
+                    $("#likes").text('Likes: ' + post.likes);
+                } else {
+                    $("#like-err").fadeIn().text("You've already followed them.");
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    });
+    
+    // Make our REST call
+    get_similars();
+});

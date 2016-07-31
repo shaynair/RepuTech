@@ -5,16 +5,18 @@
                 <fieldset>
                     <legend>Criteria</legend>
                     <p>Posted By:</p>
-                    <input type="text" id="name" placeholder="Name"/>
-                    <p>Urgency:</p>
-                    <input type="number" id="urgency" placeholder="1-5"/>
-                    <p>Reputation:</p>
-                    <input type="number" id="reputation" placeholder="1-5"/>
-                    <p>Location:</p>
-                    <input type="text" id="city" placeholder="City"/>
-                    <input type="text" id="country" placeholder="Country"/>
+                    <input type="text" id="name" pattern="[A-Za-z ]" placeholder="Name"/>
+                    <p>Minimum Urgency:</p>
+                    <input type="number" id="urgency" pattern="[1-5]" placeholder="1-5"/>
+                    <p>Minimum Reputation:</p>
+                    <input type="number" id="reputation" pattern="[1-5]" placeholder="1-5"/>
                     <p>Offering service:</p>
                     <input type="checkbox" id="service" unchecked/>
+                </fieldset>
+                <fieldset>
+                    <legend>Query</legend>
+                    <p>Search:</p>
+                    <input type="text" name="text" id="search" placeholder="Query" value="<%= search %>"/>
                 </fieldset>
                 <button id='refine'>Refine</button>
             </section>
@@ -23,4 +25,8 @@
             </section>
             
         </main> 
+        <script type='text/javascript'>
+          var posts = <%-JSON.stringify(posts)%>
+          var s = <%= search %>
+        </script>        
 <%- include partials/footer.ejs %>

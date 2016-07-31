@@ -108,24 +108,19 @@ DROP TABLE IF EXISTS posts CASCADE;
 CREATE TABLE posts(
   p_id SERIAL NOT NULL,
   poster INTEGER NOT NULL,
+  title TEXT NOT NULL,
   content TEXT NOT NULL,
+  urgency SMALLINT NOT NULL,
   privacy privacy_types NOT NULL,
   post_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   
   PRIMARY KEY (p_id),
-  FOREIGN KEY (poster) REFERENCES users(u_id) ON DELETE CASCADE
+  FOREIGN KEY (poster) REFERENCES users(u_id) ON DELETE CASCADE,
+  
+  CHECK(urgency >= 0 AND urgency < 6)
 );
 
 CREATE INDEX priv ON posts(privacy);
-
-DROP TABLE IF EXISTS post_images CASCADE;
-CREATE TABLE post_images(
-  img_url CHAR(16) NOT NULL,
-  p_id INTEGER NOT NULL,
-  
-  PRIMARY KEY (img_url),
-  FOREIGN KEY (p_id) REFERENCES posts(p_id) ON DELETE CASCADE  
-);
 
 DROP TABLE IF EXISTS reviews CASCADE;
 CREATE TABLE reviews(

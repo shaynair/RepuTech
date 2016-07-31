@@ -22,7 +22,7 @@ const del = require('del');
  
 const paths = {
   scripts: ['static/scripts/*.js', 'public/assets/scripts'],
-  images: ['static/images/*', 'public/assets/images'],
+  images: ['static/images/**/*', 'public/assets/images'],
   css: ['static/stylesheets/*.css', 'public/assets/stylesheets'],
   icon: ['static/*.ico', 'public']
 };

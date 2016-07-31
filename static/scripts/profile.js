@@ -126,7 +126,7 @@ function render_general_info() {
     $('#followers').append($('<p/>', {id: 'followers-err', 'class': 'error', text: ''}));
     $('#profile-general').append($('<h4/>', {text: 'Information:'}));
     $('#profile-general').append($('<p/>', {text: 'Specialize in: ' + user.job}));
-    $('#profile-general').append($('<p/>', {text: 'Located in: ' + user.city + ', ' + user.state + ', ' + user.country}));
+    $('#profile-general').append($('<p/>', {text: 'Located in: ' + user.city + ', ' + user.region + ', ' + user.country}));
     
 }
 
@@ -177,19 +177,89 @@ function render_listing_form() {
     ReactDOM.render(<ListingForm/>,
                     document.getElementById('profile-content')
     );   
+    
+    $("#post-type-search").on("click", () => {
+        if ($("#urgency").length == 0) { 
+            $("#privacy").after($('<input type="number" pattern="[1-5]" maxlength="1" minlength="1" name="urgency" id="urgency"></input>'));
+        }
+    });
+    $("#post-type-offer").on("click", () => {
+        $("#urgency").remove();
+    });
+    
+    $('#listing-form').on('submit', function(event) {
+        $("#listing-err").fadeOut().text("");
+        
+        event.preventDefault();
+        $.ajax({
+            method: "POST",
+            url: '/api/add-post',
+            data: $('#listing-form').serialize(),
+            success: function () {
+                if (data.status) {
+                    pGot = false;
+                    get_posts();
+                } else {
+                    $("#listing-err").fadeIn().text("Please check your input. All fields are required.");
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    });
 }
 
 function render_messages() {
+    function clickEvent(event, form, uid) {
+        event.preventDefault();
+        
+        let box = $("#reply-" + uid);
+        if (box.text() == "") {
+            return;
+        }
+        
+        $.ajax({
+            method: "POST",
+            url: '/api/add-message',
+            data: {reply: box.text(), to: uid},
+            success: function () {
+                if (data.status) {
+                    $('#post-' + uid).append($('<p/>', {text: user.firstname + " " + user.lastname + ": " + box.text()}));
+                    msgs[uid].messages.unshift({sender: user.id, content: box.text()}); // Add to beginning
+                    
+                    box.text("");
+                } else {
+                    $('#post-' + uid).append($('<p/>', {text: "An error occurred trying to send that."}));
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    }
+    
 //function render_messages(msgs) {
     $('.profile-content').empty();
     $('.profile-content').append($('<section/>', {id: 'messages'}));
 	$('.profile-content').append($('<h3/>', {text: 'My Messages'}));
-    for (var i = 0; i < msgs.length; i ++) {
-        $('.profile-content').append($('<section/>', {class: 'post', id: 'post-' + i}));
-        for (var j = 0; j < msgs[i].length; j ++) {
-            $('#post-' + i).append($('<p/>', {text: msgs[i][j][0] + ": " + msgs[i][j][1]}));
+    for (var uid in msgs) {
+        $('.profile-content').append($('<section/>', {class: 'post', id: 'post-' + uid}));
+        for (var j = 0; j < msgs[uid].messages.length; j ++) {
+            var m = msgs[uid].messages[j];
+            var send = user.firstname + " " + user.lastname;
+            if (m.sender != user.id) {
+                send = msgs[uid].name;
+            }
+            $('#post-' + uid).append($('<p/>', {text: send + ": " + m.content}));
         }
-        $('#post-' + i).append($('<button/>', {text: "Reply"}));
+        
+        var form = $("<form/>", {method: "post"});
+        
+        $('#post-' + uid).append(form
+                        .append('<input type="hidden" name="_csrf" value="' + csrf + '"></input>')
+                        .append('<input type="text" name="reply" id="reply-"' + uid + '"></input>')
+                        .append($('<button/>', {type: "submit", text: "Reply"}).on("click", (e) => clickEvent(e, form, uid))));
     }
 }
 
@@ -203,9 +273,13 @@ function render_images() {
         
     }
     $("#images").append($("<p/>", {"class": "error", "id": "image-err"}));
+    $("#images").append($("<form/>", {method: "post", action: "/api/new-image", enctype: "multipart/form-data", id: "upload"})
+                        .append('<input type="hidden" name="_csrf" value="' + csrf + '"></input>')
+                        .append('<input type="file" name="file"></input>')
+                        .append($('<button/>', {id: "add-new-img", type: "submit", text: "Add New"})));
+    
     $('#images').append($('<button/>', {id: "select-img", text: "Select"}));
     $('#images').append($('<button/>', {id: "delete-img", text: "Delete"}));
-    $('#images').append($('<button/>', {id: "add-new-img", text: "Add New"}));
     
     $('#images img').on("click", function(event) {
         if ($selected != null) {
@@ -268,28 +342,38 @@ function render_images() {
     });
 }
 
-function render_posts() {
+function render_posts(filter = null) {
 //function render_posts(data) {
     $('.profile-content').empty();
 	$('.profile-content').append($('<h3/>', {text: 'My Posts'}));
     // Renders posts for the profile
     for (var i = 0; i < posts.length; i ++) {
+        if (filter && !filter(posts[i])) {
+            continue;
+        }
+        
         $('.profile-content').append($('<article/>', {class: 'post', id: 'post-' + i}));
         var curr_id = '#post-' + i;
-        $(curr_id).append($('<a/>', {href: "post.html"}).append($('<h2/>', {class: 'title', text: posts[i].title})));
+        $(curr_id).append($('<a/>', {href: "/post?id=" + posts[i].id}).append($('<h2/>', {class: 'title', text: posts[i].title})));
         $(curr_id).append($('<p/>', {class: 'author', text: 'Posted by: ' + posts[i].firstname + ' ' + posts[i].lastname}));
         $(curr_id).append($('<p/>', {class: 'post_type', id: 'type-' + i}));
-        if (posts[i].type === 'Searching') {
+        if (myuser && user.id == myuser.id) {
+            $(curr_id).append($('<p/>', {class: 'post_type', text: 'Privacy setting: ' + posts[i].privacy}));
+        }
+        if (posts[i].urgency != 0) {
             $('#type-' + i).text("Searching for service");
-			$(curr_id).append($('<p/>', {class: 'post_type', text: "Urgency: " + posts[i].rating}));
+			$(curr_id).append($('<p/>', {class: 'post_type', text: "Urgency: " + rating_stars[posts[i].urgency]}));
         } else {
             $('#type-' + i).text("Offering service");
             $(curr_id).append($("<p/>", {class: 'post_type', html: rating_stars[posts[i].rating]}));
         }
-        if (posts[i].contact_info != '') {
-            $(curr_id).append($('<p/>', {class: 'contact-info', text: 'Contact Info: ' + posts[i].contact_info}));
-        }
-        $(curr_id).append($('<p/>', {class: 'description', text: "Description: " + posts[i].description}));
+        
+        $(curr_id).append($('<p/>', {class: 'contact-info', text: 'Contact Info: ' + posts[i].phone + ' | ' + posts[i].email}));
+        $(curr_id).append($('<p/>', {class: 'contact-info', text: 'Location: ' + posts[i].country + ", " + posts[i].region + ", " + posts[i].city}));
+        $(curr_id).append($('<p/>', {class: 'description', text: "Description: " + posts[i].content}));
+        
+        $(curr_id).append($('<p/>', {class: 'description', text: "Likes: " + posts[i].likes}));
+        $(curr_id).append($('<p/>', {class: 'description', text: "Comments: " + posts[i].comments.length}));
     }
 }
 
@@ -412,7 +496,12 @@ $(document).ready(function() {
         });
     });
     
-    $('#general').click();
+    if (user.info) {
+        $('#general').click();
+    } else {
+        $('#settings').click();
+        $(".profile-menu button").prop('disabled', true);
+    }
     
     ListingForm = React.createClass({
         
@@ -434,25 +523,34 @@ $(document).ready(function() {
                 <h3>Create Listing</h3>
                 <form method="post" id="listing-form" class="profile-form">
                     <p>Title:</p>
-                    <input type="text" id="post-title"/>
+                    <input type="text" name="title" id="post-title"/>
                     <p>Post Type:</p>
                     <div class="radio">
                         <label>
-                            <input type="radio" name='post-type' value="Searching" checked={this.state.selectedOption === 'Searching'}
+                            <input type="radio" name='posttype' id="post-type-search" value="0" checked={this.state.selectedOption === '0'}
                             onChange={this.handleOptionChange}/>
                             Searching for Service
                         </label>
                     </div>
                     <div class="radio">
                         <label>
-                            <input type="radio" name='post-type' value="Offering" checked={this.state.selectedOption === 'Offering'}
+                            <input type="radio" name='posttype' id="post-type-offer" value="1" checked={this.state.selectedOption === '1'}
                             onChange={this.handleOptionChange}/>
                             Offering Service
                         </label>
                     </div>
+                    <p>Privacy:</p>
+                    <select name="privacy" id="privacy">
+                        <option selected value="All">Viewable by all</option>
+                        <option value="Registered">Viewable by all registered members</option>
+                        <option value="Medium">Viewable by reputable members</option>
+                        <option value="High">Viewable by highly reputable members</option>
+                    </select>
                     <p>Description:</p>
-                    <textarea id="post-description" rows="15"></textarea>
+                    <textarea id="post-description" name="content" rows="15"></textarea>
                     <input type="hidden" name="_csrf" value={csrf}></input>
+                    
+                    <p class="error" id="listing-err"></p>
                     <button type="submit" form="listing-form" value="Submit" id="listing-button">Submit</button>
                 </form>
                 </div>
@@ -522,4 +620,5 @@ $(document).ready(function() {
             );
         }
     });
+    
 });

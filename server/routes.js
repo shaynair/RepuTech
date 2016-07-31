@@ -4,12 +4,14 @@
 const c = require("./constants");
 
 const PAGES = {
-    '/': {name: 'index'},
+    '/': {name: 'index', title: "Home"},
+    '/404': {name: '404', title: 'Error'},
     '/admin': {name: 'admin', logged_in: true, needs_admin: true, title: 'Administrator Panel'},
     '/signup': {name: 'signup', logged_out: true, title: 'Sign Up'},
     '/login': {name: 'login', logged_out: true, title: 'Log In'},
     '/admin-signup': {name: 'signup', logged_in: true, needs_admin: true, title: 'Add New User'},
-    '/profile': {name: 'profile', title: 'Profile'}
+    '/profile': {name: 'profile', title: 'Profile'},
+    '/search': {name: 'search', title: 'Search'}
 }
 
 module.exports = {
@@ -21,6 +23,8 @@ module.exports = {
                     return res.sendStatus(400); // Error
                 } else if (PAGES[r].logged_in && !req.session.user) {
                     res.redirect('/login'); // Must be logged in
+                } else if (PAGES[r].logged_in && req.session.user && !req.session.user.info) {
+                    res.redirect('/profile'); // Must fill out info
                 } else if (PAGES[r].logged_out && req.session.user) {
                     res.redirect('/profile'); // Must be logged out
                 } else if (PAGES[r].needs_admin 
@@ -28,8 +32,10 @@ module.exports = {
                     res.redirect('/profile'); // Must be admin
                 } else {
                     main.setIP(req);
-                    module.exports.generateData(req, r, main, (data) => {
-                        res.render(PAGES[r].name, data);
+                    module.exports.generateData(req, res, r, main, (data) => {
+                        if (data != null) {
+                            res.render(PAGES[r].name, data);
+                        }
                     });
                 }
             });
@@ -66,8 +72,9 @@ module.exports = {
     },
     
     // Generates data for use in EJS template. 
-    generateData: (req, r, main, cb) => {
-        let ret = {user: false, title: false, csrfToken: req.csrfToken()};
+    generateData: (req, res, r, main, cb) => {
+        let ret = {user: false, title: false, search: false,
+                    csrfToken: req.csrfToken()};
         if (req.session.user) {
             ret.user = req.session.user;
         }
@@ -85,6 +92,38 @@ module.exports = {
             }
             if (PAGES[r].name == 'login') {
                 ret.oauth = c.OAUTH_KEYS;
+            }
+            if (PAGES[r].name == 'search') {
+                if (req.query && req.query.search) {
+                    req.sanitize("search");
+                    ret.search = req.query.search;
+                    main.db.searchPosts(ret.user, req.query.search, (data) => {
+                        ret.posts = data;
+                        cb(ret);
+                    });
+                    return;
+                }
+                ret.posts = []; // empty
+            }
+            if (PAGES[r].name == 'profile') {
+                if (req.query && req.query.id) {
+                    req.sanitize("id").toInt();
+                    main.db.getUser(req.query.id, (data) => {
+                        if (!data || data.banned) { // not found
+                            res.redirect('/404');
+                            cb(null);
+                        } else {
+                            ret.profile = adta;
+                            cb(ret);
+                        }
+                    });
+                    return;
+                } else if (!req.session.user) {
+                    res.redirect('/login');
+                    cb(null);
+                    return;
+                }
+                ret.profile = ret.user; // view own profile
             }
             cb(ret);
         } else {

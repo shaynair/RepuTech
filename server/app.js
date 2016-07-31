@@ -15,7 +15,6 @@ const pg = require('pg');
 const Pool = require('pg-pool');
 
 // File requires
-const socket = require('./socket');
 const c = require('./constants');
 const rest = require('./rest');
 const routes = require('./routes');
@@ -59,7 +58,7 @@ app.use(express.static(__dirname + '/../public'));
 // Sessions
 const RedisStore = redis(session);
 const sessionStore = new RedisStore(c.REDIS);
-app.use(session({
+const sessionInstance = session({
     secret: c.COOKIE_SECRET,
     name: 'session',
     resave: false, // Redis implements touch
@@ -69,7 +68,8 @@ app.use(session({
         secure: process.env.SECURE || false,
         maxAge: 6*60*60*1000
     } // 6 hour cookie maximum
-}));
+});
+app.use(sessionInstance);
 
 // Template files
 app.set('views', __dirname + '/../views');
@@ -116,10 +116,9 @@ module.exports = {
         routes.configure(app, module.exports);
         
         // Run the server
-        const server = app.listen(app.get('port'), () => {
+        app.listen(app.get('port'), () => {
             console.log('Node is running on port', app.get('port'));
         });
-        socket.run(server, module.exports);
     },
     
     // Formatted query handler
