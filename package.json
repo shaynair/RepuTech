@@ -32,6 +32,7 @@
     "express": "*",
     "serve-favicon": "*",
 	"body-parser": "*",
+    "cookie-parser": "*",
     
     "csurf": "*",
     "helmet": "*",
@@ -43,6 +44,13 @@
     "nodemailer": "*",
 	"moment": "*",
 	"socket.io": "*",
+    
+    "passport": "*",
+    "passport-facebook": "*",
+    "passport-google-oauth20": "*",
+    "passport-github": "*",
+    "passport-linkedin": "*",
+    "passport-reddit": "*",
     
     "monitor": "*",
     

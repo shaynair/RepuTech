@@ -62,12 +62,12 @@ function populateStates(){
     $.ajax({
 	     type:"GET",
 	     dataType: "json",
-		 url:"/api/get_states",
+		 url:"/api/get-states",
          data: {country: $('#country').val()},
 		 success: (res) => {
 		             $('#state').empty();
 					 
-                     if( res.length == 0 ) {			 
+                     if( res.length == 0 || res.error ) {			 
                           $('#state').append('<option selected disabled>State/Province</option>');					 
                      }
                      for (let s in Object.keys(res).sort()) {
@@ -78,8 +78,8 @@ function populateStates(){
                      }
 		          },
 		  error: (err) => {
-			 	     console.log(err);								                              	   	          
-                 }
+			console.log(err);								                              	   	          
+          }
     }); 
 }
 

@@ -33,7 +33,6 @@ module.exports = function(pool, sessionStore) {
         // Returns an associative array of countries to IDs
         getCountries: function(cb) {
             this.query("SELECT * FROM address_country", [], (countries) => {
-
                 let ret = {};
                 for (let row of countries.rows) {
                     ret[row.country] = row.country_id;
@@ -160,10 +159,7 @@ module.exports = function(pool, sessionStore) {
         logIn: function(email, pass, ipaddr, sID, cb) {
             
             // Get user from database
-            this.query("SELECT * FROM auth LEFT JOIN login USING (u_id) "
-                   + "LEFT JOIN users USING (u_id) "
-                   + "LEFT JOIN address_region USING (region_id) "
-                   + "LEFT JOIN address_country USING (country_id) WHERE email = $1", [email], (users) => {
+            this.query("SELECT * FROM auth LEFT JOIN login USING (u_id) WHERE email = $1", [email], (users) => {
 
                 if (!users || users.rows.length == 0) { // NOT FOUND
                     if (cb) {
@@ -180,7 +176,7 @@ module.exports = function(pool, sessionStore) {
                     }
                     return;
                 }
-                if (u.privilege == "Inactivated") {
+                if (u.privilege == "Inactivated" || u.user_type != "Normal") {
                     if (cb) {
                         cb(2); // NOT ACTIVATED
                     }
@@ -198,30 +194,81 @@ module.exports = function(pool, sessionStore) {
                         return;
                     }
                     
-                    // Destroy the old session
-                    this.destroySession(u.sessionID);
-                    
-                    // Update login time
-                    this.simpleQuery("UPDATE login SET login_time = NOW(), "
-                        + "ip_address = $1, sessionID = $2 WHERE u_id = $3", [ipaddr, sID, u.u_id]);
-
-                    // Found and succeeded. Return user object
-                    cb({
-                        "email": email,
-                        "id": u.u_id,
-                        "is_admin": u.privilege == "Admin",
-                        "type": u.user_type,
-                        "info": {
-                            "firstname": u.firstname,
-                            "lastname": u.lastname,
-                            "phone": u.phone,
-                            "city": u.city,
-                            "status": u.status,
-                            "region": u.region_id,
-                            "country": u.country_id
-                        }
-                    });
+                    this.innerLogIn(u.u_id, email, u.user_type, u.privilege == "Admin", u.sessionID, sID, ipaddr, cb);
                 });
+            });
+        },
+        
+        // Gets extended information about a user
+        innerLogIn: function(u_id, email, type, admin, oldSID, newSID, ipaddr, cb) {
+            // Destroy the old session
+            if (oldSID) {
+                this.destroySession(oldSID);
+            }
+            // Update login time
+            this.simpleQuery("UPDATE login SET login_time = NOW(), "
+                + "ip_address = $1, sessionID = $2 WHERE u_id = $3", [ipaddr, newSID, u_id]);
+
+            // Try to get detailed data
+            
+            this.query("SELECT * FROM users "
+                   + "LEFT JOIN address_region USING (region_id) "
+                   + "LEFT JOIN address_country USING (country_id) WHERE u_id = $1", [u_id], (users) => {
+                       
+                let info = false;
+                if (users && users.rows.length > 0) {
+                    let u = users.rows[0];
+                    info = {
+                        "firstname": u.firstname,
+                        "lastname": u.lastname,
+                        "phone": u.phone,
+                        "city": u.city,
+                        "status": u.status,
+                        "region": u.region_id,
+                        "country": u.country_id
+                    };
+                }
+                
+                cb({
+                    "email": email,
+                    "id": u_id,
+                    "is_admin": admin,
+                    "type": type,
+                    "info": info
+                });
+            });
+        },
+        
+        // Returns a user object if email and type are right, otherwise error code
+        logInThirdParty: function(email, user_type, ipaddr, sID, cb) {
+            
+            // Get user from database
+            this.query("SELECT * FROM login WHERE email = $1", [email], (users) => {
+
+                if (!users || users.rows.length == 0) { // NOT FOUND
+                    if (cb) {
+                        cb(0);
+                    }
+                    return;
+                }
+                
+                let u = users.rows[0]; // email is UNIQUE KEY
+                
+                if (u.banned) { // BANNED USER
+                    if (cb) {
+                        cb(1);
+                    }
+                    return;
+                }
+                if (u.user_type != user_type) {
+                    if (cb) {
+                        cb(2); // Unknown error
+                    }
+                    return;
+                }
+                
+                this.innerLogIn(u.u_id, email, user_type, false, u.sessionID, sID, ipaddr, cb);
+                
             });
         }
     }

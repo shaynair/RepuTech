@@ -8,55 +8,59 @@ $(document).ready(() => {
     } else if (last == 'signup') {
         $(".error").hide();
         $("#submit").on("click", validateEvent);
+        $("#country").on("change", populateStates);
     }
 
-    $(".search-form").on("submit", function(event) {
+    $(".search-form").on("submit", (event) => {
         $.ajax({
             method: "POST",
             url: '',
             data: $('.search-form').serialize(),
-            success: function (data) {
+            success: (data) => {
                 window.location.href("search.html");
                 render_search_data(data);
             },
-            error: function (err) {
+            error: (err) => {
                 console.log(err);
             }
         });
     });
     
-    $(".search-user").on("submit", function(event) {
+    $(".search-user").on("submit", (event) => {
         $.ajax({
             method: "POST",
             url: '',
             data: $('.search-user').serialize(),
-            success: function (data) {
+            success: (data) => {
                 window.location.href("search.html");
                 render_search_data(data);
             },
-            error: function (err) {
+            error: (err) => {
                 console.log(err);
             }
         });
     });
 
-    $(".login-form").on("submit", function(event) {
-        $(".error").fadeOut().text("");
+    $("#login-form").on("submit", (event) => {
+        event.preventDefault();
         
+        $("#err").fadeOut().text("");
         $.ajax({
             method: "POST",
-            url: '/login-form',
+            url: '/api/login-form',
             data: $('#login-form').serialize(),
-            success: function (data) {
+            success: (data) => {
                 if (!data.status || data.status == "Bad") {
                     $("#err").fadeIn().text("Unknown email or incorrect password.");
                 } else if (data.status == "OK"){
                     window.location.href = "/profile";
+                } else if (data.status == "Attempts") {
+                    $("#err").fadeIn().text("You've tried to use this too many times. Try again after 30 seconds.");
                 } else {
                     $("#err").fadeIn().text("This account is " + data.status + ".");
                 }
             },
-            error: function (err) {
+            error: (err) => {
                 console.log(err);
             }
         });

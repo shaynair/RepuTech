@@ -44,14 +44,9 @@
 				    <button id="submit" type="submit" form="sign-up-form" value="Sign Up">Sign Up</button>    
 				</form>
                 
-				<a href="/login-facebook"><button>Sign Up with Facebook</button></a>
-                <a href="/login-twitter"><button>Sign Up with Twitter</button></a>
-                <a href="/login-google"><button>Sign Up with Google+</button></a>
-                <a href="/login-linkedin"><button>Sign Up with LinkedIn</button></a>
-                <a href="/login-reddit"><button>Sign Up with Reddit</button></a>
-                <a href="/login-dropbox"><button>Sign Up with Dropbox</button></a>
-                <a href="/login-bitbucket"><button>Sign Up with BitBucket</button></a>
-                <a href="/login-github"><button>Sign Up with GitHub</button></a>
+                <% for (let o in oauth) { %>
+                    <a href="/<%= oauth[o].URL %>"><button>Sign Up with <%= o %></button></a>
+                <% } %>
 			</section>
 		</main>
 <%- include partials/footer.ejs %>

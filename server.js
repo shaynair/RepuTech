@@ -1,7 +1,7 @@
 // Forks the Node.js server into threads.
 
 const cluster = require('cluster');
-const numCPUs = require('os').cpus().length;
+const numCPUs = Math.ceil(require('os').cpus().length / 2);
 
 if (cluster.isMaster) {
   // Fork workers.

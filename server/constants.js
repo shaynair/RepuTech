@@ -33,4 +33,33 @@ exports.REDIS = {
 
 // Admin Info
 exports.ADMIN_LOGIN = "admin@reputech.com";
-exports.ADMIN_PASS = "admin";
+exports.ADMIN_PASS = "RepuTech1";
+
+// OAUTH
+exports.OAUTH_KEYS = {
+    Facebook: {
+        KEY: "427043824132968",
+        SECRET: "cbe10b7e7f08235fe6a82a23d911cc4a",
+        URL: "facebook-login"
+    },
+    LinkedIn: {
+        KEY: "77dy87e08dm9y4",
+        SECRET: "70Jlv1wbz2KfkSYN",
+        URL: "linkedin-login"
+    },
+    GitHub: {
+        KEY: "dacddb3f57b100e96e4d",
+        SECRET: "cfc9c3ca4a876cb4e5403dae553670cd05a014d1",
+        URL: "github-login"
+    },
+    Reddit: {
+        KEY: "tu_cPcBTxGQWuw",
+        SECRET: "75XSipQT4JxdlupueiAYCFTFpaQ",
+        URL: "reddit-login"
+    },
+    Google: {
+        KEY: "705593332793",
+        SECRET: "f56r0fkv52sa3qo67mqf70okpus5024e",
+        URL: "google-login"
+    }
+};
