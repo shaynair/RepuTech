@@ -27,6 +27,8 @@ module.exports = function(pool, sessionStore) {
         
         // Initializes and repopulates a database.
         initializeDatabase: function() {
+            console.log("Re-populating database...");
+            
             this.simpleQuery(fs.readFileSync(c.SQL_INIT_PATH).toString(), []);
             this.register(c.ADMIN_LOGIN, 'Normal', c.ADMIN_PASS, 'Admin');
         },
@@ -119,6 +121,7 @@ module.exports = function(pool, sessionStore) {
                             "id": u_id,
                             "is_admin": privilege == "Admin",
                             "type": user_type,
+                            "banned": false,
                             "info": false
                         });
                     }
@@ -132,28 +135,87 @@ module.exports = function(pool, sessionStore) {
                     + "u_id = $1 AND privilege = 'Inactivated'", [u_id], cb);
         },
         
-        // Activates a user
-        updateStatus: function(u_id, status, cb) {
-            this.query("UPDATE users SET status  = $1 WHERE u_id = $2", [status, u_id], cb);
-        },
-        
-        editUser: function(u_id, firstname, lastname, phone, region_id, city, ipaddr, sID, cb) {
+        editUser: function(u_id, firstname, lastname, phone, region_id, city, job, ipaddr, sID, cb) {
             // Check if exists
             this.query("SELECT u_id FROM users WHERE u_id = $1", [u_id], (users) => {
 
                 if (users && users.rows.length != 0) { // EXISTS
                     this.simpleQuery("UPDATE users SET firstname = $1, lastname = $2, "
-                            + "phone = $3, region_id = $4, city = $5 WHERE u_id = $6", 
-                            [firstname, lastname, phone, region_id, city, u_id]);
+                            + "phone = $3, region_id = $4, city = $5, job = $6 WHERE u_id = $7", 
+                            [firstname, lastname, phone, region_id, city, job, u_id]);
                 } else { // ADD NEW ENTRY
                     this.simpleQuery("INSERT INTO users (u_id, firstname, lastname, "
-                                + "phone, region_id, city) VALUES ($1, $2, $3, $4, $5, $6)", 
-                                [u_id, firstname, lastname, phone, region_id, city]);
+                                + "phone, region_id, city, job) VALUES ($1, $2, $3, $4, $5, $6, $7)", 
+                                [u_id, firstname, lastname, phone, region_id, city, job]);
                 }
                 
                 this.simpleQuery("UPDATE login SET ip_address = $1, sessionID = $2 WHERE u_id = $3", [ipaddr, sID, u_id]);
                 if (cb) {
                     cb();
+                }
+            });
+        },
+        
+        setImage: function(u_id, url, cb) {
+            this.query("UPDATE user_images SET is_active = TRUE WHERE u_id = $1 AND img_url = $2", [u_id, url], (users) => {
+
+                if (users && users.rows.length != 0) { // EXISTS
+                    this.simpleQuery("UPDATE user_images SET is_active = FALSE WHERE u_id = $1 AND img_url != $2", 
+                            [u_id, url]);
+                            
+                    cb(true);
+                } else {
+                    cb(false);
+                }
+            });
+        },
+        
+        deleteImage: function(u_id, url, cb) {
+            this.query("DELETE FROM user_images WHERE u_id = $1 AND img_url = $2", [u_id, url], (users) => {
+                if (users && users.rows.length != 0) { // EXISTS
+                    cb(true);
+                } else {
+                    cb(false);
+                }
+            });
+        },
+        // Return true on success
+        changeSettings: function(u_id, firstname, lastname, phone, city, job, status, pass, oldpass, cb) {
+            this.query("UPDATE users SET firstname = $1, lastname = $2, "
+                            + "phone = $3, city = $4, job = $5, status = $6 WHERE u_id = $7", 
+                            [firstname, lastname, phone, city, job, status, u_id], (users) => {
+
+                if (users && users.rows.length != 0) {
+                    if (pass && oldpass) {
+                        this.query("SELECT * FROM auth WHERE u_id = $1", [u_id], (users) => {
+
+                            if (!users || users.rows.length == 0) { // NOT FOUND
+                                cb(false);
+                                return;
+                            }
+                            
+                            let u = users.rows[0]; // email is UNIQUE KEY
+                            
+                            // Check password
+                            bcrypt.compare(oldpass, u.password, (err, res) => {
+                                this.logError(err);
+                                
+                                if (!res) { // WRONG PASSWORD
+                                    cb(false);
+                                    return;
+                                }
+                                        
+                                this.simpleQuery("UPDATE auth SET password = $1 WHERE u_id = $2", 
+                                        [bcrypt.hashSync(pass, c.SALT), u_id]);
+                                cb(true);
+                            });
+                        });
+
+                    } else {
+                        cb(true);
+                    }
+                } else {
+                    cb(false);
                 }
             });
         },
@@ -260,6 +322,19 @@ module.exports = function(pool, sessionStore) {
             this.simpleQuery("UPDATE login SET login_time = NOW(), "
                 + "ip_address = $1, sessionID = $2 WHERE u_id = $3", [ipaddr, newSID, u_id]);
 
+            this.getUserData(u_id, (info) => {
+                cb({
+                    "email": email,
+                    "id": u_id,
+                    "is_admin": admin,
+                    "type": type,
+                    "banned": false,
+                    "info": info
+                });
+            });
+        },
+        
+        getUserData: function(u_id, cb) {
             // Try to get detailed data
             
             this.query("SELECT * FROM users "
@@ -275,18 +350,98 @@ module.exports = function(pool, sessionStore) {
                         "phone": u.phone,
                         "city": u.city,
                         "status": u.status,
-                        "region": u.region_id,
-                        "country": u.country_id
+                        "region": u.region,
+                        "country": u.country,
+                        "job": u.job,
+                        "followers": 0,
+                        "rating": 0
                     };
+                    
+                    this.query("SELECT COUNT(follower) AS c FROM followers WHERE followed = $1", [u_id], (users) => {
+                        if (users && users.rows.length > 0) {
+                            // Follower Count
+                            info.followers = users.rows[0].c;
+                        }
+                        
+                        this.query("SELECT rating, review_time FROM posts p LEFT JOIN reviews r ON r.post = p.p_id WHERE poster = $1", [u_id], (users) => {
+                            if (users && users.rows.length > 0) {
+                                // Average rating
+                                info.rating = users.rows.reduce((prev, row) => {
+                                    return prev + row.rating; 
+                                }, 0);
+                                info.rating /= users.rows.length;
+                            }
+                            this.query("SELECT img_url FROM user_images WHERE u_id = $1 AND is_active = TRUE", [u_id], (users) => {
+                                if (users && users.rows.length > 0) {
+                                    info.img = users.rows[0].img_url;
+                                }
+                                cb(info);
+                            });
+                            
+                        });
+                    });
+                } else {
+                    cb(info);
                 }
-                
-                cb({
-                    "email": email,
-                    "id": u_id,
-                    "is_admin": admin,
-                    "type": type,
-                    "info": info
-                });
+            });
+        },
+        
+        getWikiData: function(u_id, cb) {
+            // Try to get detailed data
+            
+            this.query("SELECT title, content FROM wiki WHERE poster = $1 ORDER BY post_time DESC", [u_id], (users) => {
+                       
+                let info = [];
+                if (users && users.rows.length > 0) {
+                    info = users.rows;
+                }
+                 cb(info);
+            });
+        },
+        
+        getMessageData: function(u_id, cb) {
+            // Try to get detailed data
+            
+            this.query("SELECT * FROM wiki WHERE sender = $1 OR receiver = $2 ORDER BY message_time DESC", [u_id, u_id], (users) => {
+                let info = [];
+                if (users && users.rows.length > 0) {
+                    info = users.rows.map(row => [row.sender, row.content]);
+                }
+                cb(info);
+            });
+        },
+        
+        getImageData: function(u_id, cb) {
+            // Try to get detailed data
+            this.query("SELECT * FROM user_images WHERE u_id = $1", [u_id, u_id], (users) => {
+                let info = [];
+                if (users && users.rows.length > 0) {
+                    info = users.rows.map(row => row.img_url);
+                }
+                cb(info);
+            });
+        },
+        
+        // Return true on success
+        tryFollow: function(u_id, other, cb) {
+            this.query("SELECT * FROM followers WHERE follower = $1 AND followed = $2", [u_id, other], (users) => {
+                if (users && users.rows.length > 0) {
+                    cb(false);
+                } else {
+                    this.simpleQuery("INSERT INTO followers (follower, followed) VALUES($1, $2)", [u_id, other]);
+                    cb(true);
+                }
+            });
+        },
+        
+        // Return true on success
+        addWiki: function(u_id, title, content, cb) {
+            this.query("INSERT INTO wiki (poster, title, content) VALUES ($1, $2, $3)", [u_id, title, content], (users) => {
+                if (users && users.rows.length > 0) {
+                    cb(true);
+                } else {
+                    cb(false);
+                }
             });
         },
         
@@ -320,6 +475,38 @@ module.exports = function(pool, sessionStore) {
                 
                 this.innerLogIn(u.u_id, email, user_type, false, u.sessionID, sID, ipaddr, cb);
                 
+            });
+        },
+        
+        // Returns a user object if u_id are right, otherwise null
+        getUser: function(u_id, cb) {
+            
+            // Get user from database
+            this.query("SELECT * FROM login WHERE u_id = $1", [u_id], (users) => {
+
+                if (!users || users.rows.length != 1) { // NOT FOUND
+                    if (cb) {
+                        cb(null);
+                    }
+                    return;
+                }
+                
+                let u = users.rows[0]; // UNIQUE KEY
+                
+                u.is_admin = false;
+                
+                // Check for privilege type
+                this.query("SELECT * FROM auth WHERE u_id = $1", [u_id], (users) => {
+                    if (users && users.rows.length == 1) {
+                        u.is_admin = users.rows[0].privilege == "Admin";
+                    }
+                    
+                    // Get as much data as we can
+                    this.getUserData(u_id, (info) => {
+                        u.info = info;
+                        cb(u);
+                    });
+                });
             });
         }
     }
