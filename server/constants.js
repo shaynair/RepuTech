@@ -12,7 +12,7 @@ exports.DATABASE_INFO = {
     min: 4,
     idleTimeoutMillis: 1000
 };
-exports.SQL_INIT_PATH = "./Data/Structure.sql"; // File containing SQL struct
+exports.SQL_INIT_PATH = "./server/Data/Structure.sql"; // File containing SQL struct
 exports.SALT = 13; // Salt rounds for Bcrypt
 //exports.DATABASE_URL = "postgres://" + pg.user + ":" + pg.password + "@"
 //			+ pg.host + ":" + pg.port + "/" + pg.database + "?ssl=true";

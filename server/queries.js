@@ -7,28 +7,33 @@ const c = require("./constants");
 module.exports = function(pool, sessionStore) {
     return {
         // Checks if database is initialized. If it isn't, initialize it.
-        checkAndInitialize: () => {
-            pool.query("SELECT 1 FROM information_schema.tables WHERE table_schema = $1 AND table_name = $2",
-                        [c.DATABASE_INFO.database, "login"], (err, info) => {
+        checkAndInitialize: function() {
+            // Postgres has a neat little function to check if a table exists
+            this.query("SELECT to_regclass($1);",
+                        ["login"], (info) => {
                             
-                module.exports.logError(err);
-                if (info.rowCount == 0) { // No table found, execute SQL
-                    module.exports.initializeDatabase();
+                if (!info || info.rows.length == 0 || !info.rows[0]) { // No table found, execute SQL
+                    this.initializeDatabase();
                 }
             });
         },
         
+        logError: function(err) {
+            if (err) {
+                console.log(err);
+            }
+        },
+        
         // Initializes and repopulates a database.
-        initializeDatabase: () => {
-            simpleQuery(fs.readFileSync(c.SQL_INIT_PATH).toString(), []);
-            register(c.ADMIN_LOGIN, 'Normal', c.ADMIN_PASS, 'Admin');
+        initializeDatabase: function() {
+            this.simpleQuery(fs.readFileSync(c.SQL_INIT_PATH).toString(), []);
+            this.register(c.ADMIN_LOGIN, 'Normal', c.ADMIN_PASS, 'Admin');
         },
         
         // Returns an associative array of countries to IDs
-        getCountries: (cb) => {
-            pool.query("SELECT * FROM address_country", [], (err, countries) => {
-                module.exports.logError(err);
-                
+        getCountries: function(cb) {
+            this.query("SELECT * FROM address_country", [], (countries) => {
+
                 let ret = {};
                 for (let row of countries.rows) {
                     ret[row.country] = row.country_id;
@@ -38,10 +43,8 @@ module.exports = function(pool, sessionStore) {
         },
         
         // Returns an associative array of states to IDs
-        getStates: (country_id, cb) => {
-            pool.query("SELECT region, region_id FROM address_region WHERE country_id = $1", [country_id], (err, states) => {
-                module.exports.logError(err);
-                
+        getStates: function(country_id, cb) {
+            this.query("SELECT region, region_id FROM address_region WHERE country_id = $1", [country_id], (states) => {
                 let ret = {};
                 for (let row of states.rows) {
                     ret[row.region] = row.region_id;
@@ -51,23 +54,24 @@ module.exports = function(pool, sessionStore) {
         },
         
         // Helper
-        simpleQuery: (query, params) => {
-            pool.query(query, params, err => module.exports.logError(err));
+        simpleQuery: function(query, params) {
+            this.query(query, params);
         },
         
-        // Helper for this file
-        logError: (err) => {
-            if (err) {
-                console.log(err);
-            }
+        query: function(query, params, cb) {
+            pool.query(query, params, (err, res) => {
+                this.logError(err);
+                if (cb) {
+                    cb(res);
+                }
+            });
         },
         
         // Destroys a session in session store
-        destroySession: (sID, cb) => {
-            pool.query("UPDATE login SET sessionID = NULL WHERE sessionID = $1", [sID], (err) => {
-                module.exports.logError(err);
+        destroySession: function(sID, cb) {
+            this.query("UPDATE login SET sessionID = NULL WHERE sessionID = $1", [sID], () => {
                 sessionStore.destroy(sID, (err) => {
-                    module.exports.logError(err);
+                    this.logError(err);
                     if (cb) {
                         cb();
                     }
@@ -76,111 +80,129 @@ module.exports = function(pool, sessionStore) {
         },
         
         // Return a user object if success, otherwise error code
-        register: (email, user_type, password = null, privilege = 'Normal', cb) => {
+        register: function(email, user_type, password = null, privilege = 'Normal', cb) {
             // Check if exists
             let hashedPassword = password;
             if (password) {
                 hashedPassword = bcrypt.hashSync(password, c.SALT);
             }
             // Get user from database
-            pool.query("SELECT u_id FROM login WHERE email = $1", [email], (err, users) => {
-                module.exports.logError(err);
-                
-                if (users.rowCount != 0) { // EXISTS
-                    cb(0);
+            this.query("SELECT u_id FROM login WHERE email = $1", [email], (users) => {
+                if (users && users.rows.length != 0) { // EXISTS
+                    if (cb) {
+                        cb(0);
+                    }
                     return;
                 }
                 
                 // Add to database
-                pool.query("INSERT INTO login (email, user_type) VALUES ($1, $2) RETURNING u_id", 
-                                [email, user_type], (err, users) => {
-                    module.exports.logError(err);
-                    
-                    if (users.rows.length != 1 || users.rows[0].u_id <= 0) {
-                        cb(-1); // Unknown error.
+                this.query("INSERT INTO login (email, user_type) VALUES ($1, $2) RETURNING u_id", 
+                                [email, user_type], (users) => {
+                                    
+                    if (!users || users.rows.length != 1 || users.rows[0].u_id <= 0) {
+                        if (cb) {
+                            cb(-1); // Unknown error.
+                        }
                         return;
                     }
                     let u_id = users.rows[0].u_id;
                     
                     if (user_type == 'Normal') {
                         // Add normal user
-                        simpleQuery("INSERT INTO auth (u_id, password, privilege) VALUES ($1, $2, $3)", 
+                        this.simpleQuery("INSERT INTO auth (u_id, password, privilege) VALUES ($1, $2, $3)", 
                                 [hashedPassword, privilege]);
                         
                     }
-                    
-                    cb({
-                        "email": email,
-                        "id": u_id,
-                        "is_admin": privilege == "Admin",
-                        "type": user_type,
-                        "info": false
-                    });
+                    if (cb) {
+                        cb({
+                            "email": email,
+                            "id": u_id,
+                            "is_admin": privilege == "Admin",
+                            "type": user_type,
+                            "info": false
+                        });
+                    }
                 });
             });
         },
         
-        activateUser: (u_id) => {
+        // Activates a user
+        activateUser: function(u_id, cb) {
+            this.query("UPDATE auth SET privilege = 'Normal' WHERE "
+                    + "u_id = $1 AND privilege = 'Inactivated'", [u_id], cb);
         },
         
-        editUser: (u_id, firstname, lastname, phone, region_id, city, cb) => {
+        // Activates a user
+        updateStatus: function(u_id, status, cb) {
+            this.query("UPDATE users SET status  = $1 WHERE u_id = $2", [status, u_id], cb);
+        },
+        
+        editUser: function(u_id, firstname, lastname, phone, region_id, city, cb) {
             // Check if exists
-            pool.query("SELECT u_id FROM users WHERE u_id = $1", [u_id], (err, users) => {
-                module.exports.logError(err);
-                
-                if (users.rows.length != 0) { // EXISTS
-                    simpleQuery("UPDATE login SET firstname = $1, lastname = $2, "
+            this.query("SELECT u_id FROM users WHERE u_id = $1", [u_id], (users) => {
+
+                if (users && users.rows.length != 0) { // EXISTS
+                    this.simpleQuery("UPDATE users SET firstname = $1, lastname = $2, "
                             + "phone = $3, region_id = $4, city = $5 WHERE u_id = $6", 
                             [firstname, lastname, phone, region_id, city, u_id]);
                 } else { // ADD NEW ENTRY
-                    simpleQuery("INSERT INTO login (u_id, firstname, lastname, "
+                    this.simpleQuery("INSERT INTO users (u_id, firstname, lastname, "
                                 + "phone, region_id, city) VALUES ($1, $2, $3, $4, $5, $6)", 
                                 [u_id, firstname, lastname, phone, region_id, city]);
                 }
-                cb();
+                if (cb) {
+                    cb();
+                }
             });
         },
         
         // Returns a user object if email and pass are right, otherwise error code
-        logIn: (email, pass, ipaddr, sID, cb) => {
+        logIn: function(email, pass, ipaddr, sID, cb) {
             
             // Get user from database
-            pool.query("SELECT * FROM auth LEFT JOIN login USING (u_id) "
+            this.query("SELECT * FROM auth LEFT JOIN login USING (u_id) "
                    + "LEFT JOIN users USING (u_id) "
                    + "LEFT JOIN address_region USING (region_id) "
-                   + "LEFT JOIN address_country USING (country_id) WHERE email = $1", [email], (err, users) => {
-                module.exports.logError(err);
-                
-                if (users.rows.length == 0) { // NOT FOUND
-                    cb(0);
+                   + "LEFT JOIN address_country USING (country_id) WHERE email = $1", [email], (users) => {
+
+                if (!users || users.rows.length == 0) { // NOT FOUND
+                    if (cb) {
+                        cb(0);
+                    }
                     return;
                 }
                 
                 let u = users.rows[0]; // email is UNIQUE KEY
                 
                 if (u.banned) { // BANNED USER
-                    cb(1);
+                    if (cb) {
+                        cb(1);
+                    }
                     return;
                 }
                 if (u.privilege == "Inactivated") {
-                    cb(2); // NOT ACTIVATED
+                    if (cb) {
+                        cb(2); // NOT ACTIVATED
+                    }
                     return;
                 }
                 
                 // Check password
                 bcrypt.compare(pass, u.password, (err, res) => {
-                    module.exports.logError(err);
+                    this.logError(err);
                     
                     if (!res) { // WRONG PASSWORD
-                        cb(0);
+                        if (cb) {
+                            cb(0);
+                        }
                         return;
                     }
                     
                     // Destroy the old session
-                    module.exports.destroySession(u.sessionID);
+                    this.destroySession(u.sessionID);
                     
                     // Update login time
-                    module.exports.simpleQuery("UPDATE login SET login_time = NOW(), "
+                    this.simpleQuery("UPDATE login SET login_time = NOW(), "
                         + "ip_address = $1, sessionID = $2 WHERE u_id = $3", [ipaddr, sID, u.u_id]);
 
                     // Found and succeeded. Return user object

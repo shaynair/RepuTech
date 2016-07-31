@@ -1,0 +1,71 @@
+TODO:
+-----
+ADDITIONAL FUNCTIONALITY
+admin
+- delete db
+- change pw
+- edit user
+
+profile
+- change pass (if normal)
+
+search
+- based off of user history
+- similar to listing
+
+rating
+- averaging algorithm
+
+-----
+PASSWORDS
+
+bcrypt.genSalt(saltRounds, function(err, salt) {
+    bcrypt.hash(myPlaintextPassword, salt, function(err, hash) {
+        // Store hash in your password DB. 
+    });
+});
+
+bcrypt.compare(myPlaintextPassword, hash, function(err, res) {
+    // res == true 
+});
+
+-----
+INPUT VALIDATION
+
+expressValidator
+req.checkBody('email').optional().isEmail();
+(and others! sanitize!)
+
+-----
+RESET PASSWORD
+
+(also terminate any current sessions)
+node-gpw : generates human-readable password
+
+-----
+FILE UPLOADS
+
+formidable
+multiparty
+sharp -- resizes images
+
+-----
+OAUTH
+
+passport
+
+
+-----
+MESSAGING
+
+socket.io
+
+-----
+TESTING
+
+cheerio -- imitates a DOM + jquery
+zombie -- imitates browser requests; connects -> visits/fills forms
+jshint / istanbul -- scans javascript files (both server and client!!)
+nodeunit -- assertions
+mocha -- assertions
+supertest -- does requests to server, checks headers

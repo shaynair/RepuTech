@@ -90,13 +90,17 @@ const db = queries(pool, sessionStore);
 module.exports = {
     // Runs server
     run: () => {
+        // Check if SQL is ready
+        db.checkAndInitialize();
+        
+        // Configure routes
         routes.configure(app, module.exports);
         auth.configure(app, module.exports);
         
+        // Run the server
         const server = app.listen(app.get('port'), () => {
             console.log('Node is running on port', app.get('port'));
         });
-        
         socket.run(server, module.exports);
     },
     
