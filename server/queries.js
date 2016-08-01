@@ -1,6 +1,6 @@
 // This file handles the database queries.
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt-nodejs');
 const fs = require('graceful-fs');
 const c = require("./constants");
 const gpw = require("node-gpw");
@@ -103,7 +103,7 @@ module.exports = function(pool, sessionStore) {
             // Check if exists
             let hashedPassword = password;
             if (password) {
-                hashedPassword = bcrypt.hashSync(password, c.SALT);
+                hashedPassword = bcrypt.hashSync(password);
             }
             // Get user from database
             this.query("SELECT u_id FROM login WHERE email = $1", [email], (users) => {
@@ -129,7 +129,7 @@ module.exports = function(pool, sessionStore) {
                     if (user_type == 'Normal') {
                         // Add normal user
                         this.simpleQuery("INSERT INTO auth (u_id, password, privilege) VALUES ($1, $2, $3)", 
-                                [hashedPassword, privilege]);
+                                [u_id, hashedPassword, privilege]);
                         
                     }
                     if (cb) {
@@ -180,7 +180,7 @@ module.exports = function(pool, sessionStore) {
         },
         
         addImage: function(u_id, url, cb) {
-            this.query("INSERT INTO user_images (u_id, img_url) VALUES ($1, $2)", [u_id, url], (images) => {
+            this.query("INSERT INTO user_images (u_id, img_url) VALUES ($1, $2) RETURNING is_active", [u_id, url], (images) => {
 
                 if (images && images.rows.length != 0) { // EXISTS
                     cb(true);
@@ -191,16 +191,13 @@ module.exports = function(pool, sessionStore) {
         },
         
         setImage: function(u_id, url, cb) {
-            this.query("UPDATE user_images SET is_active = TRUE WHERE u_id = $1 AND img_url = $2", [u_id, url], (images) => {
+            this.query("UPDATE user_images SET is_active = TRUE WHERE u_id = $1 AND img_url = $2", [u_id, url], () => {
 
-                if (images && images.rows.length != 0) { // EXISTS
                     this.simpleQuery("UPDATE user_images SET is_active = FALSE WHERE u_id = $1 AND img_url != $2", 
                             [u_id, url]);
                             
                     cb(true);
-                } else {
-                    cb(false);
-                }
+
             });
         },
         
@@ -217,9 +214,8 @@ module.exports = function(pool, sessionStore) {
         changeSettings: function(u_id, firstname, lastname, phone, city, job, status, pass, oldpass, cb) {
             this.query("UPDATE users SET firstname = $1, lastname = $2, "
                             + "phone = $3, city = $4, job = $5, status = $6 WHERE u_id = $7", 
-                            [firstname, lastname, phone, city, job, status, u_id], (users) => {
+                            [firstname, lastname, phone, city, job, status, u_id], () => {
 
-                if (users && users.rows.length != 0) {
                     if (pass && oldpass) {
                         this.query("SELECT * FROM auth WHERE u_id = $1", [u_id], (users) => {
 
@@ -240,7 +236,7 @@ module.exports = function(pool, sessionStore) {
                                 }
                                         
                                 this.simpleQuery("UPDATE auth SET password = $1 WHERE u_id = $2", 
-                                        [bcrypt.hashSync(pass, c.SALT), u_id]);
+                                        [bcrypt.hashSync(pass), u_id]);
                                 cb(true);
                             });
                         });
@@ -248,9 +244,7 @@ module.exports = function(pool, sessionStore) {
                     } else {
                         cb(true);
                     }
-                } else {
-                    cb(false);
-                }
+
             });
         },
         
@@ -259,13 +253,7 @@ module.exports = function(pool, sessionStore) {
             let token = gpw(6).toUpperCase() + gpw(6).toLowerCase() + Math.floor(Math.random() * 10); // GPW + number
             this.query("UPDATE auth LEFT JOIN login USING (u_id) "
                     + "SET reset_token = $1, reset_time = NOW() WHERE email = $2", [token, email], (users) => {
-                if (!users || users.rows.length == 0 
-                        || users.rows[0].privilege == "Inactivated" || users.rows[0].user_type != "Normal") { // NOT FOUND
-                    if (cb) {
-                        cb(null);
-                    }
-                    return;
-                }
+
                 cb(token);
             });
         },
@@ -283,7 +271,7 @@ module.exports = function(pool, sessionStore) {
                     // Less than one day has passed
                     this.simpleQuery("UPDATE auth SET reset_time = NULL, reset_token = NULL, "
                                     + "password = $1 WHERE u_id = $2", 
-                                [bcrypt.hashSync(token, c.SALT), u.u_id]);
+                                [bcrypt.hashSync(token), u.u_id]);
                                 
                     cb(token);
                 } else {
@@ -307,7 +295,6 @@ module.exports = function(pool, sessionStore) {
             
             // Get user from database
             this.query("SELECT * FROM auth LEFT JOIN login USING (u_id) WHERE email = $1", [email], (users) => {
-
                 if (!users || users.rows.length == 0) { // NOT FOUND
                     if (cb) {
                         cb(0);
@@ -329,18 +316,15 @@ module.exports = function(pool, sessionStore) {
                     }
                     return;
                 }
-                
                 // Check password
                 bcrypt.compare(pass, u.password, (err, res) => {
                     this.logError(err);
-                    
                     if (!res) { // WRONG PASSWORD
                         if (cb) {
                             cb(0);
                         }
                         return;
                     }
-                    
                     this.innerLogIn(u.u_id, email, u.user_type, u.privilege == "Admin", u.sessionID, sID, ipaddr, cb);
                 });
             });
@@ -390,6 +374,7 @@ module.exports = function(pool, sessionStore) {
                         "followers": 0,
                         "rating": 0,
                         "img": "",
+                        "filled": true,
                         "images": []
                     };
                     
@@ -414,9 +399,8 @@ module.exports = function(pool, sessionStore) {
                                     for (let row of users.rows) {
                                         if (row.is_active) {
                                             info.img = row.img_url;
-                                        } else {
-                                            info.images.push(row.img_url);
                                         }
+                                        info.images.push(row.img_url);
                                     }
                                 }
                                 cb(info);
@@ -425,7 +409,21 @@ module.exports = function(pool, sessionStore) {
                         });
                     });
                 } else {
-                    cb(info);
+                    cb({
+                        "firstname": '',
+                        "lastname": '',
+                        "phone": '',
+                        "city": '',
+                        "status": '',
+                        "region": '',
+                        "country": '',
+                        "job": '',
+                        "followers": 0,
+                        "rating": 0,
+                        "img": "",
+                        "filled": false,
+                        "images": []
+                    });
                 }
             });
         },
@@ -478,17 +476,6 @@ module.exports = function(pool, sessionStore) {
                     }
                     cb(ret);
                 });
-            });
-        },
-        
-        getImageData: function(u_id, cb) {
-            // Try to get detailed data
-            this.query("SELECT * FROM user_images WHERE u_id = $1", [u_id, u_id], (images) => {
-                let info = [];
-                if (images && images.rows.length > 0) {
-                    info = images.rows.map(row => row.img_url);
-                }
-                cb(info);
             });
         },
         
@@ -553,7 +540,7 @@ module.exports = function(pool, sessionStore) {
         },
         // Return true on success
         addWiki: function(u_id, title, content, cb) {
-            this.query("INSERT INTO wiki (poster, title, content) VALUES ($1, $2, $3)", [u_id, title, content], (wikis) => {
+            this.query("INSERT INTO wiki (poster, title, content) VALUES ($1, $2, $3) RETURNING w_id", [u_id, title, content], (wikis) => {
                 if (wikis && wikis.rows.length > 0) {
                     cb(true);
                 } else {
@@ -569,7 +556,7 @@ module.exports = function(pool, sessionStore) {
             } else if (!urgency) {
                 urgency = 1;
             }
-            this.query("INSERT INTO posts (poster, title, content, urgency, privacy) VALUES ($1, $2, $3, $4, $5)", [u_id, title, content, urgency, privacy], (posts) => {
+            this.query("INSERT INTO posts (poster, title, content, urgency, privacy) VALUES ($1, $2, $3, $4, $5) RETURNING p_id", [u_id, title, content, urgency, privacy], (posts) => {
                 if (posts && posts.rows.length > 0) {
                     cb(true);
                 } else {
@@ -582,7 +569,7 @@ module.exports = function(pool, sessionStore) {
         
         // Return true on success
         addMessage: function(u_id, to, content, cb) {
-            this.query("INSERT INTO messages (receiver, sender, content) VALUES ($1, $2, $3)", [to, u_id, content], (msgs) => {
+            this.query("INSERT INTO messages (receiver, sender, content) VALUES ($1, $2, $3) RETURNING m_id", [to, u_id, content], (msgs) => {
                 if (msgs && msgs.rows.length > 0) {
                     cb(true);
                 } else {

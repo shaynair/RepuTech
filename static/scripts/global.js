@@ -5,27 +5,15 @@ $(document).ready(() => {
     
     if (last == '' || last == 'index') {
         loadImageSlider();
-    } else if (last == 'signup') {
+    } else if (last == 'signup' || last == 'admin-signup') {
         $(".error").hide();
         $("#submit").on("click", validateEvent);
         $("#country").on("change", populateStates);
+    } else if (last.startsWith("post")) {
+        render_post_full();
+        // Make our REST call
+        get_similars();
     }
-    
-    $("#search-user").on("submit", (event) => {
-        $.ajax({
-            method: "POST",
-            url: '',
-            dataType: "json",
-            data: $('.search-user').serialize(),
-            success: (data) => {
-                window.location.href("search.html");
-                render_search_data(data);
-            },
-            error: (err) => {
-                console.log(err);
-            }
-        });
-    });
 
     $("#login-form").on("submit", (event) => {
         event.preventDefault();

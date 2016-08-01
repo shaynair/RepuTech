@@ -2,7 +2,7 @@
 
 
 const c = require("./constants");
-const mailer = require("./mail");
+const mail = require("./mail");
 const formidable = require("formidable");
 const fs = require("graceful-fs");
 const sharp = require("sharp");
@@ -38,13 +38,12 @@ function logError(err) {
 
 const CALLS = {
     'get-states': {
-        post: false, 
         api: true,
         validate: (req) => {
-            req.checkBody('country', 'Invalid').len(2, 2);
+            req.checkQuery('country', 'Invalid').isLength({min: 2, max: 2});
         },
         perform: (req, main, cb) => {
-            main.db.getStates(req.body.country, cb);
+            main.db.getStates(req.query.country, cb);
         }
     },
     
@@ -154,7 +153,6 @@ const CALLS = {
     
     'signup-form':  {
         post: true,
-        logged_out: true,
         api: true,
         validate: (req) => {
             req.checkBody('email', 'Required field').notEmpty();
@@ -175,13 +173,13 @@ const CALLS = {
             req.checkBody('firstname', 'Max length of 50').isLength({max: 50});
             req.checkBody('lastname', 'Max length of 50').isLength({max: 50});
             req.checkBody('country', 'Letters only').isAlpha();
-            req.checkBody('country', 'Invalid').len(2, 2);
+            req.checkBody('country', 'Invalid').isLength({min: 2, max: 2});
             req.checkBody('state', 'Numbers only').isNumeric();
             req.checkBody('city', 'Letters only').isAlpha();
             req.checkBody('city', 'Max length of 50').isLength({max: 50});
             req.checkBody('phone', 'Numbers only').isNumeric();
-            req.checkBody('phone', 'Length between 10 and 12').len(10, 12);
-            req.checkBody('job', 'Letters only').optional().isText();
+            req.checkBody('phone', 'Length between 10 and 12').isLength({min: 10, max: 12});
+            req.checkBody('job', 'Letters only').optional({ checkFalsy: true }).isText();
             
             req.assert('email2', 'Do not match').equals(req.body.email);
             req.assert('pass2', 'Do not match').equals(req.body.pass);
@@ -199,11 +197,11 @@ const CALLS = {
                     ret.status = "OK";
                     main.db.editUser(user.id, req.body.firstname, req.body.lastname, 
                             req.body.phone, req.body.state, req.body.city, req.body.job, 
-                            req.ip, req.sessionID, (user) => {
+                            req.ip, req.sessionID, (u) => {
 
                         if (req.session.user && req.session.user.is_admin) {
                             ret.status = "Done"; // No need for verification
-                            main.db.activateUser(user.id, (user) => cb(ret));
+                            main.db.activateUser(user.id, (u) => cb(ret));
                         } else {
                             mail.send(req.body.email, 
                                 "RepuTech Registration", // subject
@@ -281,15 +279,6 @@ const CALLS = {
         }
     },
     
-    'get-images':  {
-        logged_in: true,
-        api: true,
-        validate: (req) => {},
-        perform: (req, main, cb) => {
-            main.db.getImageData(req.session.user.id, cb);
-        }
-    },
-    
     
     'follow':  {
         logged_in: true,
@@ -318,7 +307,7 @@ const CALLS = {
             
         },
         perform: (req, main, cb) => {
-            main.db.banUser(req.query.id, req.session.user.id, (ret) => cb({status: ret}));
+            main.db.banUser(req.query.id, req.session.user.id, () => cb(null));
         }
     },
     
@@ -476,6 +465,8 @@ const CALLS = {
                 sharp(old_path).resize(100, 100).toFile(new_path, function(err) {
                     logError(err);
                     // Success
+                    req.session.user.info.images.push(file_name + '.' + file_ext);
+                    req.session.save();
                     main.db.addImage(req.session.user.id, file_name + '.' + file_ext, (ret) => cb(null));
                 });
             });
@@ -519,7 +510,6 @@ const CALLS = {
             
             req.checkBody('firstname', 'Required field').notEmpty();
             req.checkBody('lastname', 'Required field').notEmpty();
-            req.checkBody('country', 'Required field').notEmpty();
             req.checkBody('phone', 'Required field').notEmpty();
             
             req.checkBody('firstname', 'Letters only').isAlpha();
@@ -529,12 +519,13 @@ const CALLS = {
             req.checkBody('city', 'Letters only').isAlpha();
             req.checkBody('city', 'Max length of 50').isLength({max: 50});
             req.checkBody('phone', 'Numbers only').isNumeric();
-            req.checkBody('phone', 'Length between 10 and 12').len(10, 12);
-            req.checkBody('job', 'Letters only').optional().isText();
-            req.checkBody('status', 'Letters only').optional().isText();
+            req.checkBody('phone', 'Length between 10 and 12').isLength({min: 10, max: 12});
             
-            req.checkBody('currentpass', 'Must be a password').optional().isPassword();
-            req.checkBody('newpass', 'Must be a password').optional().isPassword();
+            req.checkBody('job', 'Letters only').optional({ checkFalsy: true }).isText();
+            req.checkBody('status', 'Letters only').optional({ checkFalsy: true }).isText();
+            
+            req.checkBody('currentpass', 'Must be a password').optional({ checkFalsy: true }).isPassword();
+            req.checkBody('newpass', 'Must be a password').optional({ checkFalsy: true }).isPassword();
             
             req.assert('newpass2', 'Do not match').equals(req.body.newpass2);
             
@@ -542,12 +533,12 @@ const CALLS = {
                 req.assert('id', 'Do not match').equals("");
             }
             // Only non-third party can change passwords
-            if (req.body.currentpass && req.session.user.user_type != "Normal") {
+            if (req.body.currentpass && req.session.user.type != "Normal") {
                 req.assert('id', 'Do not match').equals("");
             }
         },
         perform: (req, main, cb) => {
-            main.db.addWiki(req.body.id, req.body.firstname, req.body.lastname,
+            main.db.changeSettings(req.body.id, req.body.firstname, req.body.lastname,
                             req.body.phone, req.body.city, req.body.job, req.body.status,
                             req.body.newpass, req.body.currentpass, (ret) => cb({status: ret}));
         }
@@ -574,7 +565,11 @@ module.exports = {
                 ret.error = "Insufficient privileges";
             } else {
                 CALLS[r].validate(req);
-                if (req.validationErrors()) {
+                let errors = req.validationErrors();
+                if (errors) {
+                    if(req.session.user && req.session.user.is_admin) {
+                        console.log("There were validation errors: " + JSON.stringify(errors));
+                    }
                     ret.error = "Invalid parameters";
                 } else {
                     CALLS[r].perform(req, main, (r) => {

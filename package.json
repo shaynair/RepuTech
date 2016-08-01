@@ -37,7 +37,7 @@
     "csurf": "*",
     "helmet": "*",
     
-    "bcrypt": "*",
+    "bcrypt-nodejs": "*",
     "pg": "*",
     "pg-pool": "*",
     
@@ -69,6 +69,7 @@
     "gulp-imagemin": "*",
     "gulp-cssnano": "*",
     "gulp-autoprefixer": "*",
+    "gulp-mocha": "*",
     "del": "*",
     "cross-spawn": "*",
     "babel-preset-es2015": "*",

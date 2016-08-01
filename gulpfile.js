@@ -5,6 +5,7 @@ const gulp = require("gulp");
 const sourcemaps = require('gulp-sourcemaps');
 const changed = require('gulp-changed');
 const concat = require('gulp-concat');
+const mocha = require('gulp-mocha');
 
 // JS
 const babel = require('gulp-babel');
@@ -24,7 +25,8 @@ const paths = {
   scripts: ['static/scripts/*.js', 'public/assets/scripts'],
   images: ['static/images/**/*', 'public/assets/images'],
   css: ['static/stylesheets/*.css', 'public/assets/stylesheets'],
-  icon: ['static/*.ico', 'public']
+  icon: ['static/*.ico', 'public'],
+  tests: ['tests/**/*', 'tests']
 };
  
 // Cleans all gulp files
@@ -70,6 +72,12 @@ gulp.task('css', () => {
     .pipe(nano())
     .pipe(concat('style.css'))
     .pipe(gulp.dest(paths.css[1]))
+});
+
+// Run test cases
+gulp.task('tests', () => {
+  return gulp.src(paths.tests[0], {extension: '.js'})
+    .pipe(mocha());
 })
 
 gulp.task('watch', () => {

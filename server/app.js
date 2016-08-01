@@ -98,6 +98,9 @@ app.use(expressValidator({
 app.use(cookieParser(c.COOKIE_SECRET));
 app.use(csrf({ cookie: true }));
 
+if (!process.env.SECURE) { // development
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
 
 // Database connection
 const pool = new Pool(c.DATABASE_INFO);

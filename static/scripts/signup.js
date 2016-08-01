@@ -1,16 +1,13 @@
 function validateEvent(e) {
+    e.preventDefault();
 	var valid = true;
-	$("input").each(function(index, elem) {
-		if($(elem).attr("id") != "search"){ 
+	$("#sign-up-form input").each(function(index, elem) {
 		  if ( !validate($(elem)) ){
 			valid = false;
 	      }
-	    }
 	});
 		
-	if (!valid) {
-		e.preventDefault();
-	} else {
+	if (valid) {
    	  submitForm();
 	}  
 }
@@ -67,10 +64,10 @@ function populateStates(){
 		 success: (res) => {
 		             $('#state').empty();
 					 
-                     if( res.length == 0 || res.error ) {			 
+                     if( !res ) {			 
                           $('#state').append('<option selected disabled>State/Province</option>');					 
                      }
-                     for (let s in Object.keys(res).sort()) {
+                     for (let s of Object.keys(res).sort()) {
 					      let option = $('<option>');
 						  option.attr('value', res[s]);
 						  option.html(s);
@@ -98,10 +95,10 @@ function submitForm(){
 			    setBorderColor($("#email"), "red");
 			    $("#email-err").text("An unknown error occurred.").fadeIn();
 			} else if (res.status == "Done") {
-                $("#sign-up-form").hide();
+                $("#sign-up-form, .modal-box button").hide();
                 $("#status-text").text("Account registered.").fadeIn();
 			} else if (res.status == "OK") {
-                $("#sign-up-form").hide();
+                $("#sign-up-form, .modal-box button").hide();
                 $("#status-text").text("Please check your e-mail for activation.").fadeIn();
             }
 		 },

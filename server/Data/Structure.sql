@@ -28,7 +28,7 @@ CREATE INDEX sessionID ON login(sessionID) WHERE sessionID IS NOT NULL;
 DROP TABLE IF EXISTS auth CASCADE;
 CREATE TABLE auth(
   u_id INTEGER,
-  password CHAR(64) NOT NULL,
+  password TEXT NOT NULL,
   privilege privilege_types NOT NULL, 
   
   reset_token VARCHAR(64) DEFAULT NULL,

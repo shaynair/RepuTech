@@ -2,11 +2,9 @@
 var posts = [];
 var wiki = [];
 var msgs = [];
-var imgs = [];
 var pGot = false;
 var wGot = false;
 var mGot = false;
-var iGot = false;
 var $selected = null;
 
 
@@ -76,32 +74,11 @@ function get_wiki() {
     });
 }
 
-function get_images() {
-    if (iGot) {
-        render_images(); 
-        return;
-    }
-    
-    $.ajax({
-        method: "GET",
-        dataType: "json",
-        url: '/api/get-images',
-        data: {id: user.id},
-        success: function (data) {
-            imgs = data;
-            iGot = true;
-            render_images();
-        },
-        error: function (err) {
-            console.log(err);
-        }
-    });
-}
-
 // React classes to be filled in later
 var ListingForm;
 var AccountInfo;
 var WikiNew;
+var MessageNew;
 
 var rating_stars = {
     1 : "Rating: &#9733;&#9734;&#9734;&#9734;&#9734;",
@@ -114,37 +91,63 @@ var rating_stars = {
 // NOTE: use second function call after server is set up
 
 function render_general_info() {
-    $('.profile-content').empty();
+    $('.profile-content').stop(true, true).hide().empty();
     $('.profile-content').append($('<section/>', {id: 'profile-general'}));
-    $('#profile-general').append($('<h3/>', {id: 'name', text: user.firstname + ' ' + user.lastname}));
-    $('#profile-general').append($('<p/>', {id: 'profile-status', text: 'Status: ' + user.status}));
+    $('#profile-general').append($('<h3/>', {id: 'name', text: user.info.firstname + ' ' + user.info.lastname}));
+    $('#profile-general').append($('<p/>', {id: 'profile-status', text: 'Status: ' + user.info.status}));
     $('#profile-general').append($('<h4/>', {text: 'Reputation:'}));
     
-    $('#profile-general').append($("<p/>", {id: 'rating', html: rating_stars[user.rating]}));
+    $('#profile-general').append($("<p/>", {id: 'rating', html: rating_stars[user.info.rating]}));
     
-    $('#profile-general').append($('<p/>', {id: 'followers', text: 'Followers: ' + user.followers}));
+    $('#profile-general').append($('<p/>', {id: 'followers', text: 'Followers: ' + user.info.followers}));
     $('#followers').append($('<p/>', {id: 'followers-err', 'class': 'error', text: ''}));
+    if (user.id != myuser.id) {
+        $('#followers').append($('<button/>', {id: "follow", text: "Follow"}));
+    }
     $('#profile-general').append($('<h4/>', {text: 'Information:'}));
-    $('#profile-general').append($('<p/>', {text: 'Specialize in: ' + user.job}));
-    $('#profile-general').append($('<p/>', {text: 'Located in: ' + user.city + ', ' + user.region + ', ' + user.country}));
+    $('#profile-general').append($('<p/>', {text: 'Specialize in: ' + user.info.job}));
+    $('#profile-general').append($('<p/>', {text: 'Located in: ' + user.info.city + ', ' + user.info.region + ', ' + user.info.country}));
     
+    $('.profile-content').fadeIn();
+    
+    
+    $('#follow').click(function() {
+        $("#followers-err").text("").fadeOut();
+        $.ajax({
+            method: "GET",
+            dataType: "json",
+            url: '/api/follow',
+            data: {id: user.id},
+            success: function (data) {
+                if (data.status) {
+                    user.info.followers++;
+                    $("#followers").text('Followers: ' + user.info.followers);
+                } else {
+                    $("#followers-err").fadeIn().text("You've already followed them.");
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    });
 }
 
 function render_settings_form() {
 //function render_settings_form(data) {
-    $('.profile-content').empty();
-    ReactDOM.render(<AccountInfo data={data} />,
+    $('.profile-content').stop(true, true).hide().empty();
+    ReactDOM.render(<AccountInfo data={user} />,
                     document.getElementById('profile-content')
     );
     
-    if (user.user_type != "Normal") {
+    $('.profile-content').fadeIn();
+    
+    if (user.type != "Normal") {
         $("#passinfo").hide();
     }
     
     $('#update-info').on('submit', function(event) {
         let info = $('#update-info').serialize();
-        info.id = user.id;
-        
         $("#update-err").fadeOut().text("");
         
         event.preventDefault();
@@ -152,15 +155,16 @@ function render_settings_form() {
             method: "POST",
             url: '/api/change-settings',
             data: info,
-            success: function () {
+            success: function (data) {
                 if (data.status) {
-                    user.firstname = $("#firstname").text();
-                    user.lastname = $("#lastname").text();
-                    user.status = $("#status").text();
-                    user.job = $("#job").text();
-                    user.city = $("#city").text();
-                    user.phone = $("#phone").text();
-                    render_general_info();
+                    user.info.firstname = $("#firstname").val();
+                    user.info.lastname = $("#lastname").val();
+                    user.info.status = $("#status").val();
+                    user.info.job = $("#job").val();
+                    user.info.city = $("#city").val();
+                    user.info.phone = $("#phone").val();
+                    
+                    $("#general").click();
                 } else {
                     $("#update-err").fadeIn().text("An error occurred or the passwords are incorrect.");
                 }
@@ -173,14 +177,17 @@ function render_settings_form() {
 }
 
 function render_listing_form() {
-    $('.profile-content').empty();
+    $('.profile-content').stop(true, true).hide().empty();
     ReactDOM.render(<ListingForm/>,
                     document.getElementById('profile-content')
     );   
     
+    $('.profile-content').fadeIn();
+    
     $("#post-type-search").on("click", () => {
         if ($("#urgency").length == 0) { 
             $("#privacy").after($('<input type="number" pattern="[1-5]" maxlength="1" minlength="1" name="urgency" id="urgency"></input>'));
+            $("#privacy").after($('<p>Urgency (1-5):</p>'));
         }
     });
     $("#post-type-offer").on("click", () => {
@@ -195,7 +202,7 @@ function render_listing_form() {
             method: "POST",
             url: '/api/add-post',
             data: $('#listing-form').serialize(),
-            success: function () {
+            success: function (data) {
                 if (data.status) {
                     pGot = false;
                     get_posts();
@@ -215,18 +222,18 @@ function render_messages() {
         event.preventDefault();
         
         let box = $("#reply-" + uid);
-        if (box.text() == "") {
+        if (box.val() == "") {
             return;
         }
         
         $.ajax({
             method: "POST",
             url: '/api/add-message',
-            data: {reply: box.text(), to: uid},
-            success: function () {
+            data: {reply: box.val(), to: uid},
+            success: function (data) {
                 if (data.status) {
-                    $('#post-' + uid).append($('<p/>', {text: user.firstname + " " + user.lastname + ": " + box.text()}));
-                    msgs[uid].messages.unshift({sender: user.id, content: box.text()}); // Add to beginning
+                    $('#post-' + uid).append($('<p/>', {text: user.info.firstname + " " + user.info.lastname + ": " + box.val()}));
+                    msgs[uid].messages.unshift({sender: user.id, content: box.val()}); // Add to beginning
                     
                     box.text("");
                 } else {
@@ -240,14 +247,14 @@ function render_messages() {
     }
     
 //function render_messages(msgs) {
-    $('.profile-content').empty();
+    $('.profile-content').stop(true, true).hide().empty();
     $('.profile-content').append($('<section/>', {id: 'messages'}));
 	$('.profile-content').append($('<h3/>', {text: 'My Messages'}));
     for (var uid in msgs) {
         $('.profile-content').append($('<section/>', {class: 'post', id: 'post-' + uid}));
         for (var j = 0; j < msgs[uid].messages.length; j ++) {
             var m = msgs[uid].messages[j];
-            var send = user.firstname + " " + user.lastname;
+            var send = user.info.firstname + " " + user.info.lastname;
             if (m.sender != user.id) {
                 send = msgs[uid].name;
             }
@@ -261,27 +268,29 @@ function render_messages() {
                         .append('<input type="text" name="reply" id="reply-"' + uid + '"></input>')
                         .append($('<button/>', {type: "submit", text: "Reply"}).on("click", (e) => clickEvent(e, form, uid))));
     }
+    
+    $('.profile-content').fadeIn();
 }
 
 function render_images() {
 //function render_messages(msgs) {
-    $('.profile-content').empty();
-    $('.profile-content').append($('<section/>', {id: 'images'}));
+    $('.profile-content').stop(true, true).hide().empty();
+    $('.profile-content').append($('<section/>', {id: 'images-section'}));
 	$('.profile-content').append($('<h3/>', {text: 'My Images'}));
-    for (var i = 0; i < imgs.length; i ++) {
-        $('.profile-content').append($('<img/>', {src: 'assets/images/avatar/' + imgs[i], alt: 'Image'}));
+    for (var i = 0; i < user.info.images.length; i ++) {
+        $('.profile-content').append($('<img/>', {src: '/assets/images/avatar/' + user.info.images[i], alt: 'Image'}));
         
     }
-    $("#images").append($("<p/>", {"class": "error", "id": "image-err"}));
-    $("#images").append($("<form/>", {method: "post", action: "/api/new-image", enctype: "multipart/form-data", id: "upload"})
+    $("#images-section").append($("<p/>", {"class": "error", "id": "image-err"}));
+    $("#images-section").append($("<form/>", {method: "post", action: "/api/new-image", enctype: "multipart/form-data", id: "upload"})
                         .append('<input type="hidden" name="_csrf" value="' + csrf + '"></input>')
                         .append('<input type="file" name="file"></input>')
                         .append($('<button/>', {id: "add-new-img", type: "submit", text: "Add New"})));
     
-    $('#images').append($('<button/>', {id: "select-img", text: "Select"}));
-    $('#images').append($('<button/>', {id: "delete-img", text: "Delete"}));
+    $('#images-section').append($('<button/>', {id: "select-img", text: "Select Image"}));
+    $('#images-section').append($('<button/>', {id: "delete-img", text: "Delete Image"}));
     
-    $('#images img').on("click", function(event) {
+    $('#images-section img').on("click", function(event) {
         if ($selected != null) {
             $selected.toggleClass('active');
         }
@@ -298,10 +307,10 @@ function render_images() {
                 method: "GET",
                 url: '/api/delete-image',
                 data: {url: srcImg}, // Strip first path
-                success: function () {
+                success: function (data) {
                     if (data.status) {
-                        if (user.img == $selected.attr("src")) {
-                            user.img = '';
+                        if (user.info.img == $selected.attr("src")) {
+                            user.info.img = '';
                             $("#pic").attr("src", '/assets/images/avatar.png');
                         }
                         $selected.remove();
@@ -326,9 +335,9 @@ function render_images() {
                 method: "GET",
                 url: '/api/set-image',
                 data: {url: srcImg}, // Strip first path
-                success: function () {
+                success: function (data) {
                     if (data.status) {
-                        user.img = $selected.attr("src");
+                        user.info.img = $selected.attr("src");
                         $("#pic").attr("src", $selected.attr("src"));
                     } else {
                         $("#image-err").fadeIn().text("An error occurred");
@@ -340,12 +349,13 @@ function render_images() {
             });
         }
     });
+    
+    $('.profile-content').fadeIn();
 }
 
 function render_posts(filter = null) {
 //function render_posts(data) {
-    $('.profile-content').empty();
-	$('.profile-content').append($('<h3/>', {text: 'My Posts'}));
+    $('.profile-content').stop(true, true).hide().empty();
     // Renders posts for the profile
     for (var i = 0; i < posts.length; i ++) {
         if (filter && !filter(posts[i])) {
@@ -375,10 +385,12 @@ function render_posts(filter = null) {
         $(curr_id).append($('<p/>', {class: 'description', text: "Likes: " + posts[i].likes}));
         $(curr_id).append($('<p/>', {class: 'description', text: "Comments: " + posts[i].comments.length}));
     }
+    
+    $('.profile-content').fadeIn();
 }
 
 function render_wiki() {
-    $('.profile-content').empty();
+    $('.profile-content').stop(true, true).hide().empty();
 	$('.profile-content').append($('<h3/>', {text: 'My Wiki Posts'}));
     $('.profile-content').append($('<section/>', {id: 'profile-wiki'}));
     $('#profile-wiki').append($('<button/>', {id: 'wiki-new', text: 'New Wiki Post'}));
@@ -386,17 +398,24 @@ function render_wiki() {
         $('#profile-wiki').append($('<h4/>', {text: wiki[i].title}));
         $('#profile-wiki').append($('<p/>', {text: wiki[i].content}));
     }
-    // Click to create new wiki form
-    $('#wiki-new').click(function() {
-        render_wiki_new();
-    });
+    if (user.id == myuser.id) {
+        // Click to create new wiki form
+        $('#wiki-new').click(function() {
+            render_wiki_new();
+        });
+    }
+    
+    $('.profile-content').fadeIn();
 }
 
 function render_wiki_new() {
-    $('.profile-content').empty();
-    ReactDOM.render(<WikiNew/>,
-                    document.getElementById('profile-content')
-    ); 
+    $('.profile-content').stop(true, true).hide().empty();
+    if (user.id == myuser.id) {
+        ReactDOM.render(<WikiNew/>,
+                        document.getElementById('profile-content')
+        ); 
+    }
+    $('.profile-content').fadeIn();
     
     $('#wiki-form').on('submit', function(event) {
         event.preventDefault();
@@ -407,10 +426,41 @@ function render_wiki_new() {
             data: $('#wiki-form').serialize(),
             success: function (data) {
                 if (data.status) {
-                    wiki.push({title: $("#wiki-title").text(), content: $("#wiki-content").text()});
-                    render_wiki();
+                    wiki.push({title: $("#wiki-title").val(), content: $("#wiki-content").val()});
+                    $("#wiki").click();
                 } else {
                     $("#wiki-err").text("An error occurred.").fadeIn();
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    });
+}
+
+
+function render_message_new() {
+    $('.profile-content').stop(true, true).hide().empty();
+    if (user.id != myuser.id) {
+        ReactDOM.render(<WikiNew/>,
+                        document.getElementById('profile-content')
+        ); 
+    }
+    $('.profile-content').fadeIn();
+    
+    $('#message-form').on('submit', function(event) {
+        event.preventDefault();
+        $("#message-err").text("").fadeOut();
+        $.ajax({
+            method: "POST",
+            url: '/api/add-message',
+            data: {reply: $('#message-content').val(), to: user.id},
+            success: function (data) {
+                if (data.status) {
+                    $("#message-err").text("Sent successfully.").fadeIn();
+                } else {
+                    $("#message-err").text("An error occurred.").fadeIn();
                 }
             },
             error: function (err) {
@@ -470,30 +520,16 @@ $(document).ready(function() {
         $old = $(this);
     });
     $('#images').click(function() {
-        get_images();
+        render_images();
         $old.toggleClass('active');
         $(this).toggleClass('active');
         $old = $(this);
     });
-    $('#follow').click(function() {
-        $("#followers-err").text("").fadeOut();
-        $.ajax({
-            method: "GET",
-            dataType: "json",
-            url: '/api/follow',
-            data: {id: user.id},
-            success: function (data) {
-                if (data.status) {
-                    user.followers++;
-                    $("#followers").text('Followers: ' + user.followers);
-                } else {
-                    $("#followers-err").fadeIn().text("You've already followed them.");
-                }
-            },
-            error: function (err) {
-                console.log(err);
-            }
-        });
+    $('#message').click(function() {
+        render_message_new();
+        $old.toggleClass('active');
+        $(this).toggleClass('active');
+        $old = $(this);
     });
     $('#ban').click(function() {
         // ADMIN FUNCTION
@@ -514,13 +550,17 @@ $(document).ready(function() {
             }
         });
     });
-    if (user.info) {
-        $('#general').click();
-    } else {
-        $('#settings').click();
-        $(".profile-menu button").prop('disabled', true);
+    const href = window.location.href;
+    const last = href.substr(href.lastIndexOf('/') + 1);
+    if (last.startsWith("profile")) {
+        if (user && user != null && user.info && user.info.filled) {
+            $('#general').click();
+        } else {
+            $('#settings').click();
+            $(".profile-menu button").prop('disabled', true);
+        }
     }
-    
+        
     ListingForm = React.createClass({
         
         getInitialState: function() {
@@ -558,8 +598,8 @@ $(document).ready(function() {
                         </label>
                     </div>
                     <p>Privacy:</p>
-                    <select name="privacy" id="privacy">
-                        <option selected value="All">Viewable by all</option>
+                    <select defaultValue="All" name="privacy" id="privacy">
+                        <option value="All">Viewable by all</option>
                         <option value="Registered">Viewable by all registered members</option>
                         <option value="Medium">Viewable by reputable members</option>
                         <option value="High">Viewable by highly reputable members</option>
@@ -578,24 +618,24 @@ $(document).ready(function() {
     
     AccountInfo = React.createClass({
         render: function() {
-            var userNodes = this.props.data.map(function(user) {
+            var user = this.props.data;
                 return (
                     <form method="post" id="update-info" class="profile-form">
                         <h3>Update Account Info</h3>
                         <fieldset>
                             <legend>Personal Information:</legend>
                             <p>First name:</p>
-                            <input type="text" name="firstname" id="firstname" required defaultValue={user.firstname} pattern="[a-zA-Z]{1,50}" title="This field can only consist of letters."/>
+                            <input type="text" name="firstname" id="firstname" required defaultValue={user.info.firstname} pattern="[a-zA-Z]{1,50}" title="This field can only consist of letters."/>
                             <p>Last name:</p>
-                            <input type="text" name="lastname" id="lastname" required defaultValue={user.lastname} pattern="[a-zA-Z]{1,50}" title="This field can only consist of letters."/>
+                            <input type="text" name="lastname" id="lastname" required defaultValue={user.info.lastname} pattern="[a-zA-Z]{1,50}" title="This field can only consist of letters."/>
                             <p>City:</p>
-                            <input type="text" id="city" name="city" required defaultValue={user.city} pattern="[a-zA-Z]{2,50}" title="This field can only consist of letters."/>
+                            <input type="text" id="city" name="city" required defaultValue={user.info.city} pattern="[a-zA-Z]{2,50}" title="This field can only consist of letters."/>
                             <p>Phone Number:</p>
-                            <input type="text" id="phone" name="phone" required defaultValue={user.phone} pattern="[0-9]{10,12}" title="This field can only consist of numbers."/>
+                            <input type="text" id="phone" name="phone" required defaultValue={user.info.phone} pattern="[0-9]{10,12}" title="This field can only consist of numbers."/>
                             <p>Speciality:</p>
-                            <input type="text" id="job" name="job" defaultValue={user.job} maxlength="50" pattern="[a-zA-Z ]+" title="This field can only consist of letters."/>
+                            <input type="text" id="job" name="job" defaultValue={user.info.job} maxlength="50" pattern="[a-zA-Z ]+" title="This field can only consist of letters."/>
                             <p>Status:</p>
-                            <input type="text" id="status" name="status" defaultValue={user.status} maxlength="50" pattern="[a-zA-Z ]+" title="This field can only consist of letters."/>
+                            <input type="text" id="status" name="status" defaultValue={user.info.status} maxlength="50" pattern="[a-zA-Z ]+" title="This field can only consist of letters."/>
                         </fieldset>
                         <fieldset id="passinfo">
                             <legend>Account Information:</legend>
@@ -606,17 +646,12 @@ $(document).ready(function() {
                             <p>Retype New Password (same as above): </p>
                             <input type="password" name="newpass2" id="newpass-confirmation" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
                         </fieldset>
+                        <input type="hidden" name="id" value={user.id}></input>
                         <input type="hidden" name="_csrf" value={csrf}></input>
                         <p class="error" id="update-err"></p>
                         <button type="submit" form="update-info" value="Update" id="update-button">Update</button>
                     </form>
                 );
-            });
-            return (
-                <div className="AccountInfo">
-                    {userNodes}
-                </div>
-            );
         }
     });
     
@@ -633,6 +668,23 @@ $(document).ready(function() {
                         <textarea required name="content" form="wiki-form" id="wiki-content" rows="15"></textarea>
                         <input type="hidden" name="_csrf" value={csrf}></input>
                         <button type="submit" form="wiki-form" value="Submit" id="wiki-button">Submit</button>
+                    </form>
+                </section>
+            );
+        }
+    });
+    
+    MessageNew = React.createClass({
+        render: function() {
+            return (
+                <section id="profile-message-new">
+                    <h3>New Message</h3>
+                    <form data-reactroot="" method="post" id="message-form" class="profile-form">
+                        <p id="message-err" class="error"></p>
+                        <p>Content:</p>
+                        <textarea required name="content" form="message-form" id="message-content" rows="15"></textarea>
+                        <input type="hidden" name="_csrf" value={csrf}></input>
+                        <button type="submit" form="message-form" value="Submit" id="message-button">Submit</button>
                     </form>
                 </section>
             );

@@ -16,7 +16,6 @@
                             <button id='images'>My Images</button>
                             <button id='create-listing'>Create Listing</button>
                         <% } else { %>
-                            <button id="follow">Follow</button>
                             <button id="message">Message</button>
                         <% } %>
                     <% } %>
@@ -35,8 +34,8 @@
         </main>
             
         <script type='text/javascript'>
-          var myuser = <%-JSON.stringify(user)%>
-          var user = <%-JSON.stringify(profile)%>
-          var csrf = <%= csrfToken %>
+          var myuser = <%-JSON.stringify(user)%>;
+          var user = <%-JSON.stringify(profile)%>;
+          var csrf = "<%= csrfToken %>";
         </script>        
 <%- include partials/footer.ejs %>

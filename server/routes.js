@@ -24,7 +24,7 @@ module.exports = {
                     return res.sendStatus(400); // Error
                 } else if (PAGES[r].logged_in && !req.session.user) {
                     res.redirect('/login'); // Must be logged in
-                } else if (PAGES[r].logged_in && req.session.user && !req.session.user.info) {
+                } else if (PAGES[r].logged_in && req.session.user && !req.session.user.info.filled) {
                     res.redirect('/profile'); // Must fill out info
                 } else if (PAGES[r].logged_out && req.session.user) {
                     res.redirect('/profile'); // Must be logged out
@@ -49,7 +49,7 @@ module.exports = {
 
           // respond with html page
           if (req.accepts('html')) {
-            module.exports.generateData(req, null, main, (data) => {
+            module.exports.generateData(req, res, null, main, (data) => {
                 res.render('404', data);
             });
             return;

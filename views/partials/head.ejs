@@ -18,7 +18,7 @@
 		<script defer src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="/assets/stylesheets/style.css">
         
-        <% if (!title || title == "Profile") { %>
+        <% if (title == "Home" || title == "Post") { %>
             <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
             <script defer src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
         <% } %>
@@ -48,7 +48,6 @@
                         <section class="inline-form">
                             <input name="search" type="text" minlength="5" placeholder="Keywords..."></input>
                         </section>
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <button type="submit" form="search-form" class="search-button">Search</button>
                     </form>
                 <% } %>

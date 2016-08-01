@@ -127,8 +127,6 @@ function render_post_full() {
 
 
 $(document).ready(() => {
-    render_post_full();
-    
     $('#like').click(function() {
         $("#like-err").text("").fadeOut();
         $.ajax({
@@ -204,6 +202,4 @@ $(document).ready(() => {
             }
         });
     });
-    // Make our REST call
-    get_similars();
 });
