@@ -1,5 +1,4 @@
 // This file handles the main running of the server.
-
 // Do all requires
 const express = require('express');
 const compression = require('compression');
@@ -31,24 +30,26 @@ app.use(compression());
 // Enable prevention of clickjacking and other headers
 // Also set Content-Security-Policy
 app.use(helmet({
-    contentSecurityPolicy: {
-      // Specify directives as normal. 
-      directives: {
-        defaultSrc: ["'self'"],
-        childSrc: ["'self'"],
-        frameAncestors: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "https://code.jquery.com",
-                    "https://cdnjs.cloudflare.com"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https://code.jquery.com"],
-        imgSrc: ["'self'", 'data:'],
-        objectSrc: [],
-        sandbox: ["allow-forms", "allow-scripts", "allow-same-origin",
-                    "allow-top-navigation", "allow-modals"] 
-      },
-      reportOnly: false,
-      setAllHeaders: false,
-      disableAndroid: false
-    }
+	contentSecurityPolicy: {
+		// Specify directives as normal. 
+		directives: {
+			defaultSrc: ["'self'"],
+			childSrc: ["'self'"],
+			frameAncestors: ["'self'"],
+			scriptSrc: ["'self'", "'unsafe-inline'", "https://code.jquery.com",
+				"https://cdnjs.cloudflare.com"
+			],
+			styleSrc: ["'self'", "'unsafe-inline'", "https://code.jquery.com"],
+			imgSrc: ["'self'", 'data:'],
+			objectSrc: [],
+			sandbox: ["allow-forms", "allow-scripts", "allow-same-origin",
+				"allow-top-navigation", "allow-modals"
+			]
+		},
+		reportOnly: false,
+		setAllHeaders: false,
+		disableAndroid: false
+	}
 }));
 
 // Static files
@@ -59,15 +60,15 @@ app.use(express.static(__dirname + '/../public'));
 const RedisStore = redis(session);
 const sessionStore = new RedisStore(c.REDIS);
 const sessionInstance = session({
-    secret: c.COOKIE_SECRET,
-    name: 'session',
-    resave: false, // Redis implements touch
-    saveUninitialized: false,
-    store: sessionStore,
-    cookie: {
-        secure: process.env.SECURE || false,
-        maxAge: 6*60*60*1000
-    } // 6 hour cookie maximum
+	secret: c.COOKIE_SECRET,
+	name: 'session',
+	resave: false, // Redis implements touch
+	saveUninitialized: false,
+	store: sessionStore,
+	cookie: {
+		secure: process.env.SECURE || false,
+		maxAge: 6 * 60 * 60 * 1000
+	} // 6 hour cookie maximum
 });
 app.use(sessionInstance);
 
@@ -78,28 +79,32 @@ app.set('view engine', 'ejs');
 
 // Enable body parsing
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+	extended: false
+}));
 app.use(expressValidator({
-    customValidators: {
-        // default: isAlpha isAlphanumeric isNumeric isEmail isFloat isDate len isInt
-        isRegularEmail: (value) => {
-            return /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(value);
-        },
-        isPassword: (value) => {
-            return /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}/.test(value);
-        },
-        isText: (value) => {
-            return /[a-zA-Z ]/g.test(value);
-        }
-    }
+	customValidators: {
+		// default: isAlpha isAlphanumeric isNumeric isEmail isFloat isDate len isInt
+		isRegularEmail: (value) => {
+			return /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(value);
+		},
+		isPassword: (value) => {
+			return /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}/.test(value);
+		},
+		isText: (value) => {
+			return /[a-zA-Z ]/g.test(value);
+		}
+	}
 }));
 
 // CSRF protection for POST
 app.use(cookieParser(c.COOKIE_SECRET));
-app.use(csrf({ cookie: true }));
+app.use(csrf({
+	cookie: true
+}));
 
 if (!process.env.SECURE) { // development
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
 // Database connection
@@ -108,28 +113,28 @@ const db = queries(pool, sessionStore);
 
 // Exports for other files
 module.exports = {
-    // Runs server
-    run: () => {
-        // Check if SQL is ready
-        db.checkAndInitialize();
-        
-        // Configure routes
-        auth.configure(app, module.exports);
-        rest.configure(app, module.exports);
-        routes.configure(app, module.exports);
-        
-        // Run the server
-        app.listen(app.get('port'), () => {
-            console.log('Node is running on port', app.get('port'));
-        });
-    },
-    
-    // Formatted query handler
-    "db": db,
-    
-    // Helper function to keep IP consistent
-    setIP: (req) => {
-        req.ip = req.ip || req.connection.remoteAddress 
-            || req.socket.remoteAddress || req.connection.socket.remoteAddress;
-    }
+	// Runs server
+	run: () => {
+		// Check if SQL is ready
+		db.checkAndInitialize();
+
+		// Configure routes
+		auth.configure(app, module.exports);
+		rest.configure(app, module.exports);
+		routes.configure(app, module.exports);
+
+		// Run the server
+		app.listen(app.get('port'), () => {
+			console.log('RepuTech server is running on port', app.get('port'));
+		});
+	},
+
+	// Formatted query handler
+	"db": db,
+
+	// Helper function to keep IP consistent
+	setIP: (req) => {
+		req.ip = req.ip || req.connection.remoteAddress ||
+			req.socket.remoteAddress || req.connection.socket.remoteAddress;
+	}
 }

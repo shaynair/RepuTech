@@ -82,7 +82,7 @@ CREATE INDEX name ON users(firstname, lastname);
 
 DROP TABLE IF EXISTS user_images CASCADE;
 CREATE TABLE user_images(
-  img_url CHAR(16) NOT NULL,
+  img_url VARCHAR(24) NOT NULL,
   u_id INTEGER NOT NULL,
   is_active BOOLEAN NOT NULL DEFAULT FALSE,
   
@@ -118,6 +118,15 @@ CREATE TABLE posts(
   FOREIGN KEY (poster) REFERENCES users(u_id) ON DELETE CASCADE,
   
   CHECK(urgency >= 0 AND urgency < 6)
+);
+
+DROP TABLE IF EXISTS post_images CASCADE;
+CREATE TABLE post_images(
+  img_url VARCHAR(24) NOT NULL,
+  p_id INTEGER NOT NULL,
+  
+  PRIMARY KEY (img_url), 
+  FOREIGN KEY (p_id) REFERENCES posts(p_id) ON DELETE CASCADE
 );
 
 CREATE INDEX priv ON posts(privacy);

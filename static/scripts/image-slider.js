@@ -4,7 +4,7 @@ function loadImageSlider(images, title = "RepuTech") {
     // Load the correct images
     
     if (!Array.isArray(images)) {
-        // Placeholder images, pull user's images from database
+        // Placeholder images
         images = ["/assets/images/computer-2.jpg",
             "/assets/images/computer-3.jpg",
             "/assets/images/smartphone-1.jpg",

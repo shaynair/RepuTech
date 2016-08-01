@@ -1,6 +1,7 @@
-function search_posts(search, filter) {
+// Searches posts and filters them with a function.
+function searchPosts(search, filter) {
     if (search == s) {
-        render_posts(filter); 
+        renderPosts(filter); 
         return;
     }
     
@@ -9,24 +10,24 @@ function search_posts(search, filter) {
         dataType: "json",
         url: '/api/search-posts',
         data: {query: search},
-        success: function (data) {
+        success: (data) => {
             posts = data;
             s = search;
-            render_posts(filter); 
+            renderPosts(filter); 
         },
-        error: function (err) {
+        error: (err) => {
             console.log(err);
         }
     });
 }
 
-$(document).ready(function() {
+$(document).ready(() => {
     // Get value from input fields
-    $('#refine').click(function() {
-        var name = $('#name').val();
-        var urgency = parseInt($('#urgency').val()) || 0;
-        var reputation = parseInt($('#reputation').val()) || 0;
-        var service; 
+    $('#refine').click(() => {
+        let name = $('#name').val();
+        let urgency = parseInt($('#urgency').val()) || 0;
+        let reputation = parseInt($('#reputation').val()) || 0;
+        let service; 
         if ($('#service').is(':checked')) {
             // Is offering service
             service = true;
@@ -37,7 +38,7 @@ $(document).ready(function() {
         
         // Send above information to back-end and search through all posts to return matching ones
         
-        search_posts($('#search').val(), (post) => {
+        searchPosts($('#search').val(), (post) => {
             if ((post.urgency == 0) != service) { // urgency = 0 are servicing
                 return false;
             }

@@ -37,5 +37,6 @@
           var myuser = <%-JSON.stringify(user)%>;
           var user = <%-JSON.stringify(profile)%>;
           var csrf = "<%= csrfToken %>";
+          var countries = <%- JSON.stringify(countries) %>;
         </script>        
 <%- include partials/footer.ejs %>

@@ -50,6 +50,7 @@
     
     "graceful-fs": "*",
     "sharp": "*",
+    "shortid": "*",
     
     "passport": "*",
     "passport-facebook": "*",

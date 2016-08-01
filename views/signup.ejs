@@ -25,7 +25,6 @@
 				    <input type="text" class="input-half" id="lastname" maxlength="50" pattern="[a-zA-Z]+" required name="lastname" placeholder="Last Name..."/>	  
 				  
 				    <select id="country" required name="country">
-						<option selected>Country</option>
                         <% for (let c of Object.keys(countries).sort()) { %>
                             <option value="<%= countries[c] %>"><%= c %></option>
                         <% } %>

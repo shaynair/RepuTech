@@ -6,15 +6,17 @@ $(document).ready(() => {
     if (last == '' || last == 'index') {
         loadImageSlider();
     } else if (last == 'signup' || last == 'admin-signup') {
+		// Validation and state population
         $(".error").hide();
         $("#submit").on("click", validateEvent);
         $("#country").on("change", populateStates);
     } else if (last.startsWith("post")) {
-        render_post_full();
-        // Make our REST call
-        get_similars();
+        renderFullPost();
+        // Make our REST call to get similar posts
+        getSimilars();
     }
 
+	// Event for when the login form gets submitted.
     $("#login-form").on("submit", (event) => {
         event.preventDefault();
         
@@ -41,6 +43,7 @@ $(document).ready(() => {
         });
     });
 
+	// Event for when reset password gets clicked.
     $("#reset-pass").on("click", (event) => {
         event.preventDefault();
         
@@ -65,6 +68,7 @@ $(document).ready(() => {
         });
     });
     
+	// Admin function.
     $("#repopulate").on("click", (event) => {
         $.ajax({
             method: "GET",
@@ -73,6 +77,7 @@ $(document).ready(() => {
             data: {},
             success: (data) => {
                 if (data.status){
+					// Database is gone, reload
                     window.location.href = "/";
                 } else {
                     console.log("There was an error.");
