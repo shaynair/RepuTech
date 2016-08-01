@@ -307,6 +307,31 @@ const CALLS = {
         }
     },
     
+    'ban':  {
+        logged_in: true,
+        needs_admin: true,
+        api: true,
+        validate: (req) => {
+            req.checkQuery('id', 'Required field').notEmpty();
+            req.checkQuery('id', 'Must be a number').isNumeric();
+            req.sanitize('id').toInt();
+            
+        },
+        perform: (req, main, cb) => {
+            main.db.banUser(req.query.id, req.session.user.id, (ret) => cb({status: ret}));
+        }
+    },
+    
+    'repopulate':  {
+        logged_in: true,
+        needs_admin: true,
+        api: true,
+        validate: (req) => {},
+        perform: (req, main, cb) => {
+            main.db.initializeDatabase(() => cb({status: true}));
+        }
+    },
+    
     'like':  {
         logged_in: true,
         api: true,
@@ -321,6 +346,47 @@ const CALLS = {
         }
     },
     
+    'review':  {
+        logged_in: true,
+        api: true,
+        validate: (req) => {
+            req.checkQuery('id', 'Required field').notEmpty();
+            req.checkQuery('id', 'Must be a number').isNumeric();
+            req.sanitize('id').toInt();
+            
+            req.checkQuery('content', 'Required field').notEmpty();
+            
+            req.checkQuery('rating', 'Required field').notEmpty();
+            req.checkQuery('rating', 'Must be a number').isNumeric();
+            req.sanitize('rating').toInt();
+            
+            req.sanitize('content');
+        },
+        perform: (req, main, cb) => {
+            main.db.tryReview(req.query.id, req.session.user.id, req.query.content, req.query.rating, (ret) => cb({status: ret}));
+        }
+    },
+    
+    'comment':  {
+        logged_in: true,
+        api: true,
+        validate: (req) => {
+            req.checkQuery('id', 'Required field').notEmpty();
+            req.checkQuery('id', 'Must be a number').isNumeric();
+            req.sanitize('id').toInt();
+            
+            req.checkQuery('content', 'Required field').notEmpty();
+            
+            req.checkQuery('to', 'Required field').notEmpty();
+            req.checkQuery('to', 'Must be a number').isNumeric();
+            req.sanitize('to').toInt();
+            
+            req.sanitize('content');
+        },
+        perform: (req, main, cb) => {
+            main.db.tryComment(req.query.id, req.session.user.id, req.query.content, req.query.to, (ret) => cb({status: ret}));
+        }
+    },
     'search-posts':  {
         api: true,
         validate: (req) => {

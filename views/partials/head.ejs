@@ -56,6 +56,9 @@
                     <a href="/signup"><button>Sign Up</button></a>
                     <a href="/login"><button>Sign In</button></a>
                 <% } else { %>
+                    <% if (user.is_admin) { %>
+                        <a href="/admin"><button>Admin</button></a>
+                    <% } %>
                     <a href="/logout"><button>Logout</button></a>
                 <% } %>
 			</section>

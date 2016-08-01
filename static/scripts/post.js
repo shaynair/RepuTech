@@ -1,4 +1,6 @@
 let similar = [];
+let maxReviewId = 0;
+let maxCommentId = 0;
 
 function get_similars() {
     $.ajax({
@@ -34,6 +36,10 @@ function render_review(r) {
     $('#post-review-' + r.id).append($("<p/>", {id: 'rating', html: rating_stars[r.rating]}));
         
     $('#post-review-' + r.id).append($('<p/>', {text: r.content}));
+    
+    if (r.id > maxReviewId) {
+        maxReviewId = r.id;
+    }
 }
 
 function render_comment(c) {
@@ -49,6 +55,10 @@ function render_comment(c) {
     if (user) {
         $('#post-comment-' + c.id).append($('<textarea/>', {id: 'reply-' + c.id + '-text'}));
         $('#post-comment-' + c.id).append($('<button/>', {class: 'comment-reply', id: 'reply-' + c.id, text: 'Reply'}));
+    }
+    
+    if (c.id > maxCommentId) {
+        maxCommentId = c.id;
     }
 }
 
@@ -140,6 +150,60 @@ $(document).ready(() => {
         });
     });
     
+    $('#review').click(function() {
+        $("#review-err").text("").fadeOut();
+        let content = $("review-text").val();
+        let rate = $("review-rate").val();
+        if (content == "" || rate == "") {
+            return;
+        }
+        $.ajax({
+            method: "GET",
+            dataType: "json",
+            url: '/api/review',
+            data: {id: post.id, "content": content, rating: rate},
+            success: function (data) {
+                if (data.status) {
+                    render_review({id: maxRatingId + 1, rating: rate, "content": content, name: user.firstname + ' ' + user.lastname});
+                } else {
+                    $("#review-err").fadeIn().text("Please fill in the fields properly. Or you've already made a review.");
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    });
+    
+    $('.comment-reply').click(function() {
+        $("#comment-err").text("").fadeOut();
+        let content = $($(this).attr("id") + "-text").val();
+        if (content == "") {
+            return;
+        }
+        let to = 0;
+        let reply = $(this).attr("id").split("-");
+        if (reply.length > 0) {
+            to = parseInt(reply[1]);
+        }
+        
+        $.ajax({
+            method: "GET",
+            dataType: "json",
+            url: '/api/comment',
+            data: {id: post.id, "content": content, "to": to},
+            success: function (data) {
+                if (data.status) {
+                    render_comment({id: maxRatingId + 1, rating: rate, "content": content, name: user.firstname + ' ' + user.lastname});
+                } else {
+                    $("#comment-err").fadeIn().text("Please fill in the fields properly.");
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    });
     // Make our REST call
     get_similars();
 });

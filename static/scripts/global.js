@@ -76,4 +76,23 @@ $(document).ready(() => {
             }
         });
     });
+    
+    $("#repopulate").on("click", (event) => {
+        $.ajax({
+            method: "GET",
+            url: '/api/repopulate',
+            dataType: "json",
+            data: {},
+            success: (data) => {
+                if (data.status){
+                    window.location.href = "/";
+                } else {
+                    console.log("There was an error.");
+                }
+            },
+            error: (err) => {
+                console.log(err);
+            }
+        });
+    });
 });

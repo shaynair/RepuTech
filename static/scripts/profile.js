@@ -495,7 +495,25 @@ $(document).ready(function() {
             }
         });
     });
-    
+    $('#ban').click(function() {
+        // ADMIN FUNCTION
+        $.ajax({
+            method: "GET",
+            dataType: "json",
+            url: '/api/ban',
+            data: {id: user.id},
+            success: function (data) {
+                if (data.status) {
+                    window.location.href = "/profile";
+                } else {
+                    console.log("An error occurred.");
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    });
     if (user.info) {
         $('#general').click();
     } else {

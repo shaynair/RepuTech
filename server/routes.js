@@ -11,7 +11,8 @@ const PAGES = {
     '/login': {name: 'login', logged_out: true, title: 'Log In'},
     '/admin-signup': {name: 'signup', logged_in: true, needs_admin: true, title: 'Add New User'},
     '/profile': {name: 'profile', title: 'Profile'},
-    '/search': {name: 'search', title: 'Search'}
+    '/search': {name: 'search', title: 'Search'},
+    '/post': {name: 'post', title: 'Post'}
 }
 
 module.exports = {
@@ -113,7 +114,7 @@ module.exports = {
                             res.redirect('/404');
                             cb(null);
                         } else {
-                            ret.profile = adta;
+                            ret.profile = data;
                             cb(ret);
                         }
                     });
@@ -124,6 +125,24 @@ module.exports = {
                     return;
                 }
                 ret.profile = ret.user; // view own profile
+            }
+            if (PAGES[r].name == 'post') {
+                if (req.query && req.query.id) {
+                    req.sanitize("id").toInt();
+                    main.db.getPost(req.query.id, (data) => {
+                        if (!data) { // not found
+                            res.redirect('/404');
+                            cb(null);
+                        } else {
+                            ret.post = data;
+                            cb(ret);
+                        }
+                    });
+                } else {
+                    res.redirect('/404');
+                    cb(null);
+                }
+                return;
             }
             cb(ret);
         } else {

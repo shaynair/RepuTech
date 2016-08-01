@@ -516,6 +516,42 @@ module.exports = function(pool, sessionStore) {
         },
         
         // Return true on success
+        tryReview: function(p_id, u_id, content, rate, cb) {
+            if (rate < 1 || rate > 5) {
+                cb(false);
+                return;
+            }
+            this.query("SELECT * FROM reviews WHERE post = $1 AND reviewer = $2", [p_id, u_id], (users) => {
+                if (users && users.rows.length > 0) {
+                    cb(false);
+                } else {
+                    this.simpleQuery("INSERT INTO reviews (post, reviewer, content, rating) VALUES($1, $2, $3, $4)", [p_id, u_id, content, rate]);
+                    cb(true);
+                }
+            });
+        },
+        
+        // Return true on success
+        tryComment: function(p_id, u_id, content, to, cb) {
+            if (to > 0) {
+                // Do not allow nesting
+                this.query("SELECT * FROM comments WHERE post = $1 AND c_id = $2 AND reply_to IS NULL", [p_id, to], (users) => {
+                    if (users && users.rows.length > 0) {
+                        this.simpleQuery("INSERT INTO comments (post, commenter, content, reply_to) VALUES($1, $2, $3, $4)", [p_id, u_id, content, to]);
+                        cb(true);
+                    } else {
+                        // Does not exist
+                        cb(false);
+                    }
+                });
+            } else {
+                // reply_to is NULL
+                this.simpleQuery("INSERT INTO comments (post, commenter, content) VALUES($1, $2, $3)", [p_id, u_id, content]);
+                cb(true);
+            }
+
+        },
+        // Return true on success
         addWiki: function(u_id, title, content, cb) {
             this.query("INSERT INTO wiki (poster, title, content) VALUES ($1, $2, $3)", [u_id, title, content], (wikis) => {
                 if (wikis && wikis.rows.length > 0) {

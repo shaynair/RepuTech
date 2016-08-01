@@ -23,6 +23,9 @@
                     <% if (user != null && (user.is_admin || user.id == profile.id)) { %>
                         <button id='settings'>Update Account Info</button>
                     <% } %>
+                    <% if (user != null && user.is_admin && !profile.is_admin) { %>
+                        <button id='ban'>Ban User</button>
+                    <% } %>
                 </section>
             </section>
 

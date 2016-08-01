@@ -190,21 +190,6 @@ CREATE TABLE wiki (
   FOREIGN KEY (poster) REFERENCES users(u_id) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS reports CASCADE;
-CREATE TABLE reports (
-  reported INTEGER NOT NULL,
-  reporter INTEGER NOT NULL,
-  post INTEGER NOT NULL,
-  report_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  
-  PRIMARY KEY (reported, reporter),
-  FOREIGN KEY (reported) REFERENCES users(u_id) ON DELETE CASCADE,
-  FOREIGN KEY (reporter) REFERENCES users(u_id) ON DELETE CASCADE,
-  FOREIGN KEY (post) REFERENCES posts(p_id) ON DELETE CASCADE,
-   
-  CHECK (reported != reporter)
-);
-
 DROP TABLE IF EXISTS ip_bans CASCADE;
 CREATE TABLE ip_bans (
   ip_address VARCHAR(16) NOT NULL,
