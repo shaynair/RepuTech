@@ -23,7 +23,6 @@ html, body {
     font-size: 100%;
     height: 100%;
 }
-
 body, nav, footer, header {
     width: 100%;
     margin: 0 auto;
@@ -277,6 +276,10 @@ header h1 {
     color: #1976D2;
 }
 
+.active-img {
+    border: 0.25em solid red;
+}
+
 .profile-content {
     padding: 0em;
     background-color: white;
@@ -287,14 +290,13 @@ header h1 {
     clear: both;
 }
 
-#listing-form, #wiki-form {
+#listing-form, #wiki-form, #message-form {
     margin-left: 2rem;
 }
 
 #profile-wiki {
     padding: 2em;
     background-color: white;
-    overflow: scroll-y;
 }
 
 #profile-content h3 {
@@ -345,7 +347,16 @@ header h1 {
     margin: 2em;
     padding: 1em;
     max-height: 20%;
-    overflow: scroll-y;
+}
+
+.post-comments, .post-reviews, .post-similars {
+    overflow-y: scroll;
+    max-height: 100vh;
+}
+
+#messages-section, #images-section, #profile-wiki {
+    overflow-y: scroll;
+    max-height: 100%;
 }
 
 .post-content {

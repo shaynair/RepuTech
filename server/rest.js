@@ -513,6 +513,7 @@ const CALLS = {
 	'new-image': {
 		logged_in: true,
 		api: true,
+		redirect_url: '/profile',
 		post: true,
 		validate: (req) => {},
 		perform: (req, main, cb) => {
@@ -718,16 +719,17 @@ module.exports = {
 				CALLS[r].validate(req);
 				let errors = req.validationErrors();
 				if (errors) {
-					if (req.session.user && req.session.user.is_admin) {
+					//if (req.session.user && req.session.user.is_admin) {
 						logger.logInfo("There were validation errors: " + JSON.stringify(errors));
-					}
+					//}
 					ret.error = "Invalid parameters";
 				} else {
-					CALLS[r].perform(req, main, (r) => {
-						if (r) {
-							res.send(JSON.stringify(r));
+					CALLS[r].perform(req, main, (ret) => {
+						if (ret) {
+							res.send(JSON.stringify(ret));
 						} else {
-							res.redirect("/");
+							res.redirect(CALLS[r].redirect_url ? 
+									CALLS[r].redirect_url : "/");
 						}
 					});
 					return;

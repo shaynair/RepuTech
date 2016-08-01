@@ -1,7 +1,51 @@
 <%- include partials/head.ejs %>
 
        <main>
-             <section class="post-content" id="post-content"></section>
+             <section class="post-content" id="post-content">
+				<section id="gallery"></section>
+				<section class="post-full">
+					<h2><%= post.title %></h2>
+					<p class="post-author">
+						By: <%= (post.firstname + ' ' + post.lastname) %>
+						<a href="/profile?id=<%= post.poster %>"><button>View Profile</button></a>
+					</p>
+					<p id="post-type" class="post_type"></p>
+					
+					<p>Contact: <%= post.phone %> | <%= post.email %></p>
+					<p>Location: <%= post.country %>, <%= post.region %>, <%= post.city %></p>
+					<p<%= post.content %></p>
+					
+					<p id="likes">Likes: <%= post.likes %></p>
+					<% if (user) { %>
+						<p class="error" id="like-err"></p>
+						<button id="like">Like</button>
+					<% } %>
+					
+					<h3>Comments</h3>
+					<section class="post-comments">
+						<% if (user) { %>
+							<p class="error" id="comment-err"></p>
+							<textarea id="reply-text" rows="2"></textarea>
+							<button class="comment-reply" id="reply">Comment</button>
+						<% } %>
+					</section>
+					<h3>Reviews</h3>
+					<section class="post-reviews">
+						<% if (user) { %>
+							<p class="error" id="review-err"></p>
+							<p>Rating (1-5): </p>
+							<input id="review-rate" type="number"></input>
+							<p>Content: </p>
+							<textarea id="review-text" rows="5"></textarea>
+							<button id="review">Leave a Review</button>
+						<% } %>
+					</section>
+					<h3>Similar Posts</h3>
+					<section class="post-similars">
+						
+					</section>
+				</section>
+			 </section>
             
         </main> 
         

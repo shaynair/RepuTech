@@ -6,8 +6,7 @@
   "description": "RepuTech",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "postinstall": "gulp default"
+    "start": "gulp default"
   },
   "keywords": [
     "tech",
@@ -74,6 +73,7 @@
     "del": "*",
     "cross-spawn": "*",
     "babel-preset-es2015": "*",
-    "babel-preset-react": "*"
+    "babel-preset-react": "*",
+	"gulp-nodemon": "*"
   }
 }

@@ -2,7 +2,7 @@ let similar = [];
 let maxReviewId = 0;
 let maxCommentId = 0;
 
-// API call for getting similar posts.
+// API call for getting similar posts
 function getSimilars() {
     $.ajax({
         method: "GET",
@@ -12,6 +12,37 @@ function getSimilars() {
         success: function (data) {
             similar = data;
             renderSimilar(); 
+        },
+        error: (err) => {
+            console.log(err);
+        }
+    });
+}
+
+function commentClick() {
+    $("#comment-err").text("").fadeOut();
+    let content = $("#" + $(this).attr("id") + "-text").val();
+    if (content == "" || !user) {
+        return;
+    }
+    let to = 0;
+    let reply = $(this).attr("id").split("-");
+    if (reply.length > 1) {
+        to = parseInt(reply[1]);
+    }
+        
+    $.ajax({
+        method: "GET",
+        dataType: "json",
+        url: '/api/comment',
+        data: {id: post.id, "content": content, "to": to},
+        success: (data) => {
+            if (data.status) {
+                renderComment({id: maxCommentId + 1, "content": content, name: user.info.firstname + ' ' + user.info.lastname, comments: []},
+					true, to);
+            } else {
+                $("#comment-err").fadeIn().text("Please fill in the fields properly.");
+            }
         },
         error: (err) => {
             console.log(err);
@@ -33,12 +64,18 @@ function renderSimilar() {
 
 // Renders a single review.
 function renderReview(r) {
-    $('.post-reviews').append($('<article/>', {class: 'post-review', id: 'post-review-' + r.id}));
-    $('#post-review-' + r.id).append($('<h4/>', {text: 'By ' + r.name}));
+	let $parent = $('.post-reviews');
+	let newReview = $('<article/>', {class: 'post-review', id: 'post-review-' + r.id});
+	if (user) {
+		$parent.children("#review-err").before(newReview);
+	} else {
+		$parent.append(newReview);
+	}
+    newReview.append($('<h4/>', {text: 'By ' + r.name}));
         
-    $('#post-review-' + r.id).append($("<p/>", {id: 'rating', html: "Rating: " + rating_stars[r.rating]}));
+    newReview.append($("<p/>", {id: 'rating', html: "Rating: " + rating_stars[r.rating]}));
         
-    $('#post-review-' + r.id).append($('<p/>', {text: r.content}));
+    newReview.append($('<p/>', {text: r.content}));
     
     if (r.id > maxReviewId) {
         maxReviewId = r.id;
@@ -46,19 +83,35 @@ function renderReview(r) {
 }
 
 // Renders a single comment and its children.
-function renderComment(c) {
-    $('.post-comments').append($('<article/>', {class: 'post-comment', id: 'post-comment-' + c.id}));
-    $('#post-comment-' + c.id).append($('<h4/>', {text: c.name}));
-    $('#post-comment-' + c.id).append($('<p/>', {text: c.content}));
+function renderComment(c, isNew = false, parent = 0) {
+	$('#post-comment-' + c.id).remove();
+	
+	let newComment = $('<article/>', {class: 'post-comment', id: 'post-comment-' + c.id});
+	let $parent = $('.post-comments');
+	if (parent > 0) {
+		$parent = $('#post-comment-' + parent);
+	}
+	if (user) {
+		$parent.children("textarea").before(newComment);
+	} else {
+		$parent.append(newComment);
+	}
+    newComment.append($('<h4/>', {text: c.name}));
+    newComment.append($('<p/>', {text: c.content}));
         
     for (let r of c.comments) {
-        $('#post-comment-' + c.id).append($('<article/>', {class: 'post-comment', id: 'post-comment-replies-' + c.id}));
-        $('#post-comment-replies-' + c.id).append($('<h4/>', {text: r.name}));
-        $('#post-comment-replies-' + c.id).append($('<p/>', {text: r.content}));
+		newComment.append($('<article/>', {class: 'post-comment', id: 'post-comment-replies-' + r.id}));
+        $('#post-comment-replies-' + r.id).append($('<h4/>', {text: r.name}));
+        $('#post-comment-replies-' + r.id).append($('<p/>', {text: r.content}));
     }
-    if (user) {
-        $('#post-comment-' + c.id).append($('<textarea/>', {id: 'reply-' + c.id + '-text'}));
-        $('#post-comment-' + c.id).append($('<button/>', {class: 'comment-reply', id: 'reply-' + c.id, text: 'Reply'}));
+    if (user && parent == 0) {
+        newComment.append($('<textarea/>', {id: 'reply-' + c.id + '-text'}));
+		let $button = $('<button/>', {class: 'comment-reply', id: 'reply-' + c.id, text: 'Reply'});
+		if (isNew) { // new click handler
+			$button.click(commentClick);
+		}
+		
+        newComment.append($button);
     }
     
     if (c.id > maxCommentId) {
@@ -68,67 +121,25 @@ function renderComment(c) {
 
 // Renders a post in detail.
 function renderFullPost() {
-    $('.post-content').empty();
-    $('.post-content').append($('<section/>', {class: 'post-full'}));
-    
-    // Post info
-    $('.post-full').append($('<section/>', {id: "gallery"}));
-    
     loadImageSlider(post.images);
-    
-    $('.post-full').append($('<h2/>', {text: post.title}));
-    $('.post-full').append($('<p/>', {class: 'post-author', text: 'Author: ' + post.firstname + ' ' + post.lastname}));
-    $('.post-author').append($('<a/>', {href: '/profile?id=' + post.poster}).append($('<button/>', {text: 'View Profile'})));
-    
-    $('.post-full').append($('<p/>', {class: 'post_type', id: 'type'}));
+	
+	// Post type
     if (post.urgency != 0) {
         $('#type').text("Searching for service");
-        $('.post-full').append($('<p/>', {class: 'post_type', text: "Urgency: " + rating_stars[posts[i].urgency]}));
+        $('#type').after($('<p/>', {class: 'post_type', text: "Urgency: " + rating_stars[post.urgency]}));
     } else {
         $('#type').text("Offering service");
-        $('.post-full').append($("<p/>", {class: 'post_type', html: "Rating: " + rating_stars[posts[i].rating]}));
-    }
-        
-    $('.post-full').append($('<p/>', {text: 'Contact: ' + post.phone + ' | ' + post.email}));
-    $('.post-full').append($('<p/>', {text: 'Location: ' + posts[i].country + ", " + posts[i].region + ", " + posts[i].city}));
-    $('.post-full').append($('<p/>', {text: post.content}));
-    
-	// Likes
-    $('.post-full').append($('<p/>', {id: 'likes', text: "Likes: " + post.likes}));
-    if (user) {
-        $('.post-full').append($('<p/>', {class: 'error', id: 'like-err'}));
-        $('.post-full').append($('<button/>', {id: 'like', text: 'Like'}));
-    }
+        $('#type').after($("<p/>", {class: 'post_type', html: "Rating: " + rating_stars[post.rating]}));
+	}
+
     // Comments
-    $('.post-content').append($('<section/>', {class: 'post-comments'}));
-    $('.post-comments').append($('<h3/>', {text: 'Comments'}));
-    
     for (let c of post.comments) {
         renderComment(c);
     }
-    if (user) {
-        $('.post-comments').append($('<p/>', {class: 'error', id: 'comment-err'}));
-        $('.post-comments').append($('<textarea/>', {id: 'reply-text'}));
-        $('.post-comments').append($('<button/>', {class: 'comment-reply', id: 'reply', text: 'Reply'}));
-    }
-    
     // Reviews
-    $('.post-content').append($('<section/>', {class: 'post-reviews'}));
-    $('.post-reviews').append($('<h3/>', {text: 'Reviews'}));
-    
     for (let r of post.reviews) {
         renderReview(r);
     }
-    if (user) {
-        $('.post-reviews').append($('<p/>', {class: 'error', id: 'review-err'}));
-        $('.post-reviews').append($('<input/>', {id: 'review-rate', type: 'number'}));
-        $('.post-reviews').append($('<textarea/>', {id: 'review-text'}));
-        $('.post-reviews').append($('<button/>', {id: 'review', text: 'Leave a Review'}));
-    }
-    // Similar posts
-    $('.post-content').append($('<section/>', {class: 'post-similars'}));
-    $('.post-similars').append($('<h3/>', {text: 'Similar Posts'}));
-    renderSimilar();
 }
 
 
@@ -146,7 +157,7 @@ $(document).ready(() => {
                     post.likes++;
                     $("#likes").text('Likes: ' + post.likes);
                 } else {
-                    $("#like-err").fadeIn().text("You've already followed them.");
+                    $("#like-err").fadeIn().text("You've already liked it.");
                 }
             },
             error: (err) => {
@@ -158,9 +169,9 @@ $(document).ready(() => {
 	// Review button.
     $('#review').click(() => {
         $("#review-err").text("").fadeOut();
-        let content = $("review-text").val();
-        let rate = $("review-rate").val();
-        if (content == "" || rate == "") {
+        let content = $("#review-text").val();
+        let rate = $("#review-rate").val();
+        if (content == "" || rate == "" || !user) {
             return;
         }
         $.ajax({
@@ -170,7 +181,7 @@ $(document).ready(() => {
             data: {id: post.id, "content": content, rating: rate},
             success: (data) => {
                 if (data.status) {
-                    renderReview({id: maxRatingId + 1, rating: rate, "content": content, name: user.firstname + ' ' + user.lastname});
+                    renderReview({id: maxReviewId + 1, rating: rate, "content": content, name: user.info.firstname + ' ' + user.info.lastname});
                 } else {
                     $("#review-err").fadeIn().text("Please fill in the fields properly. Or you've already made a review.");
                 }
@@ -181,33 +192,5 @@ $(document).ready(() => {
         });
     });
     
-    $('.comment-reply').click(function() {
-        $("#comment-err").text("").fadeOut();
-        let content = $($(this).attr("id") + "-text").val();
-        if (content == "") {
-            return;
-        }
-        let to = 0;
-        let reply = $(this).attr("id").split("-");
-        if (reply.length > 0) {
-            to = parseInt(reply[1]);
-        }
-        
-        $.ajax({
-            method: "GET",
-            dataType: "json",
-            url: '/api/comment',
-            data: {id: post.id, "content": content, "to": to},
-            success: (data) => {
-                if (data.status) {
-                    renderComment({id: maxRatingId + 1, rating: rate, "content": content, name: user.firstname + ' ' + user.lastname});
-                } else {
-                    $("#comment-err").fadeIn().text("Please fill in the fields properly.");
-                }
-            },
-            error: (err) => {
-                console.log(err);
-            }
-        });
-    });
+    $('.comment-reply').click(commentClick);
 });

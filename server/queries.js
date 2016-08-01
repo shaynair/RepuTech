@@ -225,9 +225,8 @@ module.exports = function (pool, sessionStore) {
 																		[u_id, url], () => {
 
 				this.simpleQuery(
-					"UPDATE user_images SET is_active = FALSE WHERE u_id = $1 AND img_url != $2", [
-						u_id, url
-					]);
+					"UPDATE user_images SET is_active = FALSE WHERE u_id = $1 AND img_url != $2", 
+						[u_id, url]);
 
 				cb(true);
 
@@ -281,12 +280,25 @@ module.exports = function (pool, sessionStore) {
 		// Returns token on success
 		resetPassStart: function (email, cb) {
 			let token = auth.generatePassword();
-			this.query("UPDATE auth LEFT JOIN login USING (u_id) " +
-				"SET reset_token = $1, reset_time = NOW() WHERE email = $2", 
-							[token,email], (users) => {
+			this.query("SELECT u_id, user_type FROM login WHERE email = $1", 
+							[email], (users) => {
+				if (!users || users.rows.length != 1) {
+					cb(null);
+					return;
+				}
+				
+				let u = users.rows[0];
+				if (u.banned || u.user_type != "Normal") {
+					cb(null); // Invalid - no password
+					return;
+				}
+				this.query("UPDATE auth SET reset_token = $1, reset_time = NOW() WHERE u_id = $2", 
+								[token, u.u_id], (users) => {
 
-				cb(token);
+					cb(token);
+				});
 			});
+
 		},
 
 		resetPassEnd: function (token, cb) {
@@ -317,7 +329,7 @@ module.exports = function (pool, sessionStore) {
 				this.query("SELECT sessionID FROM login WHERE u_id = $1", [u.u_id], 
 																	(users) => {
 					if (users && users.rows.length != 0) { // EXISTS
-						destroySession(users.rows[0].sessionID);
+						this.destroySession(users.rows[0].sessionID);
 					}
 				});
 			});
@@ -433,7 +445,7 @@ module.exports = function (pool, sessionStore) {
 								info.rating = Math.round(info.rating);
 							}
 							// Get images
-							this.query("SELECT img_url FROM user_images WHERE u_id = $1", 
+							this.query("SELECT img_url, is_active FROM user_images WHERE u_id = $1", 
 																		[u_id], (users) => {
 								if (users && users.rows.length > 0) {
 									for (let row of users.rows) {
@@ -498,10 +510,7 @@ module.exports = function (pool, sessionStore) {
 						}
 						if (!(other in tasks)) {
 							tasks[other] = (ret) => {
-								this.getUserName(other, (name) => ret(null, {
-									id: other,
-									"name": name
-								}));
+								this.getUserName(other, (name) => ret(null, name));
 							};
 						}
 					}
@@ -512,13 +521,13 @@ module.exports = function (pool, sessionStore) {
 					let ret = {};
 					// Build conversation threads
 					for (let user in results) {
-						ret[user.id] = {
-							name: user,
+						ret[user] = {
+							name: results[user],
 							messages: []
 						};
 						for (let row of msgs.rows) {
-							if (row.sender == user.id || row.receiver == user.id) {
-								ret[user.id].messages.push({
+							if (row.sender == user || row.receiver == user) {
+								ret[user].messages.push({
 									sender: row.sender,
 									content: row.content
 								});
@@ -547,9 +556,8 @@ module.exports = function (pool, sessionStore) {
 		
 		// Tries to like a post. Return true on success
 		tryLike: function (p_id, u_id, cb) {
-			this.query("SELECT * FROM likes WHERE post = $1 AND liker = $2", [p_id,
-				u_id
-			], (users) => {
+			this.query("SELECT * FROM likes WHERE post = $1 AND liker = $2", 
+											[p_id, u_id], (users) => {
 				if (users && users.rows.length > 0) {
 					cb(false);
 				} else {
@@ -701,7 +709,7 @@ module.exports = function (pool, sessionStore) {
 				}
 
 				let u = users.rows[0]; // UNIQUE KEY
-
+				u.id = u_id;
 				u.is_admin = false;
 				u.activated = true;
 
@@ -743,11 +751,12 @@ module.exports = function (pool, sessionStore) {
 		searchPosts: function (user, query, cb) {
 			query = query.toLowerCase();
 			this.query(
-				"SELECT p_id FROM posts WHERE content LIKE $1 OR title LIKE $1 ORDER BY post_time DESC", 
+				"SELECT p_id FROM posts WHERE LOWER(content) LIKE $1 OR LOWER(title) LIKE $2 ORDER BY post_time DESC", 
 										["%" + query + "%", "%" + query + "%"], (posts) => {
 
 				let ret = [];
-				if (!posts || posts.rows.length != 1) { // NOT FOUND
+				
+				if (!posts || posts.rows.length <= 0) { // NOT FOUND
 					cb(ret);
 					return;
 				}
@@ -761,8 +770,9 @@ module.exports = function (pool, sessionStore) {
 
 				// Execute all tasks then return
 				async.parallel(tasks, (err, results) => {
+					let regex = new RegExp(query, "g");
 					cb(results
-						.map(p => [p, this.computeScore(user, query, p)]) 
+						.map(p => [p, this.computeScore(user, regex, p)]) 
 										// Associate each post with a score
 						.filter(p => p[1] > 5) // Filter out any scores too low
 						.sort((a, b) => a[1] - b[1]) // Sort by the score
@@ -772,18 +782,17 @@ module.exports = function (pool, sessionStore) {
 		},
 
 		// Gets similar posts to another post
-		similarPosts: function (post, cb) {
+		getSimilarPosts: function (post, cb) {
 			if (post == null) {
 				cb([]);
 				return;
 			}
-			query = query.toLowerCase();
 			this.query(
 				"SELECT p_id FROM posts WHERE p_id != $1 ORDER BY post_time DESC", 
 												[post.id], (posts) => {
 
 				let ret = [];
-				if (!posts || posts.rows.length != 1) { // NOT FOUND
+				if (!posts || posts.rows.length <= 0) { // NOT FOUND
 					cb(ret);
 					return;
 				}
@@ -808,7 +817,7 @@ module.exports = function (pool, sessionStore) {
 		},
 
 		// Returns the relative score based on the query and user
-		computeScore: function (user, query, post) {
+		computeScore: function (user, regex, post) {
 			let ret = 0;
 			if (user) {
 				if (user.id == post.poster) {
@@ -832,8 +841,14 @@ module.exports = function (pool, sessionStore) {
 			} else if (post.privacy != "All") {
 				return ret;
 			}
-			ret += post.title.toLowerCase().count(query) * 3; // Title is more important
-			ret += post.content.toLowerCase().count(query);
+			let match = post.title.toLowerCase().match(regex);
+			if (match) {
+				ret += match.length * 5;
+			}
+			match = post.content.toLowerCase().match(regex);
+			if (match) {
+				ret += match.length;
+			}
 			ret += post.rating * 2;
 			ret += post.likes / 10;
 			ret += post.urgency * 2;
@@ -868,7 +883,7 @@ module.exports = function (pool, sessionStore) {
 			this.query("SELECT p_id FROM posts WHERE poster = $1", [u_id], (posts) => {
 
 				let ret = [];
-				if (!posts || posts.rows.length != 1) { // NOT FOUND
+				if (!posts || posts.rows.length <= 0) { // NOT FOUND
 					cb(ret);
 					return;
 				}
@@ -929,7 +944,7 @@ module.exports = function (pool, sessionStore) {
 
 					// get rating
 					this.query(
-						"SELECT reviewer, content, rating FROM reviews WHERE post = $1 ORDER BY review_time DESC", 
+						"SELECT reviewer, content, rating FROM reviews WHERE post = $1 ORDER BY review_time ASC", 
 																					[p_id], (posts) => {
 						let tasks = {}; // Build the user names
 						if (posts && posts.rows.length > 0) {
@@ -969,7 +984,7 @@ module.exports = function (pool, sessionStore) {
 								}
 
 								this.query(
-									"SELECT c_id, reply_to, commenter, content FROM comments WHERE post = $1 ORDER BY comment_time DESC", 
+									"SELECT c_id, reply_to, commenter, content FROM comments WHERE post = $1 ORDER BY comment_time ASC", 
 																			[p_id], (posts) => {
 									tasks = {};
 									if (posts && posts.rows.length > 0) {

@@ -120,6 +120,9 @@ CREATE TABLE posts(
   CHECK(urgency >= 0 AND urgency < 6)
 );
 
+CREATE INDEX ON posts(LOWER(title));
+CREATE INDEX ON posts(LOWER(content));
+
 DROP TABLE IF EXISTS post_images CASCADE;
 CREATE TABLE post_images(
   img_url VARCHAR(24) NOT NULL,

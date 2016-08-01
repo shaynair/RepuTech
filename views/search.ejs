@@ -21,12 +21,12 @@
                 <button id='refine'>Refine</button>
             </section>
 
-            <section class="profile-content">
+            <section class="profile-content" id="profile-content">
             </section>
             
         </main> 
         <script type='text/javascript'>
-          var posts = <%-JSON.stringify(posts)%>
-          var s = <%= search %>
+          var posts = <%-JSON.stringify(posts)%>;
+          var s = "<%= search %>";
         </script>        
 <%- include partials/footer.ejs %>

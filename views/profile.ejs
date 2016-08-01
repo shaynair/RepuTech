@@ -3,7 +3,7 @@
             <section class="sidebar flexbox flexbox-column">
                 
                 <section class="profile-pic">
-                    <img id="pic" alt="avatar" src="<%= (profile.img ? profile.img : "/assets/images/avatar.png")%>" />
+                    <img id="pic" alt="avatar" src="<%= (profile.info.img ? "/assets/images/avatar/" + profile.info.img : "/assets/images/avatar.png")%>" />
                 </section>
 				<section class="profile-menu">
                     <% if (profile.info) { %>

@@ -5,6 +5,7 @@ const sourcemaps = require('gulp-sourcemaps');
 const changed = require('gulp-changed');
 const concat = require('gulp-concat');
 const mocha = require('gulp-mocha');
+const nodemon = require('gulp-nodemon');
 
 // JS
 const babel = require('gulp-babel');
@@ -94,9 +95,18 @@ gulp.task('watch', () => {
 	}
 });
 
-gulp.on('err', () => {
-	process.exit(1);
+// start our server and listen for changes: only after tests have passed
+gulp.task('server', Object.keys(paths), () => {
+    // configure nodemon
+    return nodemon({
+        // the script to run the app
+        script: 'server.js',
+        // this listens to changes in any of these files/routes and restarts the application
+        watch: ["server.js", "server/*"],
+        ext: 'js'
+        // Below i'm using es6 arrow functions but you can remove the arrow and have it a normal .on('restart', function() { // then place your stuff in here }
+    });
 });
 
 // The default task (run on server start)
-gulp.task('default', Object.keys(paths).concat('watch'));
+gulp.task('default', Object.keys(paths).concat('watch').concat('server'));

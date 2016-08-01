@@ -1,7 +1,7 @@
 // Searches posts and filters them with a function.
 function searchPosts(search, filter) {
     if (search == s) {
-        renderPosts(filter); 
+        renderPosts(posts, filter); 
         return;
     }
     
@@ -13,7 +13,7 @@ function searchPosts(search, filter) {
         success: (data) => {
             posts = data;
             s = search;
-            renderPosts(filter); 
+            renderPosts(posts, filter); 
         },
         error: (err) => {
             console.log(err);
@@ -39,15 +39,18 @@ $(document).ready(() => {
         // Send above information to back-end and search through all posts to return matching ones
         
         searchPosts($('#search').val(), (post) => {
+			console.log("1");
             if ((post.urgency == 0) != service) { // urgency = 0 are servicing
                 return false;
             }
             if (post.rating < reputation) {
                 return false;
             }
+			console.log("2");
             if (post.urgency > 0 && post.urgency < urgency) {
                 return false;
             }
+			console.log("3");
             // Either last or first has some of arg
             if (name.length > 0 && !name.split(" ").some((arg) => post.firstname.includes(arg) || post.lastname.includes(arg))) {
                 return false;
@@ -55,8 +58,7 @@ $(document).ready(() => {
             return true;
         });
     });
-
-    
-    $('#refine').click();
+	
+	$("#refine").click();
 });
 

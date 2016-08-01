@@ -36,8 +36,7 @@ exports.handleUpload = (req, name, cb, shouldResize = true) => {
 
 			// Resize to square
 			if (shouldResize) {
-				let lower = Math.min(512, Math.min(meta.width, meta.height));
-				s.resize(lower, lower);
+				s.resize(512, 512);
 			}
 			s.toFile(new_path, (err) => {
 				logger.logError(err);

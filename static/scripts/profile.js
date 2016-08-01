@@ -1,5 +1,5 @@
 // Should pull this info from the database
-var posts = [];
+var userPosts = [];
 var wiki = [];
 var msgs = [];
 let pGot = false;
@@ -32,7 +32,7 @@ function getMessages() {
 
 function getPosts() {
     if (pGot) {
-        renderPosts(); 
+        renderPosts(userPosts); 
         return;
     }
     
@@ -42,9 +42,9 @@ function getPosts() {
         url: '/api/get-posts',
         data: {id: user.id},
         success: (data) => {
-            posts = data;
+            userPosts = data;
             pGot = true;
-            renderPosts(); 
+            renderPosts(userPosts); 
         },
         error: (err) => {
             console.log(err);
@@ -111,7 +111,7 @@ function renderProfileInfo() {
     $('#profile-content').fadeIn();
     
     
-    $('#follow').click(function() {
+    $('#follow').click(() => {
         $("#followers-err").text("").fadeOut();
         $.ajax({
             method: "GET",
@@ -204,11 +204,12 @@ function renderNewListingForm() {
     $("#post-type-search").on("click", () => {
         if ($("#urgency").length == 0) { 
             $("#privacy").after($('<input type="number" pattern="[1-5]" maxlength="1" minlength="1" name="urgency" id="urgency"></input>'));
-            $("#privacy").after($('<p>Urgency (1-5):</p>'));
+            $("#privacy").after($('<p id="urgency-prompt">Urgency (1-5):</p>'));
         }
     });
     $("#post-type-offer").on("click", () => {
         $("#urgency").remove();
+		$("#urgency-prompt").remove();
     });
     
     $('#listing-form').on('submit', function(event) {
@@ -222,7 +223,7 @@ function renderNewListingForm() {
             success: (data) => {
                 if (data.status) {
                     pGot = false;
-                    getPosts();
+                    $("#posts").click();
                 } else {
                     $("#listing-err").fadeIn().text("Please check your input. All fields are required.");
                 }
@@ -238,21 +239,20 @@ function renderMessages() {
     function clickEvent(event, form, uid) {
         event.preventDefault();
         
-        let box = $("#reply-" + uid);
-        if (box.val() == "") {
+        let $box = $("#reply-" + uid);
+        if ($box.val() == "") {
             return;
         }
-        
         $.ajax({
             method: "POST",
             url: '/api/add-message',
-            data: {reply: box.val(), to: uid},
+            data: {reply: $box.val(), "_csrf": csrf, to: uid},
             success: (data) => {
                 if (data.status) {
-                    $('#post-' + uid).append($('<p/>', {text: user.info.firstname + " " + user.info.lastname + ": " + box.val()}));
-                    msgs[uid].messages.unshift({sender: user.id, content: box.val()}); // Add to beginning
+                    $('#post-' + uid + ' h4').after($('<p/>', {text: user.info.firstname + " " + user.info.lastname + ": " + $box.val()}));
+                    msgs[uid].messages.unshift({sender: user.id, content: $box.val()}); // Add to beginning
                     
-                    box.text("");
+                    $box.text("");
                 } else {
                     $('#post-' + uid).append($('<p/>', {text: "An error occurred trying to send that."}));
                 }
@@ -263,12 +263,13 @@ function renderMessages() {
         });
     }
     
-//function renderMessages(msgs) {
     $('#profile-content').stop(true, true).hide().empty();
-    $('#profile-content').append($('<section/>', {id: 'messages'}));
-	$('#profile-content').append($('<h3/>', {text: 'My Messages'}));
+    $('#profile-content').append($('<section/>', {id: 'messages-section'}));
+	$('#messages-section').append($('<h3/>', {text: 'My Messages'}));
+	
     for (let uid in msgs) {
-        $('#profile-content').append($('<section/>', {class: 'post', id: 'post-' + uid}));
+        $('#messages-section').append($('<section/>', {class: 'post', id: 'post-' + uid}));
+		$('#post-' + uid).append($('<h4/>', {text: msgs[uid].name}));
         for (let m of msgs[uid].messages) {
             var send = user.info.firstname + " " + user.info.lastname;
             if (m.sender != user.id) {
@@ -281,7 +282,7 @@ function renderMessages() {
         
         $('#post-' + uid).append(form
                         .append('<input type="hidden" name="_csrf" value="' + csrf + '"></input>')
-                        .append('<input type="text" name="reply" id="reply-"' + uid + '"></input>')
+                        .append('<input type="text" name="reply" id="reply-' + uid + '"></input>')
                         .append($('<button/>', {type: "submit", text: "Reply"}).on("click", (e) => clickEvent(e, form, uid))));
     }
     
@@ -292,8 +293,9 @@ function renderImages() {
     $('#profile-content').stop(true, true).hide().empty();
     $('#profile-content').append($('<section/>', {id: 'images-section'}));
 	$('#images-section').append($('<h3/>', {text: 'My Images'}));
+	$('#images-section').append($('<section/>', {id: 'images-inner', class: 'flexbox flexbox-column'}));
     for (let i of user.info.images) {
-        $('#images-section').append($('<img/>', {src: '/assets/images/avatar/' + i, alt: 'Image'}));
+        $('#images-inner').append($('<img/>', {src: '/assets/images/avatar/' + i, alt: 'Image'}));
         
     }
     $("#images-section").append($("<p/>", {"class": "error", "id": "image-err"}));
@@ -315,6 +317,7 @@ function renderImages() {
         $(this).addClass("active-img");
         $selected = $(this);
     });
+	// Delete image is clicked
     $("#delete-img").on("click", (event) => {
         if ($selected == null) {
             $("#image-err").text("Please select an image.").fadeIn();
@@ -343,12 +346,13 @@ function renderImages() {
             });
         }
     });
+	// Select image is clicked
     $("#select-img").on("click", (event) => {
         if ($selected == null) {
             $("#image-err").text("Please select an image.").fadeIn();
         } else {
             $("#image-err").text("").fadeOut();
-            let srcImg = $selected.attr("src").substr(21);
+            let srcImg = $selected.attr("src").substr(22);
             $.ajax({
                 method: "GET",
                 url: '/api/set-image',
@@ -371,7 +375,7 @@ function renderImages() {
     $('#profile-content').fadeIn();
 }
 
-function renderPosts(filter = null) {
+function renderPosts(posts, filter = null) {
 //function renderPosts(data) {
     $('#profile-content').stop(true, true).hide().empty();
     if (filter == null) { // profile
@@ -384,24 +388,28 @@ function renderPosts(filter = null) {
             continue;
         }
         
-        $('#profile-content').append($('<article/>', {class: 'post', id: 'post-' + i}));
-        let curr_id = '#post-' + i;
+        $('#profile-content').append($('<article/>', {class: 'post', id: 'post-' + p.id}));
+        let curr_id = '#post-' + p.id;
         $(curr_id).append($('<a/>', {href: "/post?id=" + p.id}).append($('<h2/>', {class: 'title', text: p.title})));
-        $(curr_id).append($('<p/>', {class: 'author', text: 'Posted by: ' + p.firstname + ' ' + p.lastname}));
-        $(curr_id).append($('<p/>', {class: 'post_type', id: 'type-' + i}));
-        if (myuser && user.id == myuser.id) {
+		if (filter != null) {// only search
+			$(curr_id).append($('<p/>', {class: 'author', text: 'Posted by: ' + p.firstname + ' ' + p.lastname}));
+		}
+        $(curr_id).append($('<p/>', {class: 'post_type', id: 'type-' + p.id}));
+        if (!filter && myuser && user.id == myuser.id) {
             $(curr_id).append($('<p/>', {class: 'post_type', text: 'Privacy setting: ' + p.privacy}));
         }
         if (p.urgency != 0) {
-            $('#type-' + i).text("Searching for service");
+            $('#type-' + p.id).text("Searching for service");
 			$(curr_id).append($('<p/>', {class: 'post_type', text: "Urgency: " + rating_stars[p.urgency]}));
         } else {
-            $('#type-' + i).text("Offering service");
+            $('#type-' + p.id).text("Offering service");
             $(curr_id).append($("<p/>", {class: 'post_type', html: "Rating: " + rating_stars[p.rating]}));
         }
         
         $(curr_id).append($('<p/>', {class: 'contact-info', text: 'Contact Info: ' + p.phone + ' | ' + p.email}));
-        $(curr_id).append($('<p/>', {class: 'contact-info', text: 'Location: ' + p.country + ", " + p.region + ", " + p.city}));
+		if (filter != null) {// only search
+			$(curr_id).append($('<p/>', {class: 'contact-info', text: 'Location: ' + p.country + ", " + p.region + ", " + p.city}));
+		}
         $(curr_id).append($('<p/>', {class: 'description', text: "Description: " + p.content}));
         
         $(curr_id).append($('<p/>', {class: 'description', text: "Likes: " + p.likes}));
@@ -413,20 +421,22 @@ function renderPosts(filter = null) {
 
 function renderWiki() {
     $('#profile-content').stop(true, true).hide().empty();
-	$('#profile-content').append($('<h3/>', {text: 'My Wiki Posts'}));
+	$('#profile-content').append($('<h3/>', {text: 'Wiki Posts'}));
     $('#profile-content').append($('<section/>', {id: 'profile-wiki'}));
-    $('#profile-wiki').append($('<button/>', {id: 'wiki-new', text: 'New Wiki Post'}));
-    for (let w of wiki) {
-        $('#profile-wiki').append($('<h4/>', {text: w.title}));
-        $('#profile-wiki').append($('<p/>', {text: w.content}));
-    }
-    if (user.id == myuser.id) {
+	if (user.id == myuser.id) {
+		$('#profile-wiki').append($('<button/>', {id: 'wiki-new', text: 'New Wiki Post'}));
+    
         // Click to create new wiki form
         $('#wiki-new').click(function() {
             renderNewWikiForm();
         });
     }
     
+    for (let w of wiki) {
+        $('#profile-wiki').append($('<h4/>', {text: w.title}));
+        $('#profile-wiki').append($('<p/>', {text: w.content}));
+    }
+
     $('#profile-content').fadeIn();
 }
 
@@ -465,7 +475,7 @@ function renderNewWikiForm() {
 function renderNewMessageForm() {
     $('#profile-content').stop(true, true).hide().empty();
     if (user.id != myuser.id) {
-        ReactDOM.render(<WikiNew/>,
+        ReactDOM.render(<MessageNew/>,
                         document.getElementById('profile-content')
         ); 
     }
@@ -477,7 +487,7 @@ function renderNewMessageForm() {
         $.ajax({
             method: "POST",
             url: '/api/add-message',
-            data: {reply: $('#message-content').val(), to: user.id},
+            data: {reply: $('#message-content').val(), "_csrf": csrf, to: user.id},
             success: (data) => {
                 if (data.status) {
                     $("#message-err").text("Sent successfully.").fadeIn();
@@ -603,40 +613,41 @@ $(document).ready(function() {
         
         render: function() {
             return (
-                
-                <form method="post" id="listing-form" class="profile-form">
-                    <h3>Create Listing</h3>
-                    <p>Title:</p>
-                    <input type="text" name="title" id="post-title"/>
-                    <p>Post Type:</p>
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name='posttype' id="post-type-search" value="0" checked={this.state.selectedOption === '0'}
-                            onChange={this.handleOptionChange}/>
-                            Searching for Service
-                        </label>
-                    </div>
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name='posttype' id="post-type-offer" value="1" checked={this.state.selectedOption === '1'}
-                            onChange={this.handleOptionChange}/>
-                            Offering Service
-                        </label>
-                    </div>
-                    <p>Privacy:</p>
-                    <select defaultValue="All" name="privacy" id="privacy">
-                        <option value="All">Viewable by all</option>
-                        <option value="Registered">Viewable by all registered members</option>
-                        <option value="Medium">Viewable by reputable members</option>
-                        <option value="High">Viewable by highly reputable members</option>
-                    </select>
-                    <p>Description:</p>
-                    <textarea id="post-description" name="content" rows="15"></textarea>
-                    <input type="hidden" name="_csrf" value={csrf}></input>
-                    
-                    <p class="error" id="listing-err"></p>
-                    <button type="submit" form="listing-form" value="Submit" id="listing-button">Submit</button>
-                </form>
+                <section id="profile-listing-new">
+					<h3>Create Listing</h3>
+					<form method="post" id="listing-form" class="profile-form">
+						<p>Title:</p>
+						<input type="text" name="title" id="post-title"/>
+						<p>Post Type:</p>
+						<div class="radio">
+							<label>
+								<input type="radio" name='posttype' id="post-type-search" value="0" checked={this.state.selectedOption === '0'}
+								onChange={this.handleOptionChange}/>
+								Searching for Service
+							</label>
+						</div>
+						<div class="radio">
+							<label>
+								<input type="radio" name='posttype' id="post-type-offer" value="1" checked={this.state.selectedOption === '1'}
+								onChange={this.handleOptionChange}/>
+								Offering Service
+							</label>
+						</div>
+						<p>Privacy:</p>
+						<select defaultValue="All" name="privacy" id="privacy">
+							<option value="All">Viewable by all</option>
+							<option value="Registered">Viewable by all registered members</option>
+							<option value="Medium">Viewable by reputable members</option>
+							<option value="High">Viewable by highly reputable members</option>
+						</select>
+						<p>Description:</p>
+						<textarea id="post-description" name="content" rows="15"></textarea>
+						<input type="hidden" name="_csrf" value={csrf}></input>
+						
+						<p class="error" id="listing-err"></p>
+						<button type="submit" form="listing-form" value="Submit" id="listing-button">Submit</button>
+					</form>
+				</section>
             );
         }
     });
@@ -645,45 +656,47 @@ $(document).ready(function() {
     AccountInfo = React.createClass({
         render: function() {
                 return (
-                    <form method="post" id="update-info" class="profile-form">
-                        <h3>Update Account Info</h3>
-                        <fieldset id="personalinfo">
-                            <legend>Personal Information:</legend>
-                            <p>First name:</p>
-                            <input type="text" name="firstname" id="firstname" required defaultValue={user.info.firstname} pattern="[a-zA-Z]{1,50}" title="This field can only consist of letters."/>
-                            <p>Last name:</p>
-                            <input type="text" name="lastname" id="lastname" required defaultValue={user.info.lastname} pattern="[a-zA-Z]{1,50}" title="This field can only consist of letters."/>
-                            <p>City:</p>
-                            <input type="text" id="city" name="city" required defaultValue={user.info.city} pattern="[a-zA-Z]{2,50}" title="This field can only consist of letters."/>
-                            <p>Phone Number:</p>
-                            <input type="text" id="phone" name="phone" required defaultValue={user.info.phone} pattern="[0-9]{10,12}" title="This field can only consist of numbers."/>
-                            <p>Speciality:</p>
-                            <input type="text" id="job" name="job" defaultValue={user.info.job} maxlength="50" pattern="[a-zA-Z ]+" title="This field can only consist of letters."/>
-                            <p>Status:</p>
-                            <input type="text" id="status" name="status" defaultValue={user.info.status} maxlength="50" pattern="[a-zA-Z ]+" title="This field can only consist of letters."/>
-                            <p>Country:</p>
-                            <select id="country" defaultValue="0" required name="country">
-                                <option value="0">Country</option>
-                            </select>
-                            <p>State/Province:</p>
-                            <select id="state" defaultValue="0" required name="state">
-                              <option value="0">State/Province</option>
-                            </select>
-                        </fieldset>
-                        <fieldset id="passinfo">
-                            <legend>Account Information:</legend>
-                            <p>Current Password (must be entered to make any changes): </p>
-                            <input type="password" name="currentpass" id="currentpass"/>
-                            <p>New Password:</p>
-                            <input type="password" name="newpass" id="newpass" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
-                            <p>Retype New Password (same as above): </p>
-                            <input type="password" name="newpass2" id="newpass-confirmation" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
-                        </fieldset>
-                        <input type="hidden" name="id" value={user.id}></input>
-                        <input type="hidden" name="_csrf" value={csrf}></input>
-                        <p class="error" id="update-err"></p>
-                        <button type="submit" form="update-info" value="Update" id="update-button">Update</button>
-                    </form>
+					<section id="profile-settings">
+						<h3>Update Account Info</h3>
+						<form method="post" id="update-info" class="profile-form">
+							<fieldset id="personalinfo">
+								<legend>Personal Information:</legend>
+								<p>First name:</p>
+								<input type="text" name="firstname" id="firstname" required defaultValue={user.info.firstname} pattern="[a-zA-Z]{1,50}" title="This field can only consist of letters."/>
+								<p>Last name:</p>
+								<input type="text" name="lastname" id="lastname" required defaultValue={user.info.lastname} pattern="[a-zA-Z]{1,50}" title="This field can only consist of letters."/>
+								<p>City:</p>
+								<input type="text" id="city" name="city" required defaultValue={user.info.city} pattern="[a-zA-Z]{2,50}" title="This field can only consist of letters."/>
+								<p>Phone Number:</p>
+								<input type="text" id="phone" name="phone" required defaultValue={user.info.phone} pattern="[0-9]{10,12}" title="This field can only consist of numbers."/>
+								<p>Speciality:</p>
+								<input type="text" id="job" name="job" defaultValue={user.info.job} maxlength="50" pattern="[a-zA-Z ]+" title="This field can only consist of letters."/>
+								<p>Status:</p>
+								<input type="text" id="status" name="status" defaultValue={user.info.status} maxlength="50" pattern="[a-zA-Z ]+" title="This field can only consist of letters."/>
+								<p>Country:</p>
+								<select id="country" defaultValue="0" required name="country">
+									<option value="0">Country</option>
+								</select>
+								<p>State/Province:</p>
+								<select id="state" defaultValue="0" required name="state">
+								  <option value="0">State/Province</option>
+								</select>
+							</fieldset>
+							<fieldset id="passinfo">
+								<legend>Account Information:</legend>
+								<p>Current Password (must be entered to make any changes): </p>
+								<input type="password" name="currentpass" id="currentpass"/>
+								<p>New Password:</p>
+								<input type="password" name="newpass" id="newpass" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
+								<p>Retype New Password (same as above): </p>
+								<input type="password" name="newpass2" id="newpass-confirmation" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,15}" title="Password must be between 8-15 characters, and must consist of at least one lower-case letter, one upper-case letter and one digit."/>
+							</fieldset>
+							<input type="hidden" name="id" value={user.id}></input>
+							<input type="hidden" name="_csrf" value={csrf}></input>
+							<p class="error" id="update-err"></p>
+							<button type="submit" form="update-info" value="Update" id="update-button">Update</button>
+						</form>
+					</section>
                 );
         }
     });
