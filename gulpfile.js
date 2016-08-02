@@ -41,14 +41,12 @@ gulp.task('scripts', () => {
 	return gulp.src(paths.scripts[0], {
 			extension: '.js'
 		})
-		.pipe(sourcemaps.init())
 		.pipe(changed(paths.scripts[0]))
 		.pipe(babel({
 			presets: ['es2015', 'react']
 		}))
-		.pipe(uglify())
 		.pipe(concat('all.min.js'))
-		.pipe(sourcemaps.write())
+		.pipe(uglify())
 		.pipe(gulp.dest(paths.scripts[1]));
 });
 
