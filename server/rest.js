@@ -742,9 +742,9 @@ module.exports = {
 				CALLS[r].validate(req);
 				let errors = req.validationErrors();
 				if (errors) {
-					//if (req.session.user && req.session.user.is_admin) {
+					if (req.session.user && req.session.user.is_admin) {
 						logger.logInfo("There were validation errors: " + JSON.stringify(errors));
-					//}
+					}
 					ret.error = "Invalid parameters";
 				} else {
 					CALLS[r].perform(req, main, (ret) => {

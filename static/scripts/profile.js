@@ -93,11 +93,11 @@ var rating_stars = [
 function renderProfileInfo() {
     $('#profile-content').stop(true, true).hide().empty();
     $('#profile-content').append($('<section/>', {id: 'profile-general'}));
-    $('#profile-general').append($('<h3/>', {id: 'name', text: user.firstname + ' ' + user.lastname}));
+    $('#profile-general').append($('<h3/>', {id: 'name', text: (user.is_admin ? '[Staff] ' : '') + user.firstname + ' ' + user.lastname}));
     $('#profile-general').append($('<p/>', {id: 'profile-status', text: 'Status: ' + user.info.status}));
     $('#profile-general').append($('<h4/>', {text: 'Reputation:'}));
     
-    $('#profile-general').append($("<p/>", {id: 'rating', html: "Rating: " + rating_stars[user.info.rating]}));
+    $('#profile-general').append($("<p/>", {id: 'rating', html: "Rating: " + rating_stars[user.is_admin ? 5 : user.info.rating]}));
     
     $('#profile-general').append($('<p/>', {id: 'followers', text: 'Followers: ' + user.info.followers}));
     $('#followers').append($('<p/>', {id: 'followers-err', 'class': 'error', text: ''}));

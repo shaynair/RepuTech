@@ -54,9 +54,7 @@
     "passport": "*",
     "passport-facebook": "*",
     "passport-google-oauth20": "*",
-    "passport-github": "*",
     "passport-linkedin": "*",
-    "passport-reddit": "*",
     
     "monitor": "*",
     

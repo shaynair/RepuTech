@@ -182,6 +182,7 @@ module.exports = function (pool, sessionStore) {
 		banUser: function (u_id, origin, cb) {
 			this.query("UPDATE login SET banned = TRUE WHERE " +
 				"u_id = $1 AND u_id != $2", [u_id, origin], cb);
+			this.destroyUserSession(u_id);
 		},
 
 		// Edits user info
@@ -358,13 +359,17 @@ module.exports = function (pool, sessionStore) {
 					cb(null);
 				}
 
-				// Release session if online
-				this.query("SELECT sessionID FROM login WHERE u_id = $1", [u.u_id], 
-																	(users) => {
-					if (users && users.rows.length != 0) { // EXISTS
-						this.destroySession(users.rows[0].sessionID);
-					}
-				});
+				destroyUserSession(u.id);
+			});
+		},
+		
+		destroyUserSession: function (u_id) {
+			// Release session if online
+			this.query("SELECT sessionID FROM login WHERE u_id = $1", [u_id], 
+																(users) => {
+				if (users && users.rows.length != 0) { // EXISTS
+					this.destroySession(users.rows[0].sessionID);
+				}
 			});
 		},
 
@@ -736,7 +741,7 @@ module.exports = function (pool, sessionStore) {
 			// Get user from database
 			this.query("SELECT * FROM login WHERE u_id = $1", [u_id], (users) => {
 
-				if (!users || users.rows.length != 1) { // NOT FOUND
+				if (!users || users.rows.length != 1 || users.rows[0].banned) { // NOT FOUND
 					if (cb) {
 						cb(null);
 					}
@@ -807,6 +812,7 @@ module.exports = function (pool, sessionStore) {
 				async.parallel(tasks, (err, results) => {
 					let regex = new RegExp(query, "g");
 					cb(results
+						.filter(p => p != null) // filter null posts
 						.map(p => [p, this.computeScore(user, regex, p)]) 
 										// Associate each post with a score
 						.filter(p => p[1] > 5) // Filter out any scores too low
@@ -842,6 +848,7 @@ module.exports = function (pool, sessionStore) {
 				// Execute all tasks then return
 				async.parallel(tasks, (err, results) => {
 					cb(results
+						.filter(p => p != null) // filter null posts
 						.map(p => [p, this.relativeScore(post, p)]) // Associate each post with a score
 						.filter(p => p[1] > 5) // Filter out any scores too low
 						.sort((a, b) => a[1] - b[1]) // Sort by the score
@@ -932,7 +939,7 @@ module.exports = function (pool, sessionStore) {
 
 				// Execute all tasks then return
 				async.parallel(tasks, (err, results) => {
-					cb(results);
+					cb(results.filter(p => p != null));
 				});
 			});
 		},
@@ -962,7 +969,7 @@ module.exports = function (pool, sessionStore) {
 
 				this.getUser(p.poster, (user) => {
 					if (!user) {
-						cb(null); // Impossible
+						cb(null); // Probably banned
 						return;
 					}
 
