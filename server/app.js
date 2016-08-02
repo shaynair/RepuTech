@@ -55,7 +55,7 @@ app.use(helmet({
 
 // Static files
 app.use(favicon(__dirname + '/../public/favicon.ico'));
-app.use(express.static(__dirname + '/../public', { maxAge: '1d' }));
+app.use(express.static(__dirname + '/../public', { maxAge: '14d' }));
 
 // Sessions
 const RedisStore = redis(session);
