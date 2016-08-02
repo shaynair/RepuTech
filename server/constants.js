@@ -38,10 +38,10 @@ exports.ADMIN_LAST_NAME = "Admin";
 
 // OAUTH
 exports.OAUTH_KEYS = {
-	Facebook: {
+	/*Facebook: {
 		KEY: "427043824132968",
 		SECRET: "cbe10b7e7f08235fe6a82a23d911cc4a"
-	},
+	},*/
 	LinkedIn: {
 		KEY: "77dy87e08dm9y4",
 		SECRET: "70Jlv1wbz2KfkSYN"
