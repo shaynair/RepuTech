@@ -79,14 +79,6 @@ gulp.task('css', () => {
 		.pipe(gulp.dest(paths.css[1]))
 });
 
-// Run test cases
-gulp.task('tests', () => {
-	return gulp.src(paths.tests[0], {
-			extension: '.js'
-		})
-		.pipe(mocha());
-})
-
 gulp.task('watch', () => {
 	for (let s in paths) {
 		gulp.watch(paths[s][0], [s]);
@@ -97,13 +89,19 @@ gulp.task('watch', () => {
 gulp.task('server', Object.keys(paths), () => {
     // configure nodemon
     return nodemon({
-        // the script to run the app
         script: 'server.js',
-        // this listens to changes in any of these files/routes and restarts the application
         watch: ["server.js", "server/*"],
         ext: 'js'
-        // Below i'm using es6 arrow functions but you can remove the arrow and have it a normal .on('restart', function() { // then place your stuff in here }
     });
+});
+
+
+// Run test cases
+gulp.task('tests', ['css', 'scripts', 'icon', 'images'], () => {
+	return gulp.src(paths.tests[0], {
+			extension: '.js'
+		})
+		.pipe(mocha());
 });
 
 // The default task (run on server start)

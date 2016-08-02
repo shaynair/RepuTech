@@ -139,6 +139,9 @@ module.exports = {
 	// Formatted query handler
 	"db": db,
 	
+	// Express
+	"app": app,
+	
 	// Authenticator
 	"passport": passport,
 
