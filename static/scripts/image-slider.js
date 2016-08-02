@@ -1,15 +1,15 @@
 // Dynamic image slider, slightly modified from W7 Lab 6: jQuery+ UI
 
-function loadImageSlider(images, title = "RepuTech") {
+function loadImageSlider(images, baseUrl = '/assets/images/', title = "RepuTech") {
     // Load the correct images
     
     if (!Array.isArray(images)) {
         // Placeholder images
-        images = ["/assets/images/computer-2.jpg",
-            "/assets/images/computer-3.jpg",
-            "/assets/images/smartphone-1.jpg",
-            "/assets/images/computer-1.jpg",
-            "/assets/images/mac-1.jpg"
+        images = ["computer-2.jpg",
+            "computer-3.jpg",
+            "smartphone-1.jpg",
+            "computer-1.jpg",
+            "mac-1.jpg"
         ];
     }
     let $slider = $('<ul/>', {
@@ -27,7 +27,7 @@ function loadImageSlider(images, title = "RepuTech") {
         });
         
         let $img = $('<img/>', {
-            src: item,
+            src: baseUrl + item,
             alt: title
         });
         

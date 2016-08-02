@@ -38,7 +38,7 @@ function commentClick() {
         data: {id: post.id, "content": content, "to": to},
         success: (data) => {
             if (data.status) {
-                renderComment({id: maxCommentId + 1, "content": content, name: user.info.firstname + ' ' + user.info.lastname, comments: []},
+                renderComment({id: maxCommentId + 1, "content": content, name: user.firstname + ' ' + user.lastname, comments: []},
 					true, to);
             } else {
                 $("#comment-err").fadeIn().text("Please fill in the fields properly.");
@@ -121,7 +121,7 @@ function renderComment(c, isNew = false, parent = 0) {
 
 // Renders a post in detail.
 function renderFullPost() {
-    loadImageSlider(post.images);
+    loadImageSlider(post.images, '/assets/images/post/');
 	
 	// Post type
     if (post.urgency != 0) {
@@ -181,7 +181,7 @@ $(document).ready(() => {
             data: {id: post.id, "content": content, rating: rate},
             success: (data) => {
                 if (data.status) {
-                    renderReview({id: maxReviewId + 1, rating: rate, "content": content, name: user.info.firstname + ' ' + user.info.lastname});
+                    renderReview({id: maxReviewId + 1, rating: rate, "content": content, name: user.firstname + ' ' + user.lastname});
                 } else {
                     $("#review-err").fadeIn().text("Please fill in the fields properly. Or you've already made a review.");
                 }

@@ -1,5 +1,5 @@
 DROP TYPE IF EXISTS user_types CASCADE;
-CREATE TYPE user_types AS ENUM('Normal', 'Facebook', 'Twitter', 'Google', 'GitHub', 'LinkedIn', 'BitBucket', 'Reddit', 'Dropbox');
+CREATE TYPE user_types AS ENUM('Normal', 'Facebook', 'Twitter', 'Google', 'LinkedIn');
 
 DROP TYPE IF EXISTS privilege_types CASCADE;
 CREATE TYPE privilege_types AS ENUM('Inactivated', 'Normal', 'Admin');
@@ -10,12 +10,14 @@ CREATE TYPE privacy_types AS ENUM('All', 'Registered', 'High', 'Medium');
 DROP TABLE IF EXISTS login CASCADE;
 CREATE TABLE login(
   u_id SERIAL NOT NULL,
+  firstname VARCHAR(100) NOT NULL,
+  lastname VARCHAR(100) NOT NULL,
   email VARCHAR(100) NOT NULL,
   user_type user_types NOT NULL,
   creation_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   login_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   banned BOOLEAN NOT NULL DEFAULT FALSE,
-  ip_address VARCHAR(16) DEFAULT NULL,
+  ip_address VARCHAR(24) DEFAULT NULL,
   sessionID VARCHAR(64) DEFAULT NULL,
   
   PRIMARY KEY (u_id),
@@ -63,8 +65,6 @@ CREATE TABLE address_region (
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users(
   u_id INTEGER,
-  firstname VARCHAR(50) NOT NULL,
-  lastname VARCHAR(50) NOT NULL,
   phone BIGINT NOT NULL,
   region_id INTEGER,
   city VARCHAR(50) NOT NULL,
@@ -204,7 +204,7 @@ CREATE TABLE wiki (
 
 DROP TABLE IF EXISTS ip_bans CASCADE;
 CREATE TABLE ip_bans (
-  ip_address VARCHAR(16) NOT NULL,
+  ip_address VARCHAR(24) NOT NULL,
   
   PRIMARY KEY (ip_address)
 );

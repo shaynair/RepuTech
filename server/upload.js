@@ -9,7 +9,7 @@ const logger = require('./logger');
 
 // Method to handle an image upload, "name" is the field name
 // cb is a function that takes in a string (filename)
-exports.handleUpload = (req, name, cb, shouldResize = true) => {
+exports.handleUpload = (req, name, folder, shouldResize, cb) => {
 	let form = new formidable.IncomingForm();
 	form.parse(req, (err, fields, files) => {
 		logger.logError(err);
@@ -27,9 +27,14 @@ exports.handleUpload = (req, name, cb, shouldResize = true) => {
 			file_name = old_path.substr(index),
 			new_file_name = shortid.generate(), // Generate a new filename
 			new_file_full_name = new_file_name + '.' + file_ext,
-			new_path = path.join(__dirname, '../static/images/avatar/',
-				new_file_full_name);
+			new_dir = path.join(__dirname, '../static/images/' + folder + '/'),
+			new_path = path.join(new_dir, new_file_full_name);
 
+		// Makes a directory
+		if (!fs.existsSync(new_dir)){
+			fs.mkdirSync(new_dir);
+		}
+			
 		let s = sharp(old_path);
 		s.metadata((err, meta) => {
 			logger.logError(err);

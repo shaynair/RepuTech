@@ -93,7 +93,7 @@ var rating_stars = [
 function renderProfileInfo() {
     $('#profile-content').stop(true, true).hide().empty();
     $('#profile-content').append($('<section/>', {id: 'profile-general'}));
-    $('#profile-general').append($('<h3/>', {id: 'name', text: user.info.firstname + ' ' + user.info.lastname}));
+    $('#profile-general').append($('<h3/>', {id: 'name', text: user.firstname + ' ' + user.lastname}));
     $('#profile-general').append($('<p/>', {id: 'profile-status', text: 'Status: ' + user.info.status}));
     $('#profile-general').append($('<h4/>', {text: 'Reputation:'}));
     
@@ -170,8 +170,8 @@ function renderSettings() {
             data: info,
             success: (data) => {
                 if (data.status) {
-                    user.info.firstname = $("#firstname").val();
-                    user.info.lastname = $("#lastname").val();
+                    user.firstname = $("#firstname").val();
+                    user.lastname = $("#lastname").val();
                     user.info.status = $("#status").val();
                     user.info.job = $("#job").val();
                     user.info.city = $("#city").val();
@@ -249,7 +249,7 @@ function renderMessages() {
             data: {reply: $box.val(), "_csrf": csrf, to: uid},
             success: (data) => {
                 if (data.status) {
-                    $('#post-' + uid + ' h4').after($('<p/>', {text: user.info.firstname + " " + user.info.lastname + ": " + $box.val()}));
+                    $('#post-' + uid + ' h4').after($('<p/>', {text: user.firstname + " " + user.lastname + ": " + $box.val()}));
                     msgs[uid].messages.unshift({sender: user.id, content: $box.val()}); // Add to beginning
                     
                     $box.text("");
@@ -271,7 +271,7 @@ function renderMessages() {
         $('#messages-section').append($('<section/>', {class: 'post', id: 'post-' + uid}));
 		$('#post-' + uid).append($('<h4/>', {text: msgs[uid].name}));
         for (let m of msgs[uid].messages) {
-            var send = user.info.firstname + " " + user.info.lastname;
+            var send = user.firstname + " " + user.lastname;
             if (m.sender != user.id) {
                 send = msgs[uid].name;
             }
@@ -662,9 +662,9 @@ $(document).ready(function() {
 							<fieldset id="personalinfo">
 								<legend>Personal Information:</legend>
 								<p>First name:</p>
-								<input type="text" name="firstname" id="firstname" required defaultValue={user.info.firstname} pattern="[a-zA-Z]{1,50}" title="This field can only consist of letters."/>
+								<input type="text" name="firstname" id="firstname" required defaultValue={user.firstname} pattern="[a-zA-Z]{1,50}" title="This field can only consist of letters."/>
 								<p>Last name:</p>
-								<input type="text" name="lastname" id="lastname" required defaultValue={user.info.lastname} pattern="[a-zA-Z]{1,50}" title="This field can only consist of letters."/>
+								<input type="text" name="lastname" id="lastname" required defaultValue={user.lastname} pattern="[a-zA-Z]{1,50}" title="This field can only consist of letters."/>
 								<p>City:</p>
 								<input type="text" id="city" name="city" required defaultValue={user.info.city} pattern="[a-zA-Z]{2,50}" title="This field can only consist of letters."/>
 								<p>Phone Number:</p>

@@ -14,7 +14,7 @@
                     <button id="reset-pass" value="Reset Password">Reset Password</button>
 				</form>
                 <% for (let o in oauth) { %>
-                    <a href="/<%= oauth[o].URL %>"><button>Log In with <%= o %></button></a>
+                    <a href="/auth/<%= o.toLowerCase() %>"><button>Log In with <%= o %></button></a>
                 <% } %>
 			</section>
 		</main>

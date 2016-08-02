@@ -48,7 +48,7 @@
 				</form>
                 
                 <% for (let o in oauth) { %>
-                    <a href="/<%= oauth[o].URL %>"><button>Sign Up with <%= o %></button></a>
+                    <a href="/auth/<%= o.toLowerCase() %>"><button>Sign Up with <%= o %></button></a>
                 <% } %>
 			</section>
 		</main>

@@ -12,6 +12,7 @@ const expressValidator = require('express-validator');
 const favicon = require('serve-favicon');
 const pg = require('pg');
 const Pool = require('pg-pool');
+const passport = require('passport');
 
 // File requires
 const c = require('./constants');
@@ -103,6 +104,11 @@ app.use(csrf({
 	cookie: true
 }));
 
+
+// OAUTH
+app.use(passport.initialize());
+//app.use(passport.session());
+
 if (!process.env.SECURE) { // development
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
@@ -119,6 +125,7 @@ module.exports = {
 		db.checkAndInitialize();
 
 		// Configure routes
+		auth.strategies(passport, db);
 		auth.configure(app, module.exports);
 		rest.configure(app, module.exports);
 		routes.configure(app, module.exports);
@@ -131,6 +138,9 @@ module.exports = {
 
 	// Formatted query handler
 	"db": db,
+	
+	// Authenticator
+	"passport": passport,
 
 	// Helper function to keep IP consistent
 	setIP: (req) => {

@@ -225,7 +225,8 @@ const CALLS = {
 			req.assert('pass2', 'Do not match').equals(req.body.pass);
 		},
 		perform: (req, main, cb) => {
-			main.db.register(req.body.email, 'Normal', req.body.pass, 'Normal', (user) => {
+			main.db.register(req.body.email, 'Normal', req.body.firstname, req.body.lastname,
+									req.body.pass, 'Normal', (user) => {
 				let ret = {};
 				if (!user) {
 					ret.status = "Exists";
@@ -517,7 +518,7 @@ const CALLS = {
 		post: true,
 		validate: (req) => {},
 		perform: (req, main, cb) => {
-			upload.handleUpload(req, "file", (res) => {
+			upload.handleUpload(req, "file", "avatar", true, (res) => {
 				if (!res) { // failed
 					cb(null);
 					return;
@@ -526,6 +527,28 @@ const CALLS = {
 				req.session.user.info.images.push(res);
 				req.session.save();
 				main.db.addImage(req.session.user.id, res, (ret) => cb(null));
+			});
+		}
+	},
+	
+	// Image upload
+	'new-post-image': {
+		logged_in: true,
+		api: true,
+		redirect_url: '/post?id=',
+		post: true,
+		validate: (req) => {
+			req.checkQuery('id', 'Required field').notEmpty();
+			req.checkQuery('id', 'Must be a number').isNumeric();
+			req.sanitize('id').toInt();
+		},
+		perform: (req, main, cb) => {
+			upload.handleUpload(req, "file", "post", false, (res) => {
+				if (!res) { // failed
+					cb(null);
+					return;
+				}
+				main.db.addPostImage(req.session.user.id, req.query.id, res, (ret) => cb(req.query.id));
 			});
 		}
 	},
@@ -670,8 +693,8 @@ const CALLS = {
 				req.body.newpass, req.body.currentpass, (ret) => {
 
 					// update the user info session
-					req.session.user.info.firstname = req.body.firstname;
-					req.session.user.info.lastname = req.body.lastname;
+					req.session.user.firstname = req.body.firstname;
+					req.session.user.lastname = req.body.lastname;
 					req.session.user.info.phone = req.body.phone;
 					req.session.user.info.city = req.body.city;
 					req.session.user.info.job = req.body.job;
@@ -725,11 +748,12 @@ module.exports = {
 					ret.error = "Invalid parameters";
 				} else {
 					CALLS[r].perform(req, main, (ret) => {
-						if (ret) {
+						if (CALLS[r].redirect_url) {
+							res.redirect(CALLS[r].redirect_url + (ret != null ? ret : ""));
+						} else if (ret) {
 							res.send(JSON.stringify(ret));
 						} else {
-							res.redirect(CALLS[r].redirect_url ? 
-									CALLS[r].redirect_url : "/");
+							res.redirect("/");
 						}
 					});
 					return;

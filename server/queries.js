@@ -123,7 +123,7 @@ module.exports = function (pool, sessionStore) {
 		},
 
 		// Return a user object if success, otherwise error code
-		register: function (email, user_type, password = null, privilege = 'Normal', cb) {
+		register: function (email, user_type, firstname, lastname, password = null, privilege = 'Normal', cb) {
 			// Check if exists
 			let hashedPassword = password;
 			if (password) {
@@ -140,8 +140,8 @@ module.exports = function (pool, sessionStore) {
 
 				// Add to database
 				this.query(
-					"INSERT INTO login (email, user_type) VALUES ($1, $2) RETURNING u_id", 
-														[email, user_type], (users) => {
+					"INSERT INTO login (email, user_type, firstname, lastname) VALUES ($1, $2, $3, $4) RETURNING u_id", 
+														[email, user_type, firstname, lastname], (users) => {
 
 					if (!users || users.rows.length != 1 || users.rows[0].u_id <= 0) {
 						if (cb) {
@@ -159,6 +159,8 @@ module.exports = function (pool, sessionStore) {
 					}
 					if (cb) {
 						cb({
+							"firstname": firstname,
+							"lastname": lastname,
 							"email": email,
 							"id": u_id,
 							"is_admin": privilege == "Admin",
@@ -182,30 +184,33 @@ module.exports = function (pool, sessionStore) {
 				"u_id = $1 AND u_id != $2", [u_id, origin], cb);
 		},
 
+		// Edits user info
 		editUser: function (u_id, firstname, lastname, phone, region_id, city, job,
 											status, ipaddr, sID, cb) {
 			// Check if exists
 			this.query("SELECT u_id FROM users WHERE u_id = $1", [u_id], (users) => {
 
 				if (users && users.rows.length != 0) { // EXISTS
-					this.simpleQuery("UPDATE users SET firstname = $1, lastname = $2, " +
-						"phone = $3, region_id = $4, city = $5, job = $6, status = $7 WHERE u_id = $8", 
-							[firstname, lastname, phone, region_id, city, job, status, u_id]);
+					this.simpleQuery("UPDATE users SET " +
+						"phone = $1, region_id = $2, city = $3, job = $4, status = $5 WHERE u_id = $6", 
+							[phone, region_id, city, job, status, u_id]);
 				} else { // ADD NEW ENTRY
-					this.simpleQuery("INSERT INTO users (u_id, firstname, lastname, " +
-						"phone, region_id, city, job, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)", 
-							[u_id, firstname, lastname, phone, region_id, city, job, status]);
+					this.simpleQuery("INSERT INTO users (u_id, " +
+						"phone, region_id, city, job, status) VALUES ($1, $2, $3, $4, $5, $6)", 
+							[u_id, phone, region_id, city, job, status]);
 				}
 
 				this.simpleQuery(
-					"UPDATE login SET ip_address = $1, sessionID = $2 WHERE u_id = $3", 
-						[ipaddr, sID, u_id]);
+					"UPDATE login SET firstname = $1, lastname = $2, "
+						+ "ip_address = $3, sessionID = $4 WHERE u_id = $3", 
+						[firstname, lastname, ipaddr, sID, u_id]);
 				if (cb) {
 					cb();
 				}
 			});
 		},
 
+		// Adds image to profile
 		addImage: function (u_id, url, cb) {
 			this.query(
 				"INSERT INTO user_images (u_id, img_url) VALUES ($1, $2) RETURNING is_active", 
@@ -219,6 +224,33 @@ module.exports = function (pool, sessionStore) {
 			});
 		},
 
+		// Adds image to post
+		addPostImage: function (u_id, p_id, url, cb) {
+			// Check if valid
+			this.query(
+				"SELECT p_id FROM posts WHERE poster = $1 AND p_id = $2", 
+												[u_id, p_id], (posts) => {
+
+				if (!posts || posts.rows.length == 0) {
+					cb(false);
+					return;
+				}
+				// Exists, now add
+				this.query(
+					"INSERT INTO post_images (p_id, img_url) VALUES ($1, $2) RETURNING p_id", 
+															[p_id, url], (images) => {
+
+					if (images && images.rows.length != 0) { // EXISTS
+						cb(true);
+					} else {
+						cb(false);
+					}
+				});
+			});
+
+		},
+		
+		// Sets main profile image
 		setImage: function (u_id, url, cb) {
 			this.query(
 				"UPDATE user_images SET is_active = TRUE WHERE u_id = $1 AND img_url = $2", 
@@ -233,6 +265,7 @@ module.exports = function (pool, sessionStore) {
 			});
 		},
 
+		// Deletes a profile image
 		deleteImage: function (u_id, url, cb) {
 			this.query("DELETE FROM user_images WHERE u_id = $1 AND img_url = $2", 
 													[u_id, url], (images) => {
@@ -371,23 +404,29 @@ module.exports = function (pool, sessionStore) {
 						return;
 					}
 					this.innerLogIn(u.u_id, email, u.user_type, u.privilege == "Admin",
-						u.sessionID, sID, ipaddr, cb);
+						u.firstname, u.lastname, u.sessionID, sID, ipaddr, cb);
 				});
 			});
 		},
+		
+		updateLogin: function (u_id, ipaddr, newSID) {
+			this.simpleQuery("UPDATE login SET login_time = NOW(), " +
+				"ip_address = $1, sessionID = $2 WHERE u_id = $3", [ipaddr, newSID, u_id]);
+		},
 
 		// Helper function for logging in. Updates IP and session IDs.
-		innerLogIn: function (u_id, email, type, admin, oldSID, newSID, ipaddr, cb) {
+		innerLogIn: function (u_id, email, type, admin, firstname, lastname, oldSID, newSID, ipaddr, cb) {
 			// Destroy the old session
 			if (oldSID) {
 				this.destroySession(oldSID);
 			}
 			// Update login time
-			this.simpleQuery("UPDATE login SET login_time = NOW(), " +
-				"ip_address = $1, sessionID = $2 WHERE u_id = $3", [ipaddr, newSID, u_id]);
+			this.updateLogin(u_id, ipaddr, newSID);
 
 			this.getUserData(u_id, (info) => {
 				cb({
+					"firstname": firstname,
+					"lastname": lastname,
 					"email": email,
 					"id": u_id,
 					"is_admin": admin,
@@ -410,8 +449,6 @@ module.exports = function (pool, sessionStore) {
 				if (users && users.rows.length > 0) {
 					let u = users.rows[0];
 					let info = {
-						"firstname": u.firstname,
-						"lastname": u.lastname,
 						"phone": u.phone,
 						"city": u.city,
 						"status": u.status,
@@ -463,8 +500,6 @@ module.exports = function (pool, sessionStore) {
 				} else {
 					// No data found
 					cb({
-						"firstname": '',
-						"lastname": '',
 						"phone": '',
 						"city": 'Unknown City',
 						"status": '',
@@ -662,7 +697,7 @@ module.exports = function (pool, sessionStore) {
 		},
 
 		// Returns a user object if email and type are right, otherwise error code
-		logInThirdParty: function (email, user_type, ipaddr, sID, cb) {
+		logInThirdParty: function (email, user_type, cb) {
 
 			// Get user from database
 			this.query("SELECT * FROM login WHERE email = $1", [email], (users) => {
@@ -689,8 +724,8 @@ module.exports = function (pool, sessionStore) {
 					return;
 				}
 
-				this.innerLogIn(u.u_id, email, user_type, false, u.sessionID, sID,
-					ipaddr, cb);
+				this.innerLogIn(u.u_id, email, user_type, false, u.firstname, u.lastname,
+					u.sessionID, u.sessionID, u.ip_address, cb);
 
 			});
 		},
@@ -732,7 +767,7 @@ module.exports = function (pool, sessionStore) {
 		getUserName: function (u_id, cb) {
 
 			// Get user from database
-			this.query("SELECT firstname, lastname FROM users WHERE u_id = $1", [u_id],
+			this.query("SELECT firstname, lastname FROM login WHERE u_id = $1", [u_id],
 				(users) => {
 
 					if (!users || users.rows.length != 1) { // NOT FOUND
@@ -936,8 +971,8 @@ module.exports = function (pool, sessionStore) {
 					post.country = user.info.country;
 					post.city = user.info.city;
 					post.region = user.info.region;
-					post.firstname = user.info.firstname;
-					post.lastname = user.info.lastname;
+					post.firstname = user.firstname;
+					post.lastname = user.lastname;
 					post.phone = user.info.phone;
 					post.email = user.email;
 					post.images = [];

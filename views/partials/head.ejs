@@ -60,7 +60,7 @@
                     <% if (user.is_admin) { %>
                         <a href="/admin"><button>Admin</button></a>
                     <% } %>
-                    <a href="/profile"><button><%= (user.info.firstname ? user.info.firstname : user.email) %></button></a>
+                    <a href="/profile"><button><%= (user.firstname ? user.firstname : user.email) %></button></a>
                     <a href="/logout"><button>Logout</button></a>
                 <% } %>
 			</section>

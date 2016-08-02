@@ -3,6 +3,13 @@
        <main>
              <section class="post-content" id="post-content">
 				<section id="gallery"></section>
+				
+				<% if (user && post.poster == user.id) { %>
+					<form id="upload" method="post" action="/api/new-post-image?_csrf=<%= csrfToken %>&id=<%= post.id %>" enctype="multipart/form-data">
+						<input type="file" name="file" accept="image/*"></input>
+						<button id="add-new-post-img" type="submit">Add New Image</button>
+					</form>
+				<% } %>
 				<section class="post-full">
 					<h2><%= post.title %></h2>
 					<p class="post-author">
