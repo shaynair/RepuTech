@@ -78,8 +78,6 @@ CREATE TABLE users(
   CHECK(phone > 0)
 );
 
-CREATE INDEX name ON users(firstname, lastname);
-
 DROP TABLE IF EXISTS user_images CASCADE;
 CREATE TABLE user_images(
   img_url VARCHAR(24) NOT NULL,
