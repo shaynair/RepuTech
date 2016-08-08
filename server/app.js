@@ -65,7 +65,7 @@ const sessionInstance = session({
 	name: 'session',
 	resave: false, // Redis implements touch
 	saveUninitialized: false,
-	store: sessionStore,
+	//store: sessionStore,
 	cookie: {
 		secure: process.env.SECURE || false,
 		maxAge: 6 * 60 * 60 * 1000
