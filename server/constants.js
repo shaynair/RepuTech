@@ -4,7 +4,7 @@ exports.SITE_URL = (process.env.SECURE ? 'https://reputech.herokuapp.com' : 'htt
 
 // Postgres information
 exports.DATABASE_INFO = {
-	host: 'localhost',//'138.51.244.189',//host: 'ec2-54-243-42-108.compute-1.amazonaws.com',
+	host: '138.51.244.189',//host: 'ec2-54-243-42-108.compute-1.amazonaws.com',
 	port: 5432,
 	database: 'reputech', //database: 'ddu88fjcr9a852',
 	user: 'heroku',//user: 'eprjxyhertbqxx',
