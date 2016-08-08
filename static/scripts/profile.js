@@ -400,7 +400,7 @@ function renderPosts(posts, filter = null) {
         }
         if (p.urgency != 0) {
             $('#type-' + p.id).text("Searching for service");
-			$(curr_id).append($('<p/>', {class: 'post_type', text: "Urgency: " + rating_stars[p.urgency]}));
+			$(curr_id).append($('<p/>', {class: 'post_type', html: "Urgency: " + rating_stars[p.urgency]}));
         } else {
             $('#type-' + p.id).text("Offering service");
             $(curr_id).append($("<p/>", {class: 'post_type', html: "Rating: " + rating_stars[p.rating]}));

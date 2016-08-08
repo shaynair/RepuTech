@@ -16,7 +16,6 @@ exports.handleUpload = (req, name, folder, shouldResize, cb) => {
 
 		// Only images are allowed
 		if (!files.file.type.startsWith('image/')) {
-			console.log(files.file.type);
 			fs.unlinkSync(files.file.path); // Delete it
 			cb(null);
 			return;
@@ -48,7 +47,7 @@ exports.handleUpload = (req, name, folder, shouldResize, cb) => {
 				logger.logError(err);
 				
 				// Delete old file
-				fs.unlinkSync(old_path);
+				//fs.unlinkSync(old_path);
 				
 				// Success
 				cb(new_file_full_name);

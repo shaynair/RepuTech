@@ -38,7 +38,7 @@
 					</section>
 					<h3>Reviews</h3>
 					<section class="post-reviews">
-						<% if (user) { %>
+						<% if (user && user.id != post.poster) { %>
 							<p class="error" id="review-err"></p>
 							<p>Rating (1-5): </p>
 							<input id="review-rate" type="number"></input>

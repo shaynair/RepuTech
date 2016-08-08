@@ -4,12 +4,12 @@ exports.SITE_URL = (process.env.SECURE ? 'https://reputech.herokuapp.com' : 'htt
 
 // Postgres information
 exports.DATABASE_INFO = {
-	host: (process.env.SECURE ? '138.51.244.189' : 'localhost'),//host: 'ec2-54-243-42-108.compute-1.amazonaws.com',
+	host: (process.env.SECURE ? 'ec2-54-243-42-108.compute-1.amazonaws.com' : 'localhost'),
 	port: 5432,
-	database: 'reputech', //database: 'ddu88fjcr9a852',
-	user: 'heroku',//user: 'eprjxyhertbqxx',
-	password: 'password',//password: 'j-nGiGLZKxuI6h7CBjyeEhi_QO',
-	ssl: false,//ssl: true,
+	database: (process.env.SECURE ? 'ddu88fjcr9a852' : 'reputech'),
+	user: (process.env.SECURE ? 'eprjxyhertbqxx' : 'heroku'),
+	password: (process.env.SECURE ? 'j-nGiGLZKxuI6h7CBjyeEhi_QO' : 'password'),
+	ssl: process.env.SECURE,
 	max: 20,
 	min: 4,
 	idleTimeoutMillis: 1000

@@ -1,3 +1,5 @@
+var states = {};
+
 // Goes through and validates each field in signup.
 function validateEvent(e) {
 	e.preventDefault();
@@ -74,6 +76,7 @@ function populateStates() {
 			if (!res) {
 				$('#state').append('<option selected disabled>State/Province</option>');
 			}
+			states = res;
 			for (let s of Object.keys(res).sort()) {
 				let option = $('<option>');
 				option.attr('value', res[s]);

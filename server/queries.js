@@ -203,7 +203,7 @@ module.exports = function (pool, sessionStore) {
 
 				this.simpleQuery(
 					"UPDATE login SET firstname = $1, lastname = $2, "
-						+ "ip_address = $3, sessionID = $4 WHERE u_id = $3", 
+						+ "ip_address = $3, sessionID = $4 WHERE u_id = $5", 
 						[firstname, lastname, ipaddr, sID, u_id]);
 				if (cb) {
 					cb();

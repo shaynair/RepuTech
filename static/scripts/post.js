@@ -126,7 +126,7 @@ function renderFullPost() {
 	// Post type
     if (post.urgency != 0) {
         $('#type').text("Searching for service");
-        $('#type').after($('<p/>', {class: 'post_type', text: "Urgency: " + rating_stars[post.urgency]}));
+        $('#type').after($('<p/>', {class: 'post_type', html: "Urgency: " + rating_stars[post.urgency]}));
     } else {
         $('#type').text("Offering service");
         $('#type').after($("<p/>", {class: 'post_type', html: "Rating: " + rating_stars[post.rating]}));
