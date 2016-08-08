@@ -35,7 +35,7 @@ module.exports = function (pool, sessionStore) {
 				}
 				logger.logInfo("Executing queries...");
 				this.query(fs.readFileSync(c.SQL_INIT_PATH).toString(), [], () => {
-					this.register(c.ADMIN_LOGIN, 'Normal', c.ADMIN_PASS, 'Admin', () => {
+					this.register(c.ADMIN_LOGIN, 'Normal', c.ADMIN_FIRST_NAME, c.ADMIN_LAST_NAME, c.ADMIN_PASS, 'Admin', () => {
 						logger.logInfo("Finished executing queries.");
 						if (cb) {
 							cb();
