@@ -60,7 +60,7 @@ app.use(express.static(__dirname + '/../public', { maxAge: '14d' }));
 // Sessions
 const RedisStore = redis(session);
 const sessionStore = new RedisStore(c.REDIS);
-const sessionInstance = session({
+const instance = {
 	secret: c.COOKIE_SECRET,
 	name: 'session',
 	resave: false, // Redis implements touch
@@ -69,10 +69,11 @@ const sessionInstance = session({
 		secure: false,
 		maxAge: 6 * 60 * 60 * 1000
 	} // 6 hour cookie maximum
-});
+};
 if (!process.env.SECURE) {
-	sessionInstance.store = sessionStore;
+	instance.store = sessionStore;
 }
+const sessionInstance = session(instance);
 app.use(sessionInstance);
 
 // Template files
