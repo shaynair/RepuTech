@@ -160,9 +160,6 @@ const CALLS = {
 						req.session.save();
 					}
 					ret.attempts = req.session.attempts;
-					
-					console.log(JSON.stringify(ret) + "\n" + JSON.stringify(req.session));
-					
 					cb(ret);
 				});
 		}
