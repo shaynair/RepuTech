@@ -59,7 +59,7 @@ app.use(express.static(__dirname + '/../public', { maxAge: '14d' }));
 
 // Sessions
 const RedisStore = redis(session);
-const sessionStore = new RedisStore(c.REDIS);
+const sessionStore = (process.env.SECURE ? new MemoryStore() : new RedisStore(c.REDIS));
 const sessionInstance = session({
 	secret: c.COOKIE_SECRET,
 	name: 'session',
@@ -67,7 +67,7 @@ const sessionInstance = session({
 	saveUninitialized: false,
 	store: sessionStore,
 	cookie: {
-		secure: process.env.SECURE || false,
+		secure: false,
 		maxAge: 6 * 60 * 60 * 1000
 	} // 6 hour cookie maximum
 });
