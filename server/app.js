@@ -66,7 +66,7 @@ const instance = {
 	saveUninitialized: false,
 	store: sessionStore,
 	cookie: {
-		secure: process.env.SECURE || false,
+		secure: false,
 		maxAge: 6 * 60 * 60 * 1000
 	} // 6 hour cookie maximum
 };

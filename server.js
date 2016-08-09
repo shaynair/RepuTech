@@ -3,7 +3,7 @@
 const cluster = require('cluster');
 const numCPUs = Math.ceil(require('os').cpus().length / 2);
 
-if (cluster.isMaster) {
+if (!process.env.SECURE && cluster.isMaster) {
   // Fork workers.
   for (var i = 0; i < numCPUs; i++) {
     cluster.fork();

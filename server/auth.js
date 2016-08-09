@@ -36,8 +36,6 @@ const strategies = {
 				'https://www.googleapis.com/auth/plus.profile.emails.read']
 	}
 }
-const RedditStrategy = require('passport-reddit').Strategy;
-
 module.exports = {
 	configure: (app, main) => {
 
