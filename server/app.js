@@ -70,7 +70,7 @@ const sessionInstance = session({
 		maxAge: 6 * 60 * 60 * 1000
 	} // 6 hour cookie maximum
 });
-if (process.env.SECURE) {
+if (!process.env.SECURE) {
 	sessionInstance.store = sessionStore;
 }
 app.use(sessionInstance);
