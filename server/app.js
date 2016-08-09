@@ -62,11 +62,9 @@ const RedisStore = redis(session);
 const sessionStore = new RedisStore(c.REDIS);
 const instance = {
 	secret: c.COOKIE_SECRET,
-	name: 'session',
 	resave: false, // Redis implements touch
 	saveUninitialized: (process.env.SECURE ? true : false),
 	cookie: {
-		secure: false,
 		maxAge: 6 * 60 * 60 * 1000
 	} // 6 hour cookie maximum
 };
