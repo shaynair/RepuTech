@@ -63,14 +63,13 @@ const sessionStore = new RedisStore(c.REDIS);
 const instance = {
 	secret: c.COOKIE_SECRET,
 	resave: false, // Redis implements touch
-	saveUninitialized: (process.env.SECURE ? true : false),
+	saveUninitialized: false,
+	store: sessionStore,
 	cookie: {
+		secure: process.env.SECURE || false,
 		maxAge: 6 * 60 * 60 * 1000
 	} // 6 hour cookie maximum
 };
-if (!process.env.SECURE) {
-	instance.store = sessionStore;
-}
 const sessionInstance = session(instance);
 app.use(sessionInstance);
 
@@ -110,9 +109,8 @@ app.use(csrf({
 app.use(passport.initialize());
 //app.use(passport.session());
 
-if (!process.env.SECURE) { // development
-	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-}
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 
 // Database connection
 const pool = new Pool(c.DATABASE_INFO);

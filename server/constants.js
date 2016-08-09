@@ -1,17 +1,17 @@
 // This file defines global constants for our app.
 // General info
-exports.SITE_URL = (process.env.SECURE ? 'https://reputech.herokuapp.com' : 'http://localhost');
+exports.SITE_URL = 'https://reputech.herokuapp.com';
 
 // Postgres information
 exports.DATABASE_INFO = {
-	host: (process.env.SECURE ? 'ec2-54-243-42-108.compute-1.amazonaws.com' : 'localhost'),
+	host: 'ec2-54-243-42-108.compute-1.amazonaws.com',
 	port: 5432,
-	database: (process.env.SECURE ? 'ddu88fjcr9a852' : 'reputech'),
-	user: (process.env.SECURE ? 'eprjxyhertbqxx' : 'heroku'),
-	password: (process.env.SECURE ? 'j-nGiGLZKxuI6h7CBjyeEhi_QO' : 'password'),
-	ssl: (process.env.SECURE ? true : false),
-	max: 20,
-	min: 4,
+	database: 'ddu88fjcr9a852',
+	user: 'eprjxyhertbqxx',
+	password: 'j-nGiGLZKxuI6h7CBjyeEhi_QO',
+	ssl: true,
+	max: 10,
+	min: 2,
 	idleTimeoutMillis: 1000
 };
 exports.SQL_INIT_PATH = "./server/Data/Structure.sql"; // File containing SQL struct

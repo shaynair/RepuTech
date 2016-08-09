@@ -11,67 +11,58 @@
   "keywords": [
     "tech",
     "technology",
-	"reputation"
+    "reputation"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/akshay-nair/RepuTech"
   },
   "engines": {
-    "node": "6.x",
-    "npm": "3.x"
+    "node": "^6.3.1",
+    "npm": "^3.10.5"
   },
   "dependencies": {
-    "compression": "*",
-    "express-validator": "*",
-    "node-gpw": "*",
-    
-    "ejs": "*",
-    "express": "*",
-    "serve-favicon": "*",
-	"body-parser": "*",
-    "cookie-parser": "*",
-    "formidable": "*",
-    
-    "csurf": "*",
-    "helmet": "*",
-    
-    "bcrypt-nodejs": "*",
-    "pg": "*",
-    "pg-pool": "*",
-    
-    "nodemailer": "*",
-	"moment": "*",
-    "async": "*",
-    
-    "express-session": "*",
-    "connect-redis": "*",
-    
-    "graceful-fs": "*",
-    "sharp": "*",
-    "shortid": "*",
-    
-    "passport": "*",
-    "passport-facebook": "*",
-    "passport-google-oauth20": "*",
-    "passport-linkedin": "*",
-    
-    "monitor": "*",
-    
-    "gulp": "*",
-    "gulp-sourcemaps": "*",
-    "gulp-changed": "*",
-    "gulp-concat": "*",
-    "gulp-babel": "*",
-    "gulp-uglify": "*",
-    "gulp-imagemin": "*",
-    "gulp-cssnano": "*",
-    "gulp-autoprefixer": "*",
-    "gulp-mocha": "*",
-    "del": "*",
-    "cross-spawn": "*",
-    "babel-preset-es2015": "*",
-    "babel-preset-react": "*",
-	"gulp-nodemon": "*"
+    "async": "^2.0.1",
+    "babel-preset-es2015": "^6.13.2",
+    "babel-preset-react": "^6.11.1",
+    "bcrypt-nodejs": "^0.0.3",
+    "body-parser": "^1.15.2",
+    "compression": "^1.6.2",
+    "connect-redis": "^3.1.0",
+    "cookie-parser": "^1.4.3",
+    "cross-spawn": "^4.0.0",
+    "csurf": "^1.9.0",
+    "del": "^2.2.1",
+    "ejs": "^2.5.1",
+    "express": "^4.14.0",
+    "express-session": "^1.14.0",
+    "express-validator": "^2.20.8",
+    "formidable": "^1.0.17",
+    "graceful-fs": "^4.1.5",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.0",
+    "gulp-babel": "^6.1.2",
+    "gulp-changed": "^1.3.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-cssnano": "^2.1.2",
+    "gulp-imagemin": "^3.0.2",
+    "gulp-mocha": "^3.0.0",
+    "gulp-nodemon": "^2.1.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^2.0.0",
+    "helmet": "^2.1.2",
+    "moment": "^2.14.1",
+    "monitor": "^0.6.10",
+    "node-gpw": "^1.0.0",
+    "nodemailer": "^2.5.0",
+    "passport": "^0.3.2",
+    "passport-facebook": "^2.1.1",
+    "passport-google-oauth20": "^1.0.0",
+    "passport-linkedin": "^1.0.0",
+    "pg": "^6.0.3",
+    "pg-pool": "^1.4.0",
+    "serve-favicon": "^2.3.0",
+    "sharp": "^0.15.1",
+    "shortid": "^2.2.6"
   }
 }
