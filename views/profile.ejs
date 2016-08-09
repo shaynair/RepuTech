@@ -11,18 +11,18 @@
                         <button id='posts'>Posts</button>
                         <button id='wiki'>Wiki Posts</button>
                         
-                        <% if (user != null && user.id == profile.id) { %>
+                        <% if (user && user.id == profile.id) { %>
                             <button id='messages'>My Messages</button>
                             <button id='images'>My Images</button>
                             <button id='create-listing'>Create Listing</button>
-                        <% } else { %>
+                        <% } else if (user) { %>
                             <button id="message">Message</button>
                         <% } %>
                     <% } %>
-                    <% if (user != null && (user.is_admin || user.id == profile.id)) { %>
+                    <% if (user && (user.is_admin || user.id == profile.id)) { %>
                         <button id='settings'>Update Account Info</button>
                     <% } %>
-                    <% if (user != null && user.is_admin && !profile.is_admin) { %>
+                    <% if (user && user.is_admin && !profile.is_admin) { %>
                         <button id='ban'>Ban User</button>
                     <% } %>
                 </section>

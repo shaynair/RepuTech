@@ -101,7 +101,7 @@ function renderProfileInfo() {
     
     $('#profile-general').append($('<p/>', {id: 'followers', text: 'Followers: ' + user.info.followers}));
     $('#followers').append($('<p/>', {id: 'followers-err', 'class': 'error', text: ''}));
-    if (user.id != myuser.id) {
+    if (myuser && user.id != myuser.id) {
         $('#followers').append($('<button/>', {id: "follow", text: "Follow"}));
     }
     $('#profile-general').append($('<h4/>', {text: 'Information:'}));
