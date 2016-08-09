@@ -9,7 +9,7 @@ exports.DATABASE_INFO = {
 	database: (process.env.SECURE ? 'ddu88fjcr9a852' : 'reputech'),
 	user: (process.env.SECURE ? 'eprjxyhertbqxx' : 'heroku'),
 	password: (process.env.SECURE ? 'j-nGiGLZKxuI6h7CBjyeEhi_QO' : 'password'),
-	ssl: process.env.SECURE,
+	ssl: (process.env.SECURE ? true : false),
 	max: 20,
 	min: 4,
 	idleTimeoutMillis: 1000

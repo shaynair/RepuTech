@@ -64,7 +64,7 @@ const instance = {
 	secret: c.COOKIE_SECRET,
 	name: 'session',
 	resave: false, // Redis implements touch
-	saveUninitialized: false,
+	saveUninitialized: (process.env.SECURE ? true : false),
 	cookie: {
 		secure: false,
 		maxAge: 6 * 60 * 60 * 1000
