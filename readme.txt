@@ -12,6 +12,7 @@ Next, type in the following commands:
 	npm install -g gulp
 	npm install -g nodemon
 	npm install
+	npm update
 
 This will read from package.json and install all dependencies, 
 and it will also give you the "gulp" and "nodemon" commands.

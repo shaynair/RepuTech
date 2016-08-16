@@ -11,18 +11,20 @@ function loadImageSlider(images, baseUrl = '/assets/images/', title = "RepuTech"
             "computer-1.jpg",
             "mac-1.jpg"
         ];
-    }
+    } else if (images.length == 0) {
+		return;
+	}
     let $slider = $('<ul/>', {
         id: 'slider'
     });
 
     let leftOffset = 0;
     let firstSize = 60;
-    let sizeEach = (100 - firstSize) / (images.length - 1);
+    let sizeEach = (100 - firstSize) / (Math.max(2, images.length) - 1);
     
     $.each( images, (index, item) => {
         let $li = $('<li/>', {
-            style: "left: " + leftOffset + "%; width: " + sizeEach + "%",
+            style: "left: " + leftOffset + "%; width: " + (index == 0 ? firstSize : sizeEach) + "%",
             id: "li-"+index
         });
         
@@ -40,13 +42,10 @@ function loadImageSlider(images, baseUrl = '/assets/images/', title = "RepuTech"
     // Append the slider <ul> to <section id="gallery">
     $("section#gallery").append($slider);
     
-    // Since we want the first image to be bigger than the next two, we'll need to apply double the width.
-    // Use the :first-child selector.
-    
-    $("section#gallery ul li:first-child").css({ "width": firstSize + "%" });
-    
     // jQuery UI to create slider
-    
+    if (images.length <= 1) {
+		return;
+	}
     // Step size changes depending on how many images to display
     let step_size = 100 / (images.length - 1);
     let last_index = -1;
