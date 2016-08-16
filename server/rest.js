@@ -406,6 +406,9 @@ const CALLS = {
 			req.sanitize('rating').toInt();
 
 			req.sanitize('content').trim();
+			if (req.query.rating && (req.query.rating < 1 || req.query.rating > 5)) {
+				req.assert('rating', 'Do not match').equals("");
+			}
 		},
 		perform: (req, main, cb) => {
 			main.db.tryReview(req.query.id, req.session.user.id, req.query.content,
