@@ -6,7 +6,6 @@ Example deployment can be found [here](https://reputech.herokuapp.com).
 
 ## Table of Contents
 
-- [Introduction](#introduction)
 - [How to start](#how-to-start)
 - [Contributing](#contributing)
 
@@ -57,6 +56,8 @@ exports.OAUTH_KEYS = {
 	}
 };
 ```
+
+3. Execute commands.
 
 ```shell
 # In project root
